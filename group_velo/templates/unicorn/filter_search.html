@@ -1,0 +1,123 @@
+{% load static %}
+{% load to_sqid from group_velo_data_tags %}
+{% load saved_filter_model_to_dict from group_velo_users_tags %}
+{% load saved_filter_dict_to_query_params from group_velo_users_tags %}
+
+<div id="filterSearchContainer" class="p-4 space-y-2">
+  <div>
+    <span class="text-gray-700 dark:text-gray-300 font-light">Search Filters</span>
+  </div>
+  <div class="grid md:grid-cols-12 gap-2 mb-2">
+    <div class="xl:col-span-4 md:col-span-6 col-span-12">
+      <div class="bg-transparent my-6">
+        <div id="div_id_club_name" class="relative">
+          <input type="text"
+                 placeholder="Search club"
+                 class="peer h-10 pl-8 w-full bg-transparent border-b-2 border-gray-500 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                 id="club_name_text"
+                 unicorn:model.debounce-500="club" />
+          <label for="member_name_text"
+                 class="absolute left-0 pl-1 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-placeholder-shown:pl-8 peer-focus:pl-1 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+            Club
+          </label>
+          <div class="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none stroke-gray-400 dark:stroke-gray-400 peer-focus:stroke-gray-600 peer-focus:dark:stroke-gray-300">
+            <svg class="w-5 h-5"
+                 aria-hidden="true"
+                 fill="currentColor"
+                 viewBox="0 0 20 20"
+                 xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="xl:col-span-4 md:col-span-6 col-span-12">
+      <div class="bg-transparent my-6">
+        <div id="div_id_group_classification" class="relative">
+          <input type="text"
+                 placeholder="Ride classification contains"
+                 class="peer h-10 pl-8 w-full bg-transparent border-b-2 border-gray-500 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                 id="group_classification_text"
+                 unicorn:model.debounce-500="group_classification" />
+          <label for="group_classification_text"
+                 class="absolute left-0 pl-1 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-placeholder-shown:pl-8 peer-focus:pl-1 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+            Ride classification
+          </label>
+          <div class="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none stroke-gray-400 dark:stroke-gray-400 peer-focus:stroke-gray-600 peer-focus:dark:stroke-gray-300">
+            <svg class="w-5 h-5"
+                 aria-hidden="true"
+                 fill="currentColor"
+                 viewBox="0 0 20 20"
+                 xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="relative overflow-y-auto mb-6">
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-xs text-left">
+      <thead class="uppercase text-xs font-semibold dark:text-gray-300 justify-items-start">
+        <tr>
+          <th scope="col" class="px-6 py-3"></th>
+          <th scope="col" class="px-6 py-3">Filter Name</th>
+          <th scope="col" class="px-6 py-3">Club Name</th>
+          <th scope="col" class="px-6 py-3">Classification</th>
+          <th scope="col" class="px-6 py-3">Surface</th>
+          <th scope="col" class="px-6 py-3">Drop</th>
+          <th scope="col" class="px-6 py-3">Distance Less Than</th>
+          <th scope="col" class="px-6 py-3">Distance Greater Than</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sf in searched_filters.filters %}
+          {% saved_filter_model_to_dict sf as saved_filter_dict %}
+          {% saved_filter_dict_to_query_params sf.filter_dict as click_params %}
+          <tr class="group dark:border-gray-700 text-gray-500 dark:text-gray-300 cursor-pointer route-row hover:text-black hover:bg-blue-100 dark:hover:bg-gray-700 dark:hover:text-white hover:text-bold">
+            <td class="px-6 py-4" width="50px">
+              <button hx-delete="{% url 'events:delete_filter' saved_filter_sqid=sf.id|to_sqid %}"
+                      hx-target="closest tr"
+                      hx-swap="outerHTML"
+                      x-tooltip.raw.placement.auto-end="Delete filter">
+                <i class="fa-solid fa-x fa text-red-600 hover:text-red-800"></i>
+              </button>
+            </td>
+            <td class="px-6 py-4"
+                onclick="window.location.href='{% url url_name %}?{{ click_params }}'">{{ sf.name }}</td>
+            <td class="px-6 py-4"
+                onclick="window.location.href='{% url url_name %}?{{ click_params }}'">
+              {{ saved_filter_dict.club_name }}
+            </td>
+            <td class="px-6 py-4"
+                onclick="window.location.href='{% url url_name %}?{{ click_params }}'">
+              {{ saved_filter_dict.group_classification }}
+            </td>
+            <td class="px-6 py-4"
+                onclick="window.location.href='{% url url_name %}?{{ click_params }}'">
+              {{ saved_filter_dict.surface_type }}
+            </td>
+            <td class="px-6 py-4"
+                onclick="window.location.href='{% url url_name %}?{{ click_params }}'">
+              {{ saved_filter_dict.drop_designation }}
+            </td>
+            <td class="px-6 py-4"
+                onclick="window.location.href='{% url url_name %}?{{ click_params }}'">
+              {{ saved_filter_dict.distance__lt }}
+            </td>
+            <td class="px-6 py-4"
+                onclick="window.location.href='{% url url_name %}?{{ click_params }}'">
+              {{ saved_filter_dict.distance__gt }}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="flex justify-end items-center p-6 space-x-2">
+    <button @click="filterSearchModalOpen=false"
+            type="button"
+            class="inline-block btn-dismiss-color">Close</button>
+  </div>
+</div>

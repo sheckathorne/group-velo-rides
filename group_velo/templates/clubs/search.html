@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}
+  GroupVelo | Club Search
+{% endblock title %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  {% load render_bundle from webpack_loader %}
+
+  <div class="w-full">
+    <form method="post" action="{% url 'clubs:search_club' %}">
+      <div class="my-2">{% crispy form %}</div>
+    </form>
+    <div id="club-search-results">
+      <span class="font-bold text-gray-700 dark:text-gray-200">
+        Search for a club above, or you can <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+    href="{% url 'clubs:create_club' %}">create your own now!</a>
+      </span>
+    </div>
+  </div>
+  {% render_bundle 'clubSearch' 'js' attrs='defer' %}
+{% endblock content %}

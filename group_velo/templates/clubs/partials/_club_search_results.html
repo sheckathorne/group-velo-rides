@@ -1,0 +1,107 @@
+{% load humanize %}
+{% load to_sqid from group_velo_data_tags %}
+
+<div id="response-alert"></div>
+<div id="club-search-results"
+     hx-swap-oob="true"
+     x-data="{ isChecked: false, show_item(el) { return this.isChecked === false || el.getAttribute('verified-club')==='true' } }">
+  {% if searched_clubs %}
+    {% if results_omitted %}
+      <span class="text-sm italic text-red-700 dark:text-red-500">Some results were omitted - enter a more specific search</span>
+    {% endif %}
+    <div class="py-2" id="show_verified">
+      <div class="flex items-center col-span-12">
+        <input type="checkbox"
+               name="shared"
+               class="rounded mr-4 checkboxinput"
+               id="route_create_shared"
+               x-model="isChecked" />
+        <label for="route_create_shared"
+               class="block text-gray-700 text-sm font-bold dark:text-gray-100">Filter Verified Clubs</label>
+      </div>
+    </div>
+    <div class="relative overflow-y-auto rounded-lg shadow-md my-4">
+      <table class="w-full shadow-lg text-sm text-left text-gray-700 dark:text-gray-400 bg-white">
+        <thead id="searched-clubs-table-head"
+               class="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-100 sticky top-0">
+          <tr>
+            <th scope="col" class="px-4 py-3">
+              <div class="grid justify-items-center">Actions</div>
+            </th>
+            <th scope="col" class="px-6 py-3">
+              <div>Club</div>
+            </th>
+            <th scope="col" class="px-6 py-3">
+              <div>Location</div>
+            </th>
+            {% if include_distance %}
+              <th scope="col" class="px-6 py-3">
+                <div>Distance (mi)</div>
+              </th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody id="my-routes-table-body">
+          {% for club in searched_clubs %}
+            {% if club.membership_status_text in 'joinable, requestable' %}
+              <tr id="club-id-{{ club.id|to_sqid }}-hover"
+                  x-show="show_item($el)"
+                  verified-club="{% if club.verified %}true{% else %}false{% endif %}"
+                  class="club-table-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600">
+              {% else %}
+                <tr id="club-id-{{ club.id|to_sqid }}"
+                    x-show="show_item($el)"
+                    verified-club="{% if club.verified %}true{% else %}false{% endif %}"
+                    class="club-table-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">
+                {% endif %}
+                <td class="w-[180px]">
+                  <div class="grid">
+                    {% if club.membership_status_text in 'joinable, requestable' %}
+                      <form method="post">
+                        {% csrf_token %}
+                        <button id="join-club-{{ club.id|to_sqid }}"
+                                hx-post="{% url 'clubs:club_membership_request' club_sqid=club.id|to_sqid %}"
+                                hx-trigger="click"
+                                hx-swap="outerHTML"
+                                class="join-club-btn {% if club.membership_status_text == 'joinable' %}btn-success-color{% else %}btn-primary-color{% endif %} w-full my-1 mx-3"
+                                type="submit">
+                          {% if club.membership_status_text == 'joinable' %}
+                            Join
+                          {% else %}
+                            Request
+                          {% endif %}
+                        </button>
+                      </form>
+                    {% elif club.membership_status_text == 'pending' %}
+                      <button class="w-full cursor-default my-1 mx-3 pointer-events-none btn-dismiss-color"
+                              disabled>Request Pending</button>
+                    {% else %}
+                      <button class="w-full cursor-default my-1 mx-3 pointer-events-none btn-dismiss-color"
+                              disabled>Joined</button>
+                    {% endif %}
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="pr-2">{{ club.name }}</span>
+                  {% if club.verified %}
+                    {% include 'clubs/partials/_verified_badge.html' %}
+                  {% endif %}
+                </td>
+                <td class="px-6 py-4">{{ club.city }}, {{ club.state }}</td>
+                {% if include_distance %}<td class="px-6 py-4">{{ club.distance_between|floatformat:1|intcomma }}</td>{% endif %}
+                {% if club.membership_status_text == 'joinable' %}
+                </tr>
+              {% else %}
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <span class="font-bold text-gray-700 dark:text-gray-200">
+      Search for a club above, or you can <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+    href="{% url 'clubs:create_club' %}">create your own now!</a>
+    </span>
+  {% endif %}
+</div>

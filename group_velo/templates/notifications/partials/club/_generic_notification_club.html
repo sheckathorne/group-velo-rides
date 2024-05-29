@@ -1,0 +1,15 @@
+{% load to_sqid from group_velo_data_tags %}
+
+{% if oob %}
+  <div id="generic-bubble-club-{{ club_id|to_sqid }}" hx-swap-oob="true">
+  {% else %}
+    <div id="generic-bubble-club-{{ club_id|to_sqid }}">
+    {% endif %}
+    {% if notifications_exist %}
+      {% include 'notifications/partials/_club_notification_dot.html' %}
+    {% endif %}
+    {% if oob %}
+    </div>
+  {% else %}
+  </div>
+{% endif %}

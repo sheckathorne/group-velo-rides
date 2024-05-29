@@ -1,0 +1,30 @@
+<div class="border-b border-gray-600 dark:border-gray-800">
+  <li class="flex justify-between items-center cursor-pointer group"
+      @click="selected = (selected === {{ list_id }} ? null : {{ list_id }})"
+      :class="selected === {{ list_id }} ? 'text-gray-200 dark:text-white pl-4 pt-4 pr-4' : 'text-gray-400 hover:text-gray-200 dark:text-gray-300 dark:hover:text-white p-4'">
+    {% if title == 'Profile' %}
+      <div class="block p-4 relative">
+        {% include 'navbar/partials/_user_avatar.html' with large_nav=False %}
+        <span class="ml-2">{{ user.username }}</span>
+        <div id="generic-bubble-user"></div>
+      </div>
+    {% elif title == 'Clubs' %}
+      <div class="block p-4 relative">
+        {{ title }}
+        <div id="generic-bubble-club"></div>
+      </div>
+    {% else %}
+      <button href="#" class="block p-4">{{ title }}</button>
+    {% endif %}
+    <svg class="w-6 h-6 shrink-0 club-arrow-svg"
+         :transform="selected === {{ list_id }} ? '' : 'rotate(-90)'"
+         fill="currentColor"
+         viewBox="0 0 20 20"
+         xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+    </svg>
+  </li>
+  {% with 'navbar/partials/small_nav/'|add:template_name as template_to_include %}
+    {% include template_to_include %}
+  {% endwith %}
+</div>

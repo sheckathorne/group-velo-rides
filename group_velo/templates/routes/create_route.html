@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+  GroupVelo | Create Route
+{% endblock title %}
+{% load render_bundle from webpack_loader %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="w-full">
+    <form method="post" action="{% url 'routes:create_route' %}">
+      {% crispy form %}
+      <div class="w-full grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1">
+        <div class="mb-4 p-2">
+          <button class="btn w-full btn-primary-color" type="submit" value="Save Route">Create Route</button>
+        </div>
+      </div>
+    </form>
+    {% render_bundle 'createRoute' 'js' %}
+  </div>
+{% endblock content %}

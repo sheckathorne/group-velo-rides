@@ -1,0 +1,37 @@
+{% load render_bundle from webpack_loader %}
+
+<div id="notifications-body" class="w-full mb-2">
+  <div class="w-full">
+    <button type="button"
+            id="mark-read-btn"
+            class="lg:w-48 md:w-80 w-full btn-primary-color font-semibold py-2 px-4 rounded shadow-lg mb-2"
+            hx-post=""
+            hx-target="#notifications-body"
+            hx-swap="outerHTML">Mark Read</button>
+    <button type="button"
+            id="mark-unread-btn"
+            class="lg:w-48 md:w-80 w-full btn-primary-color font-semibold py-2 px-4 rounded shadow-lg mb-2"
+            hx-post=""
+            hx-target="#notifications-body"
+            hx-swap="outerHTML">Mark Unread</button>
+    <button type="button"
+            id="archive-btn"
+            class="lg:w-48 md:w-80 w-full btn-primary-color font-semibold py-2 px-4 rounded shadow-lg mb-2"
+            hx-post=""
+            hx-target="#notifications-body"
+            hx-swap="outerHTML">Archive</button>
+    <button type="button"
+            id="view-archive-btn"
+            onclick="location.href='{% url 'notifications:notifications_archived' %}'"
+            class="lg:w-48 md:w-80 w-full btn-primary-color font-semibold py-2 px-4 rounded shadow-lg mb-2">
+      View Archive
+    </button>
+  </div>
+  <div class="relative overflow-y-auto rounded shadow-md mb-2">
+    {% include 'notifications/partials/notifications_table/_notifications_table.html' %}
+  </div>
+  {% if pagination.num_pages > 1 %}
+    <div class="pt-1">{% include 'pagination.html' with pagination_items=pagination.html_list %}</div>
+  {% endif %}
+  {% render_bundle 'userNotifications' 'js' attrs='defer' %}
+</div>

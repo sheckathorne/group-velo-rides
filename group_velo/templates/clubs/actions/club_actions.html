@@ -1,0 +1,50 @@
+{% load to_sqid from group_velo_data_tags %}
+
+{% if mem.show_registered_rides_btn %}
+  <a href="{% url 'events:my_rides' %}?club={{ membership.club.slug }}&group_classification=&distance__lt=&distance__gt="
+     @click.stop
+     class="club-action-btn flex justify-center items-center px-2 text-blue-600 dark:hover:text-blue-400 hover:text-blue-900 dark:border-gray-600 dark:text-gray-400">
+    <i class="fa-regular fa-calendar-check"
+       x-tooltip.raw.placement.bottom="Registered rides">
+    </i>
+    <span class="sr-only">Registered rides</span>
+  </a>
+{% endif %}
+{% if mem.show_join_rides_btn %}
+  <a href="{% url 'events:available_rides' %}?club={{ membership.club.slug }}&group_classification=&distance__lt=&distance__gt="
+     @click.stop
+     class="club-action-btn flex justify-center items-center px-2 text-blue-600 dark:hover:text-blue-400 hover:text-blue-900 dark:border-gray-600 dark:text-gray-400">
+    <i class="fa-solid fa-person-circle-plus"
+       x-tooltip.raw.placement.bottom="Join ride"></i>
+    <span class="sr-only">Join ride</span>
+  </a>
+{% endif %}
+{% if mem.show_create_ride_btn %}
+  <a href="{% url 'events:create_event' %}?club_id={{ membership.club.id|to_sqid }}"
+     @click.stop
+     class="club-action-btn flex justify-center items-center px-2 text-blue-600 dark:hover:text-blue-400 hover:text-blue-900 dark:border-gray-600 dark:text-gray-400">
+    <i class="fa-regular fa-calendar-plus"
+       x-tooltip.raw.placement.bottom="Create a ride"></i>
+    <span class="sr-only">Create ride</span>
+  </a>
+{% endif %}
+{% if mem.show_manage_members_btn %}
+  <a href="{% url 'clubs:club_member_management' slug=membership.club.slug tab_type='active' %}"
+     @click.stop
+     class="relative club-action-btn flex justify-center items-center px-2 text-blue-600 dark:hover:text-blue-400 hover:text-blue-900 dark:border-gray-600 dark:text-gray-400">
+    <div class="relative">
+      <i class="fa-solid fa-people-roof"
+         x-tooltip.raw.placement.bottom="Manage members"></i>
+      <span class="sr-only">Manage members</span>
+      <div id="generic-bubble-club-{{ membership.club.id|to_sqid }}"></div>
+    </div>
+  </a>
+{% endif %}
+{% if mem.show_edit_club_btn %}
+  <a href="{% url 'clubs:edit_club' slug=membership.club.slug %}"
+     @click.stop
+     class="club-action-btn flex justify-center items-center px-2 text-blue-600 dark:hover:text-blue-400 hover:text-blue-900 dark:border-gray-600 dark:text-gray-400">
+    <i class="fas fa-edit" x-tooltip.raw.placement.bottom="Edit club"></i>
+    <span class="sr-only">Edit club</span>
+  </a>
+{% endif %}

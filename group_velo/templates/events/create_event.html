@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}
+  GroupVelo | Create Event
+{% endblock title %}
+{% load render_bundle from webpack_loader %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="w-full">
+    {% include 'routes/modals/route_select.html' %}
+    <div id="group-classification-data"
+         hx-get="{% url 'events:get_ride_classification_limits' %}"
+         hx-trigger="getClassification"
+         hx-swap="none">
+      <form method="post" action="{% url 'events:create_event' %}" x-data="form">
+        {% crispy form %}
+      </form>
+    </div>
+    {% render_bundle 'createEvent' 'js' %}
+  </div>
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('form', () => ({
+        upper_pace_range: {
+          errorMessage: ''
+        },
+        lower_pace_range: {
+          errorMessage: ''
+        },
+        start_date: {
+          errorMessage: ''
+        },
+        end_date: {
+          errorMessage: ''
+        },
+        input: function(event) {
+          let ele = event.target;
+          let strictRules = JSON.parse(ele.getAttribute("strict-rules"))
+          if (strictRules) {
+            let rules = JSON.parse(ele.dataset.rules)
+            this[ele.name].errorMessage = this.getErrorMessage(ele.value, rules);
+          } else {
+            this[ele.name].errorMessage = "";
+          }
+        },
+        change: function(event) {
+          const start_date_element = document.getElementById("event_create_start_date")
+          const end_date_element = document.getElementById("event_create_end_date")
+          const elements = [start_date_element, end_date_element]
+          for (let ele of elements) {
+            if (ele.dataset.rules && ele.value) {
+              let rules = JSON.parse(ele.dataset.rules)
+              this[ele.name].errorMessage = this.getErrorMessage(ele.value, rules);
+            } else {
+              this[ele.name].errorMessage = "";
+            }
+          }
+        },
+        getErrorMessage: function(value, rules) {
+          const report = Iodine.assert(value, rules);
+          if (!report.valid) {
+            return report.error;
+          }
+          return '';
+        }
+      }))
+    })
+  </script>
+{% endblock content %}

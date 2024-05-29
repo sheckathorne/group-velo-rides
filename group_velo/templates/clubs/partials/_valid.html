@@ -1,0 +1,25 @@
+<div id="password-wrapper"
+     hx-swap="outerHTML"
+     hx-target="this"
+     {% if swap_oob %}hx-swap-oob="true"{% endif %}>
+  <div id="div_id_password1" class="mb-4">
+    <label for="id_password1"
+           class="block text-gray-700 dark:text-gray-200 text-sm font-bold">
+      Password<span class="asteriskField">*</span>
+    </label>
+    <div class="relative">
+      <div class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+        {% include 'users/check_form_fields/partials/_success_checkmark.html' %}
+      </div>
+      <input hx-post="{% url 'users:register_check_password' %}"
+             hx-trigger="keyup delay:500ms"
+             type="password"
+             autocomplete="new-password"
+             name="password1"
+             value="{{ value }}"
+             class="shadow-lg inline-block passwordinput bg-white border appearance-none leading-normal dark:border-green-500 px-4 dark:text-gray-200 border-green-500 dark:bg-gray-700 py-2 text-gray-700 rounded w-full focus:outline-none"
+             required="true"
+             id="id_password1" />
+    </div>
+  </div>
+</div>

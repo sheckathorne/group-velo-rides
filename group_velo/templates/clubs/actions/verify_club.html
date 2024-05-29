@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% load group_velo_clubs_tags %}
+
+{% block title %}
+  GroupVelo | Verify Clubs
+{% endblock title %}
+{% block content %}
+  {% include 'clubs/actions/modals/verify_club/_blank.html' %}
+  {% contains_pending_requests items=club_verification_requests as page_has_pending_requests %}
+  <div class="relative overflow-x-auto rounded-lg shadow-md mb-4">
+    <table class="w-full shadow-lg text-sm text-left text-gray-700 dark:text-gray-400">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-100">
+        <tr>
+          {% if page_has_pending_requests %}<th scope="col" colspan="2" class="px-6 py-3">Actions</th>{% endif %}
+          <th scope="col" class="px-6 py-3">Club Name</th>
+          <th scope="col" class="px-6 py-3">Contact Email</th>
+          <th scope="col" class="px-6 py-3">Request Date</th>
+          <th scope="col" class="px-6 py-3">Status</th>
+          <th scope="col" class="px-6 py-3">Response Date</th>
+          <th scope="col" class="px-6 py-3">Responder</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for verification_request in club_verification_requests %}
+          <tr class="bg-white border-b group dark:bg-gray-800 dark:border-gray-700">
+            {% if page_has_pending_requests %}
+              <td class="px-6 py-4" width="50px">
+                {% if verification_request.status_label == "Pending" %}
+                  <span x-tooltip.raw="Approve request">
+                    <button class="approveMembershipButton"
+                            hx-get="{% url 'clubs:get_club_verification_response_form' slug=verification_request.club.slug response_status='approved' %}"
+                            hx-target="#clubVerifyModalReplace"
+                            hx-swap="outerHTML"
+                            @click="clubVerifyModalOpen=true"
+                            x-tooltip.raw="Approve request">
+                      <i class="fa-solid fa-check fa-lg text-green-500"></i>
+                    </button>
+                  </span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4" width="50px">
+                {% if verification_request.status_label == "Pending" %}
+                  <button class="rejectMembershipButton"
+                          hx-get="{% url 'clubs:get_club_verification_response_form' slug=verification_request.club.slug response_status='denied' %}"
+                          hx-target="#clubVerifyModalReplace"
+                          hx-swap="outerHTML"
+                          @click="clubVerifyModalOpen=true"
+                          x-tooltip.raw="Reject request">
+                    <i class="fa-solid fa-x fa text-red-600"></i>
+                  </button>
+                {% endif %}
+              </td>
+            {% endif %}
+            <td class="px-6 py-4">{{ verification_request.club.name }}</td>
+            <td class="px-6 py-4">{{ verification_request.contact_email }}</td>
+            <td class="px-6 py-4">{{ verification_request.request_date|date:"M j, Y" }}</td>
+            <td class="px-6 py-4">{{ verification_request.status_label }}</td>
+            <td class="px-6 py-4">{{ verification_request.response_date|date:"M j, Y" }}</td>
+            {% if verification_request.responder %}
+              <td class="px-6 py-4">{{ verification_request.responder.name }}</td>
+            {% else %}
+              <td></td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock content %}

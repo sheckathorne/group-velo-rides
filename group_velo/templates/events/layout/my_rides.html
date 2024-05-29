@@ -1,0 +1,15 @@
+<div class="grid flex-grid grid-cols-1 w-full gap-2 text-gray-700 dark:text-gray-200">
+  {% for ride in pagination.item_list %}
+    {% with event_occurence=ride.event_occurence %}
+      {% include 'events/ride_card/ride_card.html' with is_registered=True user=user %}
+    {% endwith %}
+  {% empty %}
+    Not currently
+    {% if "waitlist" in request.path %}
+      waitlisted
+    {% else %}
+      registered
+    {% endif %}
+    for any rides in the next week.
+  {% endfor %}
+</div>

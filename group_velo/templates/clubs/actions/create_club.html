@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% load render_bundle from webpack_loader %}
+
+{% block title %}
+  GroupVelo | Create Club
+{% endblock title %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  {% include 'clubs/partials/_club_privacy_popover.html' %}
+  <div class="w-full"
+       x-data="{ showStrictRideClassBtn: {{ club.strict_ride_classification|yesno:'true,false' }} }">
+    <form method="post"
+          action="{% url 'clubs:create_club' %}"
+          enctype="multipart/form-data">
+      {% crispy form %}
+      <div class="w-full grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1">
+        <div class="w-full h-auto p-2 mt-2 space-y-2">
+          <button class="btn w-full btn-primary-color" type="submit" value="Save">Save</button>
+        </div>
+      </div>
+    </form>
+    {% render_bundle 'createClub' 'js' %}
+  </div>
+{% endblock content %}

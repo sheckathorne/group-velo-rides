@@ -1,0 +1,31 @@
+<div class="px-6 text-gray-400 dark:text-gray-300 pb-4 text-sm"
+     x-show="selected === {{ list_id }}">
+  <a href="{% url 'events:available_rides' %}"
+     class="flex flex-row items-center py-5 pl-4 w-full hover:text-gray-200 dark:hover:text-white">
+    <div class="w-8 flex">
+      <i class="fa-solid fa-calendar-plus block justify-center"></i>
+    </div>
+    Join rides
+  </a>
+  <a href="{% url 'events:my_rides' %}"
+     class="flex flex-row items-center py-5 pl-4 w-full hover:text-gray-200 dark:hover:text-white">
+    <div class="w-8 flex">
+      <i class="fa-solid fa-calendar-check block justify-center"></i>
+    </div>
+    My rides
+  </a>
+  <a href="{% url 'events:create_event' %}"
+     class="flex flex-row items-center py-5 pl-4 w-full hover:text-gray-200 dark:hover:text-white">
+    <div class="w-8 flex">
+      <i class="fa-solid fa-file block justify-center"></i>
+    </div>
+    Create ride
+  </a>
+  <a href="{% url 'events:my_waitlist' %}"
+     class="flex flex-row items-center py-5 pl-4 w-full hover:text-gray-200 dark:hover:text-white">
+    <div class="w-8 flex">
+      <i class="fa-solid fa-users-line block justify-center"></i>
+    </div>
+    My waitlist
+  </a>
+</div>

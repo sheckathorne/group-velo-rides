@@ -1,0 +1,112 @@
+{% load group_velo_clubs_tags %}
+{% load to_sqid from group_velo_data_tags %}
+{% load static %}
+
+<div class="mx-auto">
+  <script>
+    function processHtmx() {
+      editButtons = document.querySelectorAll(".editMembershipButton")
+      editButtons.forEach(btn => {
+        htmx.process(btn)
+      })
+
+      toggleButtons = document.querySelectorAll(".toggleMembershipButton")
+      toggleButtons.forEach(btn => {
+        htmx.process(btn)
+      })
+    }
+  </script>
+  {% with searched_mems=searched_members %}
+    {% with pagination_items=searched_mems.pagination_items tab_type=searched_mems.tab_type %}
+      <div class="grid md:grid-cols-12 gap-2 mb-2">
+        <div class="xl:col-span-4 md:col-span-6 col-span-12">
+          <div class="bg-transparent my-6">
+            <div id="div_id_member_name" class="relative">
+              <input type="text"
+                     placeholder="Search members"
+                     class="peer h-10 pl-8 w-full bg-transparent border-b-2 border-gray-500 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     id="member_name_text"
+                     unicorn:model.debounce-500="membername" />
+              <label for="member_name_text"
+                     class="absolute left-0 pl-1 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-placeholder-shown:pl-8 peer-focus:pl-1 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                Search members
+              </label>
+              <div class="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none stroke-gray-400 dark:stroke-gray-400 peer-focus:stroke-gray-600 peer-focus:dark:stroke-gray-300">
+                <svg class="w-5 h-5"
+                     aria-hidden="true"
+                     fill="currentColor"
+                     viewBox="0 0 20 20"
+                     xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="relative overflow-y-auto mb-6">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-xs text-left">
+          <thead class="uppercase text-sm font-semibold dark:text-gray-300 justify-items-start">
+            <tr>
+              <th scope="col" colspan="2" class="px-6 py-3">Actions</th>
+              <th scope="col" class="px-6 py-3">Name</th>
+              <th scope="col" class="px-6 py-3">Member Type</th>
+              <th scope="col" class="px-6 py-3">Joined</th>
+              <th scope="col" class="px-6 py-3">Expy. Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for member in searched_mems.members %}
+              <tr hx-get="{% url 'clubs:get_membership_form' slug=slug membership_request_sqid=member.id|to_sqid form_type='edit' %}"
+                  hx-target="#membershipModalReplace"
+                  hx-swap="outerHTML"
+                  @click="membershipModalOpen=true"
+                  class="group dark:border-gray-700 text-gray-500 dark:text-gray-300 cursor-pointer route-row hover:text-black dark:hover:text-white hover:text-bold">
+                <td class="px-6 py-4" width="50px">
+                  <span>
+                    <button class="editMembershipButton"
+                            x-tooltip.raw="Edit membership"
+                            hx-get="{% url 'clubs:get_membership_form' slug=slug membership_request_sqid=member.id|to_sqid form_type='edit' %}"
+                            hx-target="#membershipModalReplace"
+                            hx-swap="outerHTML"
+                            @click="membershipModalOpen=true"
+                            @click.stop>
+                      <i class="fas fa-edit text-blue-700 dark:hover:text-blue-400 group-hover:text-blue-800 dark:group-hover:text-blue-400"></i>
+                    </button>
+                  </span>
+                </td>
+                <td class="px-6 py-4" width="50px">
+                  {% say_deactivate tab_type=tab_type active=member.active as say_deactivate %}
+                  <button class="toggleMembershipButton"
+                          @click="toggleMembershipModalOpen=true"
+                          @click.stop
+                          hx-get="{% url 'clubs:toggle_membership' slug=slug membership_sqid=member.id|to_sqid tab_type=tab_type activation_type=say_deactivate|yesno:'deactivate,activate' %}"
+                          hx-target="#membershipToggleModalReplace"
+                          hx-swap="outerHTML"
+                          x-tooltip.raw="{{ say_deactivate|yesno:'Deactivate,Activate' }} member">
+                    {% if tab_type == "active" or member.active == True %}
+                      <i class="fa-solid fa-x fa text-red-600 hover:text-red-800"></i>
+                    {% else %}
+                      <i class="fa-solid fa-circle-plus text-green-500 hover:text-green-700"></i>
+                    {% endif %}
+                  </button>
+                </td>
+                <td class="px-6 py-4">{{ member.user.name }}</td>
+                <td class="px-6 py-4">{{ member.membership_type_label }}</td>
+                <td class="px-6 py-4">{{ member.create_date|date:"M j, Y" }}</td>
+                {% if member.expired %}
+                  <td class="px-6 py-4 text-red-600">{{ member.membership_expires|date:"M j, Y" }}</td>
+                {% else %}
+                  <td class="px-6 py-4">{{ member.membership_expires|date:"M j, Y" }}</td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if searched_mems.page_count > 1 %}
+        {% include 'pagination.html' %}
+      {% endif %}
+    {% endwith %}
+  {% endwith %}
+</div>

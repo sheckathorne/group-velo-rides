@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}
+  GroupVelo | Notifications Archive
+{% endblock title %}
+{% block content %}
+  <form method="post">
+    {% csrf_token %}
+    {% include 'notifications/partials/_archived_notifications_body.html' %}
+  </form>
+  {% include 'notifications/modals/notifications_detail.html' %}
+{% endblock content %}

@@ -1,0 +1,7 @@
+{% load to_sqid from group_velo_data_tags %}
+
+<td class="px-6 py-4 cursor-pointer{{ notification.opened|yesno:', font-bold dark:text-gray-200' }}"
+    @click="notificationModalOpen=true"
+    hx-post="{% url 'notifications:read_notification' notification_sqid=notification.id|to_sqid %}"
+    hx-target="closest .notification-row"
+    hx-swap="outerHTML">{{ cell_text }}</td>

@@ -1,0 +1,17 @@
+<div id="occurence-count" class="flex flex-row items-center">
+  <div>
+    <i class="pr-2 text-red-600 fa-solid fa-circle-exclamation fa-lg"></i>
+  </div>
+  <div>
+    <span class="font-bold">{{ occurence_count }} ride{{ occurence_count|pluralize }} will be canceled. Click "confirm" to cancel th{{ occurence_count|pluralize:"is,ese" }} ride{{ occurence_count|pluralize }}. This action cannot be undone!</span>
+  </div>
+</div>
+<div class="flex-auto overflow-y-auto relative p-4">
+  <ul class="list-decimal list-inside">
+    {% for event_occurence in event_occurences %}
+      <li class="py-1 text-gray-700 dark:text-gray-200 font-light text-sm">
+        {{ event_occurence.occurence_name }} on {{ event_occurence.ride_date|date:"l, M j, Y" }} ({{ event_occurence.rider_count }} registered)
+      </li>
+    {% endfor %}
+  </ul>
+</div>

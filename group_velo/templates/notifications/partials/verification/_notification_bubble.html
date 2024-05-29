@@ -1,0 +1,15 @@
+{% if oob %}
+  <span id="notification-count-bubble-verification" hx-swap-oob="true">
+  {% else %}
+    <span id="notification-count-bubble-verification">
+    {% endif %}
+    {% if notifications_exist %}
+      <span class="inline-flex items-center justify-center ml-2 px-2 py-1 text-xs leading-none text-red-100 bg-red-600 rounded-full">
+        {{ notification_count }}
+      </span>
+    {% endif %}
+    {% if oob %}
+    </span>
+  {% else %}
+  </span>
+{% endif %}

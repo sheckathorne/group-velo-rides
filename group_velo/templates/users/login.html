@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}
+  GroupVelo | Login
+{% endblock title %}
+{% load crispy_forms_tags %}
+{% load socialaccount %}
+
+{% block content %}
+  <div class="m-auto">
+    <div class="content-section w-96">
+      <div class="flex flex-row-reverse justify-end my-8 mt-2 space-x-1 space-x-reverse text-gray-700 dark:text-gray-300">
+        <a href="{% url 'users:register' %}"
+           class="peer py-3 px-6 w-auto rounded-3xl hover:bg-blue-600 hover:text-white dark:hover:text-white dark:text-gray-300 text-gray-700 text-2xl font-bold transition-all">Sign up</a>
+        <span class="peer-hover:shadow-none peer-hover:bg-transparent peer-hover:text-gray-700 peer-hover:dark:text-gray-300 bg-blue-600 py-3 px-6 w-auto rounded-3xl text-white text-2xl font-bold shadow-lg transition-all">Login</span>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <div class="grid grid-cols-1">
+          <fieldset class="w-full space-y-8">
+            <div id="div_id_username" class="relative">
+              <input type="text"
+                     name="username"
+                     maxlength="150"
+                     placeholder="Username"
+                     class="peer h-10 pl-8 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     required=""
+                     id="id_username" />
+              <label for="id_username"
+                     class="absolute left-0 pl-1 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-placeholder-shown:pl-8 peer-focus:pl-1 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                Username
+              </label>
+              <div class="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none stroke-gray-500 dark:stroke-gray-400 peer-focus:stroke-gray-600 peer-focus:dark:stroke-gray-300">
+                <svg class="w-5 h-5"
+                     xmlns="http://www.w3.org/2000/svg"
+                     width="44"
+                     height="40"
+                     viewBox="0 0 44 40">
+                  <g fill="none" stroke-width="3.538" transform="translate(0 -1012.362)">
+                  <ellipse ry="8.09" rx="8.244" cy="1022.221" cx="21.555" stroke-linecap="round"></ellipse>
+                  <path d="M1.858 1046.4c-.79 4.74 3.805 4.11 3.805 4.11H37.88s4.846.936 4.312-3.854c-.533-4.79-6.076-10.937-20.04-11.043-13.964-.106-19.504 6.047-20.294 10.786z" />
+                  </g>
+                </svg>
+              </div>
+            </div>
+            <div id="div_id_password" class="relative">
+              <input type="password"
+                     name="password"
+                     placeholder="Password"
+                     class="peer h-10 pl-8 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 peer-focus:text-gray-600 dark:focus:border-gray-300"
+                     required=""
+                     id="id_password" />
+              <label for="id_password"
+                     class="absolute left-0 pl-1 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-placeholder-shown:pl-8 peer-focus:pl-1 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                Password
+              </label>
+              <div class="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none stroke-gray-500 dark:stroke-gray-400 peer-focus:stroke-gray-600 peer-focus:dark:stroke-gray-300">
+                <svg class="w-5 h-5"
+                     xmlns="http://www.w3.org/2000/svg"
+                     width="44"
+                     height="46"
+                     viewBox="0 0 44 46">
+                  <g transform="translate(-28.15 -974.678)" fill="none" stroke-width="3.509">
+                  <rect ry="3.136" y="995.18" x="29.903" height="23.743" width="40.491" stroke-linecap="round"></rect>
+                  <path d="M49.386 1004.406v4.788" stroke-linecap="round" />
+                  <path d="M37.073 994.83s-1.39-18.398 12.97-18.398c14.36 0 12.207 18.397 12.207 18.397" />
+                  </g>
+                </svg>
+              </div>
+            </div>
+            <div id="recaptcha-parent-container">
+              <div id="recaptcha-container"></div>
+            </div>
+            <button class="btn w-full inline-block btn-login-signup-color"
+                    type="submit"
+                    value="Submit">Log in</button>
+          </div>
+        </fieldset>
+      </div>
+    </form>
+    <div class="my-auto py-4">
+      <div class="border-top pt-3">
+        <small class="text-muted text-blue-700 dark:text-blue-500 underline">
+          <a href="{% url 'users:reset_password' %}">Forgot password?</a>
+        </small>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

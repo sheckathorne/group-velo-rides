@@ -1,0 +1,17 @@
+{# djlint:off #}
+{% load tailwind_field %}
+
+{% if field.is_hidden %}
+    {{ field }}
+{% else %}
+    <div class="inline-flex items-center justify-start gap-2">
+    {% if field.label and form_show_labels %}
+        {% tailwind_field field %}
+        <label class="font-medium peer-disabled:opacity-70 cursor-pointer dark:text-gray-100 text-sm whitespace-nowrap hover:cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:text-slate-400" for="{{ field.id_for_label }}">
+            {{ field.label|safe }}{% if field.field.required %}<span class="asteriskField">*</span>{% endif %}
+        </label>
+    {% endif %}
+    </div>
+    {% include 'tailwind/layout/help_text_and_errors.html' %}
+{% endif %}
+{# djlint:on #}

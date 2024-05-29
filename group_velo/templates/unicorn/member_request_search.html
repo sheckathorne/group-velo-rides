@@ -1,0 +1,131 @@
+{% load group_velo_clubs_tags %}
+{% load render_bundle from webpack_loader %}
+{% load to_sqid from group_velo_data_tags %}
+
+{% with searched_reqs=searched_requests %}
+  <div class="mx-auto">
+    <script>
+      function processHtmx() {
+        approveButtons = document.querySelectorAll(".approveMembershipButton")
+        approveButtons.forEach(btn => {
+          htmx.process(btn)
+        })
+
+        rejectButtons = document.querySelectorAll(".rejectMembershipButton")
+        approveButtons.forEach(btn => {
+          htmx.process(btn)
+        })
+      }
+    </script>
+    <div class="grid md:grid-cols-12 gap-2 my-6 gap-y-6">
+      <div class="xl:col-span-4 md:col-span-6 col-span-12">
+        <div class="bg-transparent">
+          <div id="member_name_text" class="relative">
+            <input type="text"
+                   placeholder="Search members"
+                   class="peer h-10 pl-8 w-full bg-transparent border-b-2 border-gray-500 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                   id="member_name_text"
+                   unicorn:model.debounce-500="membername" />
+            <label for="member_name_text"
+                   class="absolute left-0 pl-1 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-placeholder-shown:pl-8 peer-focus:pl-1 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+              Search members
+            </label>
+            <div class="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none stroke-gray-400 dark:stroke-gray-400 peer-focus:stroke-gray-600 peer-focus:dark:stroke-gray-300">
+              <svg class="w-5 h-5"
+                   aria-hidden="true"
+                   fill="currentColor"
+                   viewBox="0 0 20 20"
+                   xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="xl:col-span-4 md:col-span-6 col-span-12">
+        <label for="selected_status" class="sr-only">Filter Status</label>
+        <div class="relative w-full">
+          <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-400">
+            <svg class="fill-current h-4 w-4"
+                 xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 20 20">
+              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+            </svg>
+          </div>
+          <select unicorn:model="selected_status"
+                  name="selected_status"
+                  id="selected_status"
+                  class="select appearance-none leading-normal h-10 w-full bg-transparent border-b-2 border-gray-500 text-gray-400 dark:text-gray-400 focus:dark:text-gray-300 focus:text-gray-700 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300 block custom-select">
+            <option value="" selected>Select Status</option>
+            {% for choice in searched_reqs.status_choices %}
+              <option value="{{ choice.value }}">{{ choice.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+    {% with pagination_items=searched_reqs.pagination.html_list tab_type=searched_reqs.tab_type members_on_page=searched_reqs.pagination.item_list %}
+      {% contains_pending_requests items=members_on_page as page_has_pending_requests %}
+      <div class="relative overflow-y-auto mb-6">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-xs text-left">
+          <thead class="uppercase text-sm font-semibold dark:text-gray-300 justify-items-start">
+            <tr>
+              {% if page_has_pending_requests %}<th scope="col" colspan="2" class="px-6 py-3">Actions</th>{% endif %}
+              <th scope="col" class="px-6 py-3">Name</th>
+              <th scope="col" class="px-6 py-3">Request Date</th>
+              <th scope="col" class="px-6 py-3">Status</th>
+              <th scope="col" class="px-6 py-3">Response Date</th>
+              <th scope="col" class="px-6 py-3">Responder</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for member in members_on_page %}
+              <tr class="group dark:border-gray-700 text-gray-500 dark:text-gray-300 route-row hover:text-black dark:hover:text-white">
+                {% if page_has_pending_requests %}
+                  <td class="px-6 py-4" width="50px">
+                    {% if member.status_label == "Pending" %}
+                      <span x-tooltip.raw="Approve request">
+                        <button class="approveMembershipButton"
+                                hx-get="{% url 'clubs:get_membership_form' slug=slug membership_request_sqid=member.id|to_sqid form_type='approve' %}"
+                                hx-target="#membershipModalReplace"
+                                hx-swap="outerHTML"
+                                @click="membershipModalOpen=true"
+                                x-tooltip.raw="Approve request">
+                          <i class="fa-solid fa-check fa-lg text-green-500"></i>
+                        </button>
+                      </span>
+                    {% endif %}
+                  </td>
+                  <td class="px-6 py-4" width="50px">
+                    {% if member.status_label == "Pending" %}
+                      <button class="rejectMembershipButton"
+                              hx-get="{% url 'clubs:get_membership_request_rejection_form' slug=slug membership_request_sqid=member.id|to_sqid %}"
+                              hx-target="#membershipRejectRequestModalReplace"
+                              hx-swap="outerHTML"
+                              @click="rejectMembershipRequestModalOpen=true"
+                              x-tooltip.raw="Reject request">
+                        <i class="fa-solid fa-x fa text-red-600"></i>
+                      </button>
+                    {% endif %}
+                  </td>
+                {% endif %}
+                <td class="px-6 py-4">{{ member.user.name }}</td>
+                <td class="px-6 py-4">{{ member.request_date|date:"M j, Y" }}</td>
+                <td class="px-6 py-4">{{ member.status_label }}</td>
+                <td class="px-6 py-4">{{ member.response_date|date:"M j, Y" }}</td>
+                {% if member.responder %}
+                  <td class="px-6 py-4">{{ member.responder.name }}</td>
+                {% else %}
+                  <td></td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% if searched_reqs.pagination.num_pages > 1 %}
+        {% include 'pagination.html' with pagination_items=searched_reqs.pagination.html_list %}
+      {% endif %}
+    {% endwith %}
+  {% endwith %}
+</div>

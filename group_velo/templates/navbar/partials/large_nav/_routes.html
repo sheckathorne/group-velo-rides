@@ -1,0 +1,27 @@
+<li id="navbarLinkRoutes" x-data="{ open: false }">
+  <div class="relative">
+    <button id="dropdownNavbarLinkRoute"
+            x-on:click="open = ! open"
+            @click.outside="open = false"
+            class="flex items-center justify-between w-full py-2 pl-3 pr-4 font-medium md:border-0 lg:p-0 md:w-auto text-gray-400 hover:text-white focus:text-white md:hover:bg-transparent">
+      <span class="{% if app_name == 'routes' %} border-b-2 border-white{% endif %}">Routes</span>
+      <svg class="w-4 h-4 ml-1"
+           aria-hidden="true"
+           fill="currentColor"
+           viewBox="0 0 20 20"
+           xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+    </button>
+    <div id="dropdownNavbarRoute"
+         class="z-10 absolute w-max lg:top-6 top-10 right-0 font-normal divide-y rounded shadow bg-gray-700 divide-gray-600"
+         x-show="open"
+         x-cloak>
+      <ul class="py-2 text-sm text-left text-gray-400"
+          aria-labelledby="dropdownLargeButton">
+        {% include 'navbar/partials/large_nav/_list_item.html' with icon_name='fa-solid fa-route' url_name='routes:my_routes' link_text='My Routes' %}
+        {% include 'navbar/partials/large_nav/_list_item.html' with icon_name='fa-regular fa-file' url_name='routes:create_route' link_text='Create a Route' %}
+      </ul>
+    </div>
+  </div>
+</li>

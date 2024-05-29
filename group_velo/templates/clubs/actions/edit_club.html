@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% load render_bundle from webpack_loader %}
+
+{% block title %}
+  GroupVelo | Edit Club
+{% endblock title %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  {% include 'clubs/partials/_club_privacy_popover.html' %}
+  <div class="w-full"
+       x-data="{ showStrictRideClassBtn: {{ club.strict_ride_classification|yesno:'true,false' }} }">
+    <form method="post"
+          action="{% url 'clubs:edit_club' slug=slug %}"
+          enctype="multipart/form-data"
+          autocomplete="off">
+      {% crispy form %}
+      <div x-show="showStrictRideClassBtn">{% include "clubs/actions/_view_classification_limits_formset.html" %}</div>
+      <div class="w-full grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1">
+        <div class="w-full h-auto p-2 mt-2 space-y-2">
+          <button class="btn w-full btn-primary-color" type="submit" value="Save">Save</button>
+        </div>
+      </div>
+    </form>
+    {% render_bundle 'createClub' 'js' %}
+  </div>
+  <script>
+    function getData() {
+      let data = {}
+      const numFields = document.querySelectorAll(".num-only");
+      const numFieldNames = Array.from(numFields).map(field => field.getAttribute("short-name"));
+      numFieldNames.forEach(name => {
+        data[name] = {
+          errorMessage: ""
+        }
+      })
+      return data
+    }
+
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('form', () => ({
+        ...getData(),
+        selected: 'R',
+        input: function(event) {
+          const element = event.target;
+          const shortName = element.getAttribute("short-name");
+          const baseTarget = shortName.slice(0, -3);
+          const fieldPair = shortName.endsWith("upr") ? "lpr" : "upr";
+          const suffixes = ["lpr", "upr"]
+          let bothValues = ""
+          const shortNames = suffixes.map(suffix => `${baseTarget}${suffix}`)
+          const elements = suffixes.map(suffix =>
+            document.querySelector(`[short-name="${baseTarget}${suffix}"]`)
+          );
+
+          elements.forEach(ele => {
+            bothValues += ele.value
+            const rules = ele.dataset.rules ? JSON.parse(ele.dataset.rules) : null;
+            const value = event.target.id == ele.id ? event.target.value : ele.value
+            const errorMessage = rules ? this.getErrorMessage(value, rules) : "";
+            this[ele.getAttribute("short-name")].errorMessage = errorMessage;
+          });
+
+          if (bothValues === "") {
+            shortNames.forEach(shortName => {
+              this[shortName].errorMessage = ""
+            })
+          }
+        },
+        getErrorMessage: function(value, rules) {
+          const report = Iodine.assert(value, rules);
+          if (!report.valid) {
+            return report.error;
+          }
+          return '';
+        }
+      }))
+    })
+  </script>
+{% endblock content %}

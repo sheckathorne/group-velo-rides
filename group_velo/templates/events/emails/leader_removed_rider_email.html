@@ -1,0 +1,15 @@
+{% autoescape off %}
+  <html lang="en">
+    <title>Removed from Ride</title>
+    <body>
+      Hi {{ member.first_name }},
+      {{ body }}
+      <br />
+      {% if custom_message %}
+        {{ deletor.first_name }} {{ deletor.last_name }} writes: {{ custom_message }}
+      {% else %}
+        Please contact your ride leader if you have any questions.
+      {% endif %}
+    </body>
+  </html>
+{% endautoescape off %}

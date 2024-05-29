@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}
+  GroupVelo |
+  {% if url_name == 'my_rides' %}
+    My Rides
+  {% elif url_name == 'available_rides' %}
+    Join Rides
+  {% else %}
+    My Waitlist
+  {% endif %}
+{% endblock title %}
+{% load render_bundle from webpack_loader %}
+
+{% block content %}
+  {% if url_name == 'available_rides' %}
+    {% include 'events/modals/cannot_join.html' %}
+  {% else %}
+    {% include 'events/modals/cancel_event_occurence/_blank.html' %}
+    {% include 'events/modals/cancel_event/_blank.html' %}
+  {% endif %}
+  {% include 'events/modals/ride_registration/_blank.html' %}
+  {% with filter_url="events:"|add:url_name %}
+    <div class="xl:w-1/3 xl:p-2 lg:w-2/5 w-full my-2 mx-auto relative">
+      {% include 'events/modals/filter_drawer_save_filter.html' %}
+      {% include 'events/layout/partials/_filter_drawer.html' %}
+      {% include 'events/modals/filter_search.html' with url_name=filter_url %}
+      <div class="lg:fixed">
+        <div class="flex justify-center mb-2">{{ calendar|safe }}</div>
+        <div class="space-y-2 sm:px-0 px-2">
+          {% include 'events/layout/partials/_filter_buttons.html' %}
+          <div class="w-auto mb-2 lg:flex lg:flex-col">
+            {% include 'events/ride_card/partials/_ride_filter_pills.html' with url_name=filter_url %}
+          </div>
+        </div>
+      </div>
+    {% endwith %}
+  </div>
+  <div class="xl:w-2/3 lg:w-3/5 w-full my-2"
+       x-data="{ screenIsSmall: false, selected: null }"
+       @resize.window=" width = (window.innerWidth > 0) ? window.innerWidth : screen.width; screenIsSmall = (width > 640) ? false : true "
+       x-init=" screenIsSmall=window.innerWidth <= 640; $watch('screenIsSmall', val => $dispatch('screen-change', !val)) ">
+    {% if pagination.num_pages > 1 %}
+      {% include 'pagination.html' with pagination_items=pagination.html_list %}
+    {% endif %}
+    {% with template_prefix='events/layout/' %}
+      {% if url_name == 'available_rides' %}
+        {% with template=template_prefix|add:'available_rides.html' %}
+          {% include template %}
+        {% endwith %}
+      {% else %}
+        {% with template=template_prefix|add:'my_rides.html' %}
+          {% include template %}
+        {% endwith %}
+      {% endif %}
+    {% endwith %}
+    {% if pagination.num_pages > 1 %}
+      {% include 'pagination.html' with pagination_items=pagination.html_list %}
+    {% endif %}
+    {% render_bundle 'rideLayout' 'js' attrs='defer' %}
+  </div>
+{% endblock content %}

@@ -1,0 +1,74 @@
+<li id="profileNavbar" x-data="{ open: false }">
+  <div class="relative">
+    <button id="dropdownNavbarLinkClub"
+            x-on:click="open = ! open"
+            @click.outside="open = false"
+            class="flex items-center justify-between w-full py-2 pl-3 pr-4 font-medium md:border-0 lg:p-0 md:w-auto text-gray-400 hover:text-white focus:text-white md:hover:bg-transparent group">
+      {% include 'navbar/partials/_user_avatar.html' with large_nav=True %}
+      <svg class="w-4 h-4 ml-1"
+           aria-hidden="true"
+           fill="currentColor"
+           viewBox="0 0 20 20"
+           xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+      </svg>
+      <div id="generic-bubble-user"></div>
+    </button>
+    <div id="dropdownNavbarProfile"
+         class="z-10 absolute w-max lg:top-6 top-10 right-0 font-normal divide-y rounded shadow bg-gray-700 divide-gray-600"
+         x-show="open"
+         x-cloak>
+      <ul class="py-2 text-sm text-left text-gray-400"
+          aria-labelledby="dropdownLargeButton">
+        <li>
+          <a href="{% url 'notifications:notifications' %}"
+             class="block px-4 py-2 hover:bg-gray-600 hover:text-white">
+            <div class="flex flex-row">
+              <div class="flex w-8 justify-center mr-2">
+                <i class="fa-solid fa-lg fa-bell"></i>
+              </div>
+              Notifications
+              <span id="notification-count-bubble-user"></span>
+            </div>
+          </a>
+        </li>
+        <li>
+          <a href="{% url 'users:edit_profile' %}"
+             class="block px-4 py-2 hover:bg-gray-600 hover:text-white">
+            <div class="flex flex-row">
+              <div class="flex w-8 justify-center mr-2">
+                <i class="fas fa-lg fa-edit"></i>
+              </div>
+              Edit Profile
+            </div>
+          </a>
+        </li>
+        {% if user.is_superuser %}
+          <li>
+            <a href="{% url 'clubs:display_club_verification_requests' %}"
+               class="block px-4 py-2 hover:bg-gray-600 hover:text-white">
+              <div class="flex flex-row">
+                <div class="flex w-8 justify-center mr-2">
+                  <i class="fas fa-lg fa-edit"></i>
+                </div>
+                Club Verification
+                <span id="notification-count-bubble-verification"></span>
+              </div>
+            </a>
+          </li>
+        {% endif %}
+        <li>
+          <a href="{% url 'users:logout' %}"
+             class="block px-4 py-2 hover:bg-gray-600 hover:text-white">
+            <div class="flex flex-row">
+              <div class="flex w-8 justify-center mr-2">
+                <i class="fas fa-lg fa-sign-out-alt"></i>
+              </div>
+              Log Out
+            </div>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</li>

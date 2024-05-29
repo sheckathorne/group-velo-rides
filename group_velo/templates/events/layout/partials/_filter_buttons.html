@@ -1,0 +1,12 @@
+<div class="flex lg:flex-col justify-center mb-1 lg:space-y-2 lg:space-x-0 space-x-2">
+  <button class="lg:w-full w-1/3 justify-center btn-primary-color"
+          type="button"
+          @click="filterOpen=true">Filter Rides</button>
+  {% if saved_filters %}
+    <button type="button"
+            @click="filterSearchModalOpen=true"
+            class="lg:w-full w-1/3 justify-center inline-block btn-primary-color">Saved Filters</button>
+  {% endif %}
+  <button type="button"
+          class="clearFilterButton lg:w-full w-1/3 btn-primary-color">Clear Filters</button>
+</div>

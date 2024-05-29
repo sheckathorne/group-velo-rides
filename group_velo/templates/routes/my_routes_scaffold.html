@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% load unicorn %}
+{% load render_bundle from webpack_loader %}
+
+{% block content %}
+  <div class="w-full">
+    {% include 'routes/modals/edit_route/_blank.html' %}
+    {% include 'routes/modals/delete_route/_blank.html' %}
+    {% unicorn 'my_routes' routes=routes %}
+    <div class="m-2 p-2">
+      <a href="{% url 'routes:create_route' %}" class="btn btn-primary-color">Add a route</a>
+    </div>
+  </div>
+  {% render_bundle 'myRoutes' 'js' %}
+{% endblock content %}

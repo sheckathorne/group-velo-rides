@@ -1,0 +1,9 @@
+<nav id="navbarMenu" class="hidden lg:flex">
+  <ul class="pt-6 lg:pt-0 list-reset lg:space-x-8 lg:flex justify-end flex-1 items-center">
+    {% if user.is_authenticated %}
+      {% include 'navbar/partials/large_nav/_logged_in.html' %}
+    {% else %}
+      {% include 'navbar/partials/large_nav/_logged_out.html' %}
+    {% endif %}
+  </ul>
+</nav>

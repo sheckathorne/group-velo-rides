@@ -1,0 +1,100 @@
+{% load static i18n %}
+{% load render_bundle from webpack_loader %}
+
+<!DOCTYPE html>
+{% load static %}
+{% load unicorn %}
+
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}"
+      x-data="{ darkMode: localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system')}"
+      x-init="$watch('darkMode', val => { localStorage.setItem('darkMode', val); document.querySelectorAll('#recaptcha-container').forEach(container => { if ( container.childNodes.length > 0 ) { parentContainer = document.getElementById('recaptcha-parent-container'); grecaptcha.reset(container); container.remove(); div = document.createElement('div'); div.setAttribute('id', 'recaptcha-container'); parentContainer.appendChild(div); newContainer = document.getElementById('recaptcha-container'); grecaptcha.render(newContainer, { 'sitekey' : '6LdImaEjAAAAADRlgYmUu07upE6c1DpzEjpd1fUS', 'theme' : val } ); } else { grecaptcha.render(container, { 'sitekey' : '6LdImaEjAAAAADRlgYmUu07upE6c1DpzEjpd1fUS', 'theme' : val }); } }); })"
+      :class="{'dark': darkMode === 'dark' || (darkMode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)}"
+      :data-theme="darkMode === 'dark' || (darkMode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light'"
+      x-cloak>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>
+      {% block title %}
+        Group Velo
+      {% endblock title %}
+    </title>
+    <script type="text/javascript">
+      var onloadCallback = function() {
+        document.querySelectorAll('#recaptcha-container').forEach(container => {
+          grecaptcha.render(container, {
+            'sitekey': '6LdImaEjAAAAADRlgYmUu07upE6c1DpzEjpd1fUS',
+            'theme': localStorage.getItem('darkMode') || localStorage.setItem('darkMode', 'system')
+          });
+        });
+      };
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+          content="A place for cycling clubs to schedule and execute group rides and events" />
+    <meta name="author" content="Sean Heckathorne" />
+    <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
+    {% block css %}
+      {% render_bundle 'project' 'css' %}
+      <link href="{% static 'fontawesomefree/css/all.min.css' %}"
+            rel="stylesheet"
+            type="text/css" />
+      <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+      <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+    {% endblock css %}
+    {% block javascript %}
+      {# Vendor dependencies bundled as one file #}
+      {% render_bundle 'vendors' 'js' attrs='defer' %}
+      {# place project specific Javascript in this file #}
+      {% render_bundle 'project' 'js' attrs='defer' %}
+      <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+      <script type="text/javascript">
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: false
+        }
+      </script>
+      <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
+      <meta name="htmx-config" content='{"useTemplateFragments":true}' />
+      {% unicorn_scripts %}
+    {% endblock javascript %}
+  </head>
+  <body class="bg-gray-50 dark:bg-gray-900"
+        :class="openMenu || filterOpen ? 'overflow-hidden' : 'overflow-visible'"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        x-data="{ openMenu: false, filterOpen: false, rideRegistrationModalOpen: false, cancelEventModalOpen: false, cancelEventOccurenceModalOpen: false, joinRideModalOpen: false, cannotJoinRideModalOpen: false, promoteDemoteRiderModalOpen: false, emergencyContactsModalOpen: false, saveFilterModalOpen: false, filterSearchModalOpen: false, routeSelectModalOpen: false, approveMembershipRequestModalOpen: false, rejectMembershipRequestModalOpen: false, membershipModalOpen: false, toggleMembershipModalOpen: false, notificationModalOpen: false, editRouteModalOpen: false, deleteRouteModalOpen: false, messageAlert: true, deleteEmergencyContactModalOpen: false, requestClubVerificationModalOpen: false, clubVerifyModalOpen:false }"
+        @keyup.esc="openMenu=false; selected=null; filterOpen=false; rideRegistrationModalOpen=false; cancelEventModalOpen=false; cancelEventOccurenceModalOpen=false; joinRideModalOpen=false; cannotJoinRideModalOpen=false; promoteDemoteRiderModalOpen=false; emergencyContactsModalOpen=false; saveFilterModalOpen=false; filterSearchModalOpen=false; routeSelectModalOpen=false; notificationModalOpen=false; messageAlert=false; deleteEmergencyContactModalOpen=false; requestClubVerificationModalOpen=false; clubVerifyModalOpen=false"
+        x-cloak>
+    <div class="lg:min-h-[calc(100vh-72px)] {% if user.is_authenticated %}min-h-[calc(100vh-76px)]{% else %}min-h-[calc(100vh-72px)]{% endif %}">
+      {% csrf_token %}
+      {% include 'navbar/navbar.html' %}
+      {% include 'users/messaging.html' %}
+      <main role="main"
+            class="container flex flex-wrap mx-auto px-2 lg:min-h-[calc(100vh-144px)] min-h-[calc(100vh-152px)]">
+        <div id="response-alert"></div>
+        {% block content %}
+        {% endblock content %}
+      </main>
+    </div>
+    <footer class="flex p-4 h-min bottom-0 w-full shadow items-center justify-between lg:p-6 bg-gray-700 dark:bg-gray-950">
+      <span class="text-sm text-gray-400">© 2024 <a href="{% url 'home' %}" class="hover:underline">GroupVelo™</a> | All Rights Reserved.</span>
+      <ul class="flex flex-wrap items-center text-sm text-gray-400">
+        {% include 'navbar/partials/_theme_selector.html' %}
+      </ul>
+    </footer>
+    {% block modal %}
+    {% endblock modal %}
+    {% block inline_javascript %}
+      <script>
+        window.addEventListener('DOMContentLoaded', () => {
+          document.body.addEventListener('htmx:configRequest', (event) => {
+            event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+          })
+        });
+      </script>
+      <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit"
+              async
+              defer></script>
+    {% endblock inline_javascript %}
+  </body>
+</html>

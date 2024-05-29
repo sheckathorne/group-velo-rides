@@ -1,0 +1,25 @@
+<div class="px-6 text-gray-400 dark:text-gray-300 pb-4 text-sm"
+     x-show="selected === {{ list_id }}">
+  <a href="{% url 'clubs:search_club' %}"
+     class="flex flex-row items-center py-5 pl-4 w-full hover:text-gray-200 dark:hover:text-white">
+    <div class="w-8 flex">
+      <i class="fa-solid fa-magnifying-glass block justify-center"></i>
+    </div>
+    Find a club
+  </a>
+  <a href="{% url 'clubs:my_clubs' %}"
+     class="flex flex-row items-center py-5 pl-4 w-full hover:text-gray-200 dark:hover:text-white">
+    <div class="w-8 flex">
+      <i class="fa-solid fa-users-rectangle block justify-center"></i>
+    </div>
+    My clubs
+    <span id="notification-count-bubble-club"></span>
+  </a>
+  <a href="{% url 'clubs:create_club' %}"
+     class="flex flex-row items-center py-5 pl-4 w-full hover:text-gray-200 dark:hover:text-white">
+    <div class="w-8 flex">
+      <i class="fa-solid fa-file block justify-center"></i>
+    </div>
+    Create a club
+  </a>
+</div>

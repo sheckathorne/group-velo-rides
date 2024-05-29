@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}
+  GroupVelo | Profile
+{% endblock title %}
+{% load crispy_forms_tags %}
+{% load render_bundle from webpack_loader %}
+
+{% block content %}
+  <div class="w-full mb-4">
+    {% include 'users/profile/modals/delete_emergency_contact/_blank.html' %}
+    <form id="profile-form"
+          method="post"
+          action="{% url 'users:edit_profile' %}"
+          enctype="multipart/form-data">
+      {% crispy form %}
+      <div class="grid grid-cols-3 gap-2">
+        <div id="emergency-contact-list" class="col-span-3">{% include 'users/profile/emergency_contacts_list.html' %}</div>
+        {% if emergency_contacts.count < 4 %}
+          <div class="w-full mb-2 xl:col-span-1 sm:col-span-2 col-span-3">
+            <button id="open-emergency-contact-form"
+                    type="button"
+                    hx-get="{% url 'users:emergency_contact_form' %}"
+                    hx-target="#emergency-contact-list"
+                    hx-swap="beforeend"
+                    :click="addEmergencyContactsModalOpen=true"
+                    class="w-full btn-primary-color">Add Emergency Contact</button>
+          </div>
+        {% endif %}
+      </div>
+      <div class="grid gap-2 grid-cols-3" id="generic-row">
+        <div class="w-full shadow-lg xl:col-span-1 sm:col-span-2 col-span-3">
+          <button form="profile-form" type="submit" class="w-full btn-primary-color">Save Profile</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  {% render_bundle 'editProfile' 'js' %}
+{% endblock content %}

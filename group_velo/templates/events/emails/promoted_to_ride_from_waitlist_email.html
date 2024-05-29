@@ -1,0 +1,5 @@
+{% autoescape off %}
+  Hi {{ member.name }},
+  Good news! You were on a waitlist for {{ event_occurence.occurence_name }} on {{ event_occurence.ride_date|date:"l, M j, Y" }} but have been moved to the main ride roster.
+  Please contact your ride leader if you have any questions.
+{% endautoescape %}

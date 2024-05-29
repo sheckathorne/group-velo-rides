@@ -1,0 +1,13 @@
+{% if oob %}
+  <div id="generic-bubble-club" hx-swap-oob="true">
+  {% else %}
+    <div id="generic-bubble-club">
+    {% endif %}
+    {% if notifications_exist %}
+      {% include 'notifications/partials/_notification_dot.html' %}
+    {% endif %}
+    {% if oob %}
+    </div>
+  {% else %}
+  </div>
+{% endif %}

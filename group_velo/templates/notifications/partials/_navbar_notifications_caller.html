@@ -1,0 +1,9 @@
+<div id="navbar-notifications-caller"
+     class="py-2 pl-3 pr-4 lg:p-0"
+     hx-get="{% url 'notifications:get_navbar_notifications' %}"
+     hx-trigger="every 60s"
+     hx-swap="outerHTML">
+  <a class="text-gray-400 hover:text-white md:w-auto font-medium md:p-0"
+     aria-current="true"
+     href="{% url 'home' %}">Home</a>
+</div>

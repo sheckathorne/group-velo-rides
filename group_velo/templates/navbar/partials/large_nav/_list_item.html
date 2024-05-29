@@ -1,0 +1,12 @@
+<li>
+  {% url url_name as the_url %}
+  <a href="{{ the_url }}"
+     class="block px-4 py-2 hover:bg-gray-600 hover:text-white{% if request.path == the_url %} text-white{% endif %}">
+    <div class="flex flex-row">
+      <div class="flex w-8 justify-center mr-2">
+        <i class="fa-lg {{ icon_name }}"></i>
+      </div>
+      {{ link_text }}
+    </div>
+  </a>
+</li>

@@ -1,0 +1,41 @@
+{% load to_sqid from group_velo_data_tags %}
+
+<div class="grid gap-2 grid-cols-1 py-2">
+  {% for contact in emergency_contacts %}
+    <div id="emergency-contact-row-{{ contact.id|to_sqid }}">
+      <div class="w-full">
+        <span class="font-bold pr-2 text-gray-800 dark:text-gray-100 contact-title">Contact #{{ forloop.counter }}</span>
+        {% if not hide_remove_button %}
+          <button class="text-center"
+                  @click="deleteEmergencyContactModalOpen=true"
+                  hx-get="{% url 'users:get_emergency_contact_delete_form' contact_sqid=contact.id|to_sqid %}"
+                  hx-target="#deleteEmergencyContactModalReplace"
+                  hx-swap="outerHTML"
+                  x-tooltip.raw.placement.right="Delete emergency contact">
+            <i class="fa-solid fa-x text-red-500 font-bold hover:text-red-700"></i>
+          </button>
+        {% endif %}
+      </div>
+      <div class="grid gap-2 grid-cols-3 pb-2 w-full xl:w-2/3">
+        <div id="div_id_name">
+          <label for="emergency_contact_name"
+                 class="block text-sm font-bold text-gray-800 dark:text-gray-100">Name</label>
+          <span class="w-full block appearance-none text-gray-600 dark:text-gray-300 py-1"
+                id="emergency_contact_name">{{ contact.name }}</span>
+        </div>
+        <div id="div_id_phone_number">
+          <label for="emergency_contact_phone_number"
+                 class="block text-sm font-bold text-gray-800 dark:text-gray-100">Phone Number</label>
+          <span class="w-full block appearance-none text-gray-600 dark:text-gray-300 py-1"
+                id="emergency_contact_phone_number">{{ contact.phone_number.as_national }}</span>
+        </div>
+        <div id="div_id_relationship">
+          <label for="emergency_contact_phone_number"
+                 class="block text-sm font-bold text-gray-800 dark:text-gray-100">Relationship</label>
+          <span class="w-full block appearance-none text-gray-600 dark:text-gray-300 py-1"
+                id="emergency_contact_relationship">{{ contact.get_relationship_display }}</span>
+        </div>
+      </div>
+    </div>
+  {% endfor %}
+</div>

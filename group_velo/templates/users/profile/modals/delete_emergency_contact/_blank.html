@@ -1,0 +1,12 @@
+<div id="deleteEmergencyContactModal"
+     class="fixed inset-0 z-50 flex items-center justify-center overflow-auto backdrop-blur-sm p-4 h-modal md:h-full"
+     x-show="deleteEmergencyContactModalOpen"
+     x-transition:enter="motion-safe:ease-out duration-300"
+     x-transition:enter-start="opacity-0 scale-90"
+     x-transition:enter-end="opacity-100 scale-100"
+     tabindex="-1"
+     aria-hidden="true">
+  <div class="relative w-full max-w-2xl">
+    {% include 'users/profile/modals/delete_emergency_contact/_blank_body.html' %}
+  </div>
+</div>

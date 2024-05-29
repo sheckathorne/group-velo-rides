@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% load initials_avatar %}
+{% load static %}
+
+{% block content %}
+  <div class="card border-primary mt-2 text-gray-700 dark:text-gray-200">
+    <h5 class="card-header bg-primary bg-gradient font-bold pb-4">
+      Waitlist for {{ event_occurence.occurence_name }} on {{ event_occurence.ride_date|date:"M d, Y" }}
+    </h5>
+    <div class="card-body">
+      <ul class="list-group list-group-flush">
+        {% for member in event_members %}
+          {% include 'events/member_lists/partials/_waitlist_member_item.html' %}
+        {% empty %}
+          No attendees signed up for this ride
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <script src="{% static 'groupridesapp/js/ride_attendees.js' %}"></script>
+{% endblock content %}

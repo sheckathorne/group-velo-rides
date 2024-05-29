@@ -1,0 +1,13 @@
+{% load initials_avatar %}
+
+{% if user.avatar %}
+  <img class="inline-block rounded-full w-8 h-8 drop-shadow-lg group-hover:ring-1 group-hover:ring-white dark:group-hover:ring-gray-300{% if large_nav and app_name == 'profile' or app_name == 'notifications' %} ring-2 ring-white dark:ring-gray-300{% endif %}"
+       src="{{ user.get_avatar }}"
+       alt="image description" />
+{% else %}
+  {% with user_name=user.name avatar_color=user.random_avatar_color_pair %}
+    <img class="inline-block rounded-full w-8 h-8 drop-shadow-lg group-hover:ring-1 group-hover:ring-white dark:group-hover:ring-gray-300{% if large_nav and app_name == 'profile' or app_name == 'notifications' %} ring-2 ring-white dark:ring-gray-300{% endif %}"
+         src="{% render_initials_avatar user_name background=avatar_color.background %}"
+         alt="image description" />
+  {% endwith %}
+{% endif %}

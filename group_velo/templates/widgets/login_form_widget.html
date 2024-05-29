@@ -1,0 +1,4 @@
+<input type="{{ widget.type }}"
+       name="{{ widget.name }}"
+       {% if widget.value != None %}value="{{ widget.value|stringformat:'s' }}"{% endif %}
+       class="border-b-2 border-gray-300 focus:border-blue-600 focus:outline-none" />

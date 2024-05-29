@@ -1,0 +1,6 @@
+<li class="border-b border-gray-600 dark:border-gray-800 block p-4 text-gray-400 hover:text-gray-200 dark:text-gray-300 dark:hover:text-white cursor-pointer">
+  <a href="{% url 'home' %}" class="block p-4">Home</a>
+</li>
+{% for navbar_item in navbar_items %}
+  {% include 'navbar/partials/small_nav/_list_item.html' with list_id=navbar_item.id title=navbar_item.title template_name=navbar_item.template_name %}
+{% endfor %}

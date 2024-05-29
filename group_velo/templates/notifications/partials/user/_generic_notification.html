@@ -1,0 +1,14 @@
+{% if oob %}
+  <div id="generic-bubble-user" hx-swap-oob="true">
+  {% else %}
+    <div id="generic-bubble-user">
+    {% endif %}
+    {% if notifications_exist %}
+      <span class="sr-only">Notifications</span>
+      {% include 'notifications/partials/_notification_dot.html' %}
+    {% endif %}
+    {% if oob %}
+    </div>
+  {% else %}
+  </div>
+{% endif %}

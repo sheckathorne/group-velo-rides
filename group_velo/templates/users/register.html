@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}
+  GroupVelo | Register
+{% endblock title %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="m-auto">
+    <div class="content-section w-96">
+      <div class="flex flex-row items-start my-8 mt-2 space-x-1 text-gray-700 dark:text-gray-300">
+        <a href="{% url 'users:login' %}"
+           class="peer py-3 px-6 w-auto rounded-3xl hover:bg-blue-600 hover:text-white dark:hover:text-white dark:text-gray-300 text-gray-700 text-2xl font-bold">Login</a>
+        <span class="peer-hover:shadow-none peer-hover:bg-transparent peer-hover:text-gray-700 peer-hover:dark:text-gray-300 bg-blue-600 py-3 px-6 w-auto rounded-3xl text-white text-2xl font-bold shadow-lg">Sign up</span>
+      </div>
+      <form method="post">
+        {% csrf_token %}
+        <fieldset class="w-full space-y-8">
+          <div hx-swap="outerHTML" hx-target="this">
+            <div id="div_id_name" class="relative">
+              <input type="text"
+                     name="name"
+                     maxlength="255"
+                     placeholder="Full name"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     required=""
+                     id="id_name"
+                     hx-post="{% url 'users:register_check_name' %}" />
+              <label for="id_name"
+                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                Full name
+              </label>
+            </div>
+          </div>
+          <div hx-swap="outerHTML" hx-target="this">
+            <div id="div_id_username" class="relative">
+              <input type="text"
+                     name="username"
+                     maxlength="150"
+                     placeholder="Username"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     required=""
+                     id="id_username"
+                     hx-post="{% url 'users:register_check_username' %}" />
+              <label for="id_username"
+                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                Username
+              </label>
+            </div>
+          </div>
+          <div hx-swap="outerHTML" hx-target="this">
+            <div id="div_id_email" class="relative">
+              <input type="email"
+                     name="email"
+                     maxlength="320"
+                     placeholder="Email"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     required=""
+                     id="id_email"
+                     hx-post="{% url 'users:register_check_email' %}" />
+              <label for="id_email"
+                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                Email
+              </label>
+            </div>
+          </div>
+          <div hx-swap="outerHTML" hx-target="this">
+            <div id="div_id_zip_code" class="relative">
+              <input type="text"
+                     name="zip_code"
+                     maxlength="5"
+                     pattern="[0-9]*"
+                     placeholder="Zip code"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     required=""
+                     id="id_zip_code"
+                     hx-post="{% url 'users:register_check_zip_code' %}" />
+              <label for="id_zip_code"
+                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                Zip code
+              </label>
+            </div>
+          </div>
+          <div id="password-wrapper"
+               class="relative"
+               hx-swap="outerHTML"
+               hx-target="this">
+            <div id="div_id_password" class="relative">
+              <input type="password"
+                     name="password1"
+                     autocomplete="new-password"
+                     placeholder="Password"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     required=""
+                     id="id_password1"
+                     hx-post="{% url 'users:register_check_password' %}" />
+              <label for="id_password1"
+                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                Password
+              </label>
+            </div>
+          </div>
+          <div class="w-full"
+               hx-swap="outerHTML"
+               hx-target="this"
+               id="password-confirm-wrapper">
+            <div id="div_id_password2" class="relative">
+              <input type="password"
+                     name="password2"
+                     autocomplete="new-password"
+                     placeholder="Password confirmation"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     required=""
+                     id="id_password2"
+                     hx-post="{% url 'users:register_check_password_confirm' %}"
+                     hx-trigger="keyup delay:500ms" />
+              <label for="id_password2"
+                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                Password confirmation
+              </label>
+            </div>
+          </div>
+          <button class="btn w-full inline-block btn-login-signup-color py-3"
+                  type="submit"
+                  value="Sign Up"
+                  wrapper-class="w-full mt-4">Sign Up</button>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+{% endblock content %}

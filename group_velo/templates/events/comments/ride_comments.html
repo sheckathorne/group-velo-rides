@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% load to_sqid from group_velo_data_tags %}
+{% load crispy_forms_tags %}
+{% load initials_avatar %}
+
+{% block content %}
+  <div class="xl:w-1/2 md:w-3/4 w-full text-gray-700 dark:text-gray-200">
+    <div class="flex flex-row justify-between mb-3 items-center">
+      <div>
+        <span class="card-header bg-primary bg-gradient text-light">
+          Comments for <span class="font-bold">{{ event.occurence_name }} on {{ event.ride_date|date:"M d, Y" }}</span>
+        </span>
+      </div>
+      <div class="items-center">
+        {% if sort == "asc" %}
+          <a href="{% url 'events:ride_comments' event_occurence_sqid %}?sort=desc">
+            <button class="py-2 px-4 text-sm font-bold bg-white hover:bg-gray-100 dark:text-white dark:bg-gray-800 dark:hover:bg-gray-900 border border-gray-300 dark:border-gray-800 shadow rounded">
+              Newest First
+              <i class="fa-solid fa-sort-up pl-2"></i>
+            </button>
+          </a>
+        {% else %}
+          <a href="{% url 'events:ride_comments' event_occurence_sqid %}?sort=asc">
+            <button class="py-2 px-4 text-sm font-bold bg-white hover:bg-gray-100 dark:text-white dark:bg-gray-800 dark:hover:bg-gray-900 border border-gray-300 dark:border-gray-800 shadow rounded">
+              Oldest First
+              <i class="fa-solid fa-sort-down pl-2"></i>
+            </button>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+    <div>
+      {% if pagination.num_pages > 1 %}
+        {% include 'pagination.html' with pagination_items=pagination.html_list %}
+      {% endif %}
+      <ul class="list-group mb-2">
+        {% for comment in pagination.item_list %}
+          <li class="py-2 px-4 mb-4 rounded-lg bg-white dark:bg-gray-800 shadow">
+            <div class="mb-1 flex flex-row">
+              <div class="mr-2">
+                {% if comment.comment.user.avatar %}
+                  <img class="rounded-full w-8 h-8"
+                       src="{{ comment.comment.user.get_avatar }}"
+                       alt="image description" />
+                {% else %}
+                  {% with comment.comment.user.name as user_name %}
+                    <img class="rounded-full w-8 h-8"
+                         src="{% render_initials_avatar user_name background=comment.color.1 %}"
+                         alt="image description" />
+                  {% endwith %}
+                {% endif %}
+              </div>
+              <div>
+                <span class="font-extrabold text-sm align-middle {{ comment.color.0 }}">{{ comment.comment.user.name }}</span>
+              </div>
+            </div>
+            <div>
+              <span class="text-gray-600 dark:text-gray-300">{{ comment.comment.message }}</span>
+            </div>
+            <div class="mt-1">
+              <span class="font-light text-sm text-gray-600 dark:text-gray-300">{{ comment.comment.time_since_message }}</span>
+            </div>
+          </li>
+        {% empty %}
+          <div class="mb-4">
+            <span class="font-bolder">No comments for this ride, add yours now!</span>
+          </div>
+        {% endfor %}
+      </ul>
+      {% if pagination.num_pages > 1 %}
+        {% include 'pagination.html' with pagination_items=pagination.html_list %}
+      {% endif %}
+      <div class="pt-2">
+        <form method="post"
+              action="{% url 'events:ride_comments' event_occurence_sqid %}">
+          <div class="mb-2">{% crispy form %}</div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

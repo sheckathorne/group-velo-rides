@@ -1,0 +1,41 @@
+{% load crispy_forms_tags %}
+
+<div id="editRouteModalReplace"
+     class="sm:h-[calc(100%-3rem)] max-w-7xl my-6 mx-auto relative w-auto pointer-events-none">
+  <div class="max-h-full overflow-hidden border-none relative flex flex-col w-full pointer-events-auto bg-white rounded-lg shadow dark:bg-gray-700 outline-none text-current">
+    <div class="flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 dark:border-gray-600 rounded-t">
+      <h5 class="text-xl font-semibold text-gray-900 dark:text-white">
+        Edit Route
+        <button type="button"
+                class="absolute top-3 right-2.5 text-gray-700 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white dark:text-white"
+                @click="editRouteModalOpen=false"
+                hx-target="#editRouteModalReplace"
+                hx-swap="outerHTML"
+                hx-get="{% url 'routes:get_blank_edit_route_form' %}">
+          <svg aria-hidden="true"
+               class="w-5 h-5"
+               fill="currentColor"
+               viewBox="0 0 20 20"
+               xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+          <span class="sr-only">Close modal</span>
+        </button>
+      </h5>
+    </div>
+    <div class="flex-auto overflow-y-auto relative p-4">
+      <form id="routeForm" method="post" action="{{ form_action }}">
+        {% crispy form %}
+      </form>
+    </div>
+    <div class="flex flex-shrink-0 flex-wrap items-center justify-end p-4 border-t border-gray-200 dark:border-gray-600 rounded-b space-x-2">
+      <button type="button"
+              @click="editRouteModalOpen=false"
+              hx-target="#editRouteModalReplace"
+              hx-swap="outerHTML"
+              hx-get="{% url 'routes:get_blank_edit_route_form' %}"
+              class="inline-block btn-dismiss-color">Close</button>
+      <button type="submit" class="inline-block btn-primary-color" form="routeForm">Save Route</button>
+    </div>
+  </div>
+</div>

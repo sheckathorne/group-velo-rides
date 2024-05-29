@@ -1,0 +1,98 @@
+python-slugify==8.0.4  # https://github.com/un33k/python-slugify
+Pillow==10.3.0  # https://github.com/python-pillow/Pillow
+argon2-cffi==23.1.0  # https://github.com/hynek/argon2_cffi
+whitenoise==6.6.0  # https://github.com/evansd/whitenoise
+redis==5.0.4  # https://github.com/redis/redis-py
+hiredis==2.3.2  # https://github.com/redis/hiredis-py
+celery==5.4.0  # pyup: < 6.0  # https://github.com/celery/celery
+django-celery-beat==2.6.0  # https://github.com/celery/django-celery-beat
+flower==2.0.1  # https://github.com/mher/flower
+
+# Django
+# ------------------------------------------------------------------------------
+django==4.2.13  # pyup: < 5.0  # https://www.djangoproject.com/
+django-environ==0.11.2  # https://github.com/joke2k/django-environ
+django-model-utils==4.5.1  # https://github.com/jazzband/django-model-utils
+django-allauth[mfa]==0.63.0  # https://github.com/pennersr/django-allauth
+django-crispy-forms==2.1  # https://github.com/django-crispy-forms/django-crispy-forms
+crispy-bootstrap5==2024.2  # https://github.com/django-crispy-forms/crispy-bootstrap5
+django-redis==5.4.0  # https://github.com/jazzband/django-redis
+django-webpack-loader==3.1.0  # https://github.com/django-webpack/django-webpack-loader
+arrow==1.2.3
+asgiref==3.7.0
+beautifulsoup4==4.11.1
+binaryornot==0.4.4
+bleach==6.0.0
+build==0.10.0
+cachetools==4.2.4
+certifi==2022.9.24
+cffi==1.15.1
+chardet==5.1.0
+charset-normalizer==2.1.1
+click==8.1.3
+cookiecutter==2.1.1
+crispy-tailwind==0.5.0
+cryptography==38.0.3
+decorator==4.4.2
+defusedxml==0.7.1
+Deprecated==1.2.13
+django-appconf==1.0.5
+django-better-elided-pagination==1.2.1
+django-braces==1.15.0
+django-filter==24.2
+django-image-uploader-widget==0.3.1
+django-initials-avatar==0.0.6
+django-localflavor==3.1
+django-phonenumber-field==7.0.2
+django-recaptcha==3.0.0
+django-sqlprint-middleware==0.1.4
+django-unicorn==0.49.2
+docutils==0.19
+fontawesomefree==6.2.0
+haversine==2.8.0
+idna==3.4
+importlib-metadata==6.0.0
+jaraco.classes==3.2.3
+Jinja2==3.1.2
+jinja2-time==0.2.0
+jwcrypto==1.4.2
+keyring==23.13.1
+markdown-it-py==2.1.0
+MarkupSafe==2.1.1
+mdurl==0.1.2
+more-itertools==9.0.0
+oauthlib==3.2.2
+orjson==3.8.3
+packaging==23.0
+phonenumberslite==8.13.7
+pkginfo==1.9.6
+psycopg2-binary==2.9.5
+pycparser==2.21
+Pygments==2.14.0
+pygments-pprint-sql==0.1.0
+PyJWT==2.6.0
+pyproject_hooks==1.0.0
+python-dateutil==2.8.2
+python-stdnum==1.18
+python3-openid==3.2.0
+pytz==2022.6
+PyYAML==6.0
+readme-renderer==37.3
+requests==2.28.1
+requests-oauthlib==1.3.1
+requests-toolbelt==0.10.1
+rfc3986==2.0.0
+rich==13.2.0
+rjsmin==1.2.1
+shortuuid==1.0.11
+six==1.16.0
+soupsieve==2.3.2.post1
+sqids==0.4.1
+sqlparse==0.4.3
+text-unidecode==1.3
+tomli==2.0.1
+twine==4.0.2
+urllib3==1.26.12
+webencodings==0.5.1
+wrapt==1.14.1
+zipp==3.11.0

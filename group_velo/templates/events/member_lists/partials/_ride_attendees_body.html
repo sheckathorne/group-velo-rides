@@ -1,0 +1,80 @@
+{% load initials_avatar %}
+
+<div class="card border-primary mt-2 text-gray-700 dark:text-gray-200">
+  {% include 'events/modals/emergency_contacts.html' %}
+  <h4 class="font-bold card-header bg-primary bg-gradient pb-4">
+    Attendees for {{ event_occurence.occurence_name }} on {{ event_occurence.ride_date|date:"M d, Y" }}
+  </h4>
+  <div class="card-body">
+    <ul class="list-group list-group-flush">
+      {% include 'events/modals/promote_demote_rider/_blank.html' %}
+      {% for member in event_members %}
+        <li class="list-group-item">
+          <div class="mb-1 flex flex-row">
+            <div class="mr-4">
+              {% if member.user.avatar %}
+                <img class="rounded-full w-8 h-8"
+                     src="{{ member.user.get_avatar }}"
+                     alt="image description" />
+              {% else %}
+                {% with member.user.name as user_name %}
+                  <img class="rounded-full w-8 h-8"
+                       src="{% render_initials_avatar user_name %}"
+                       alt="image description" />
+                {% endwith %}
+              {% endif %}
+            </div>
+            <div class="flex items-center">
+              {% if request.user == member.user %}
+                <span class="xl:w-72 sm:w-60 w-56 font-bold text-sm align-middle">
+                {% elif member.is_ride_creator %}
+                  <span class="xl:w-72 sm:w-60 w-56 font-normal italic text-sm align-middle">
+                  {% else %}
+                    <span class="xl:w-72 sm:w-60 w-56 font-normal text-sm align-middle">
+                    {% endif %}
+                    {{ member.user.name }}
+                    {% if member.is_ride_creator %}
+                      - Ride Creator
+                    {% elif member.is_ride_leader %}
+                      - Ride Leader
+                    {% endif %}
+                    {% if request.user == member.user %}
+                    </span>
+                  {% elif member.is_ride_creator %}
+                  </span>
+                {% else %}
+                </span>
+              {% endif %}
+            </div>
+            {% if user_is_ride_leader and not request.user == member.user %}
+              {% if not member.is_ride_leader %}
+                {% include 'events/member_lists/partials/_promote_to_leader_widget.html' %}
+              {% endif %}
+              {% if member.is_ride_leader and not member.is_ride_creator %}
+                {% include 'events/member_lists/partials/_demote_from_leader_widget.html' %}
+              {% endif %}
+              {% if not member.is_ride_creator %}
+                {% include 'events/member_lists/partials/_kick_rider_from_ride.html' %}
+              {% endif %}
+            {% endif %}
+            {% include 'events/member_lists/partials/_emergency_contact_widget.html' %}
+          </div>
+        </li>
+      {% empty %}
+        No attendees signed up for this ride
+      {% endfor %}
+      {% if user_is_ride_leader and waitlist_members.count > 0 %}
+        <div class="mt-4 mb-2">
+          <h4 class="font-bold">Riders on the waitlist:</h4>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            {% for member in waitlist_members %}
+              {% include 'events/member_lists/partials/_waitlist_member_item.html' %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </ul>
+  </div>
+</div>

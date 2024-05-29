@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}
+  GroupVelo | Modify Event
+{% endblock title %}
+{% load render_bundle from webpack_loader %}
+{% load crispy_forms_tags %}
+{% load to_sqid from group_velo_data_tags %}
+
+{% block content %}
+  <div class="w-full">
+    {% include 'routes/modals/route_select.html' %}
+    <div id="group-classification-data"
+         hx-get="{% url 'events:get_ride_classification_limits' %}"
+         hx-trigger="getClassification"
+         hx-swap="none"></div>
+    <form method="post"
+          action="{% url 'events:modify_event' event_occurence_sqid=event_occurence.id|to_sqid slug=event_occurence.slug %}"
+          x-data="form">
+      {% crispy form %}
+    </form>
+    <input type="hidden" id="route_url" value="{{ event_occurence.route.url }}" />
+    <input type="hidden"
+           id="route_name"
+           value="{{ event_occurence.route.name }}" />
+    {% render_bundle 'modifyEvent' 'js' attrs='defer' %}
+  </div>
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('form', () => ({
+        upper_pace_range: {
+          errorMessage: ''
+        },
+        lower_pace_range: {
+          errorMessage: ''
+        },
+        input: function(event) {
+          let ele = event.target;
+          let strictRules = JSON.parse(ele.getAttribute("strict-rules"))
+          if (strictRules) {
+            let rules = JSON.parse(ele.dataset.rules)
+            this[ele.name].errorMessage = this.getErrorMessage(ele.value, rules);
+          } else {
+            this[ele.name].errorMessage = "";
+          }
+        },
+        getErrorMessage: function(value, rules) {
+          const report = Iodine.assert(value, rules);
+          if (!report.valid) {
+            return report.error;
+          }
+          return '';
+        }
+      }))
+    })
+  </script>
+{% endblock content %}

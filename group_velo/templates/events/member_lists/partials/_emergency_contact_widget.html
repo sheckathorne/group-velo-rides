@@ -1,0 +1,34 @@
+{% load to_sqid from group_velo_data_tags %}
+
+{% if user_is_ride_leader and member.user.has_emergency_contacts %}
+  <div class="ml-2 flex items-center">
+    <button x-tooltip.raw="Emergency contacts"
+            hx-get="{% url 'events:user_emergency_contacts' event_occurence_sqid=member.event_occurence.id|to_sqid user_sqid=member.user.id|to_sqid %}"
+            hx-target="#emergency-contact-modal-body"
+            hx-swap="innerHTML"
+            hx-trigger="click delay:500ms"
+            @click="emergencyContactsModalOpen=true"
+            class="align-middle">
+      {# djlint:off H021 #}
+      <svg version="1.1"
+           id="Capa_1"
+           xmlns="http://www.w3.org/2000/svg"
+           xmlns:xlink="http://www.w3.org/1999/xlink"
+           x="0px"
+           y="0px"
+           width="18px"
+           height="18px"
+           viewBox="0 0 18 18"
+           style="enable-background:new 0 0 31.357 31.357"
+           xml:space="preserve">
+        {# djlint:on #}
+        <g>
+        <g>
+        <path fill="#ef4444" d="M8 0C3.589 0 0.001 3.589 0.001 8c0 4.412 3.588 8.001 8 8.001c4.411 0 7.999 -3.589 7.999 -8.001C15.999 3.589 12.411 0 8 0zM8 14.726c-3.71 0 -6.727 -3.017 -6.727 -6.727c0 -3.709 3.017 -6.727 6.727 -6.727c3.709 0 6.726 3.018 6.726 6.727C14.726 11.709 11.709 14.726 8 14.726z" />
+        <path fill="#ef4444" d="M9.819 6.311V3.74c0 -0.443 -0.359 -0.801 -0.801 -0.801h-1.733c-0.442 0 -0.801 0.359 -0.801 0.801v2.571h-2.572c-0.442 0 -0.801 0.359 -0.801 0.801v1.77c0 0.442 0.358 0.801 0.801 0.801h2.571v2.57c0 0.442 0.358 0.801 0.801 0.801h1.733c0.442 0 0.801 -0.359 0.801 -0.801v-2.57h2.571c0.442 0 0.801 -0.359 0.801 -0.801v-1.77c0 -0.443 -0.359 -0.801 -0.801 -0.801H9.819z" />
+        </g>
+        </g>
+      </svg>
+    </button>
+  </div>
+{% endif %}

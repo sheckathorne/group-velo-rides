@@ -1,0 +1,27 @@
+<nav class="fixed top-0 right-0 bottom-0 left-0 backdrop-blur-sm z-10"
+     :class="openMenu ? 'visible' : 'invisible'"
+     x-data="{ selected: null }"
+     x-on:resize.window="openMenu = ( window.innerWidth > 1024 ) ? false : openMenu"
+     x-cloak>
+  <ul class="absolute top-0 right-0 bottom-0 w-10/12 md:w-11/12 bg-gray-700 dark:bg-gray-950 drop-shadow-2xl z-10 transition-all"
+      :class="openMenu ? 'translate-x-0' : 'translate-x-full'">
+    {% if user.is_authenticated %}
+      {% include 'navbar/partials/small_nav/_logged_in.html' %}
+    {% else %}
+      {% include 'navbar/partials/small_nav/_logged_out.html' %}
+    {% endif %}
+  </ul>
+  <button class="absolute top-0 right-0 bottom-0 left-0 text-gray-300 hover:text-white pt-4"
+          @click="openMenu = false; selected = null"
+          :aria-expanded="openMenu"
+          aria-controls="mobile-navigation"
+          aria-label="Close Navigation Menu">
+    <svg xmlns="http://www.w3.org/2000/svg"
+         class="h-6 w-6 absolute top-2 left-2"
+         fill="none"
+         viewBox="0 0 24 24"
+         stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+</nav>

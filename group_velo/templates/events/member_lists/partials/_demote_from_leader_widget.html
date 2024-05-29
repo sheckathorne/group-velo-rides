@@ -1,0 +1,12 @@
+{% load to_sqid from group_velo_data_tags %}
+
+<div class="flex items-center ml-2">
+  <a href="#"
+     x-tooltip.raw.placement.bottom="Demote from leader"
+     @click="promoteDemoteRiderModalOpen=true"
+     hx-get="{% url 'events:get_demote_rider_form' rider_sqid=member.user.id|to_sqid event_occurence_sqid=event_occurence.id|to_sqid %}"
+     hx-swap="outerHTML"
+     hx-target="#promoteDemoteRiderModalReplace">
+    <i class="fa-solid fa-person-arrow-down-to-line text-red-600 hover:text-red-800"></i>
+  </a>
+</div>

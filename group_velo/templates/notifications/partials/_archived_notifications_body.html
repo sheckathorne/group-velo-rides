@@ -1,0 +1,23 @@
+{% load render_bundle from webpack_loader %}
+
+<div id="notifications-body">
+  <div class="w-full mb-2">
+    <button type="button"
+            id="move-to-inbox-btn"
+            class="w-48 btn-primary-color font-semibold py-2 px-4 rounded shadow-lg"
+            hx-post=""
+            hx-target="#notifications-body"
+            hx-swap="outerHTML">Move to Inbox</button>
+    <button type="button"
+            id="view-inbox-btn"
+            onclick="location.href='{% url 'notifications:notifications' %}'"
+            class="w-48 btn-primary-color font-semibold py-2 px-4 rounded shadow-lg">View Inbox</button>
+  </div>
+  <div class="relative overflow-y-auto rounded shadow-md mb-2">
+    {% include 'notifications/partials/notifications_table/_notifications_table.html' %}
+  </div>
+  {% if pagination.num_pages > 1 %}
+    <div class="pt-1">{% include 'pagination.html' with pagination_items=pagination.html_list %}</div>
+  {% endif %}
+  {% render_bundle 'userNotifications' 'js' attrs='defer' %}
+</div>

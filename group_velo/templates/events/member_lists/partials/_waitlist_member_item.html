@@ -1,0 +1,22 @@
+{% load initials_avatar %}
+
+<li class="list-group-item">
+  <div class="mb-1 flex flex-row">
+    <div class="mr-4">
+      {% if member.user.avatar %}
+        <img class="rounded-full w-8 h-8"
+             src="{{ member.user.get_avatar }}"
+             alt="image description" />
+      {% else %}
+        {% with member.user.name as user_name %}
+          <img class="rounded-full w-8 h-8"
+               src="{% render_initials_avatar user_name %}"
+               alt="image description" />
+        {% endwith %}
+      {% endif %}
+    </div>
+    <div>
+      <span class="text-sm align-middle pt-1">{{ member.user.name }} ({{ forloop.counter }})</span>
+    </div>
+  </div>
+</li>

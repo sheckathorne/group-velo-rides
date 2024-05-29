@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="m-auto">
+    <div class="content-section w-96 mt-2">
+      <div class="flex flex-row items-start mb-8 mt-2 space-x-2 text-gray-700 dark:text-gray-300">
+        <a href="{% url 'users:login' %}"
+           class=" peer py-3 px-6 w-auto rounded-3xl hover:bg-blue-600 hover:text-white dark:hover:text-white dark:text-gray-300 text-gray-700 text-2xl font-bold">Login</a>
+        <span class=" peer-hover:shadow-none peer-hover:bg-transparent peer-hover:text-gray-700 peer-hover:dark:text-gray-300 bg-blue-600 py-3 px-6 w-auto rounded-3xl text-white text-2xl font-bold shadow-lg">Confirm Email</span>
+      </div>
+      <form method="post">
+        <fieldset class="w-full space-y-8">
+          <div id="div_id_username" class="relative">
+            <input type="email"
+                   name="email"
+                   maxlength="100"
+                   placeholder="Email address"
+                   class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600"
+                   required=""
+                   id="id_email" />
+            <label for="id_email"
+                   class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+              Email address
+            </label>
+          </div>
+          <div>
+            <button class="btn w-full inline-block btn-login-signup-color"
+                    type="submit"
+                    value="Submit">Resend Email</button>
+          </div>
+        </fieldset>
+      </form>
+      <div class="my-auto py-4">
+        <div class="border-top pt-3">
+          <small class="text-muted text-blue-700 dark:text-blue-500 underline">
+            <a href="{% url 'users:reset_password' %}">Forgot password?</a>
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

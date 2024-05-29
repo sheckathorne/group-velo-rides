@@ -1,0 +1,33 @@
+<header id="mainNavbar"
+        class="flex items-center justify-between flex-wrap px-4 py-4 w-full h-min bg-gray-700 dark:bg-gray-950 mb-2"
+        :class="!openMenu && !filterOpen && 'sticky top-0 z-[100]'">
+  <div class="flex items-center flex-shrink-0 text-white">
+    <a href="{% url 'home' %}"
+       class="text-white no-underline hover:text-white hover:no-underline">
+      <span class="text-2xl pl-2">GroupVelo</span>
+      <div class="star-five"></div>
+    </a>
+  </div>
+  {% if user.is_authenticated %}
+    <button type="button"
+            class="flex lg:hidden flex-col items-center align-middle text-white hover:text-gray-300 focus:outline-none focus:text-gray-300"
+            :aria-expanded="openMenu"
+            aria-controls="mobile-navigation"
+            aria-label="Navigation Menu"
+            @click="openMenu = !openMenu"
+            x-cloak>
+      <svg xmlns="http://www.w3.org/2000/svg"
+           class="h-6 w-6"
+           fill="none"
+           viewBox="0 0 24 24"
+           stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+      <span class="text-xs">Menu</span>
+    </button>
+  {% endif %}
+  {% include 'navbar/partials/large_nav/_nav.html' %}
+</header>
+{% if user.is_authenticated %}
+  {% include 'navbar/partials/small_nav/_nav.html' %}
+{% endif %}

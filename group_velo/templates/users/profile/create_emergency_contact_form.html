@@ -1,0 +1,27 @@
+{% load crispy_forms_tags %}
+
+<div id="new-contact-div"
+     hx-target="#emergency-contact-list"
+     hx-swap="outerHTML">
+  <form method="post">
+    <div class="grid gap-2 grid-cols-12">
+      <div class="w-full col-span-12">
+        <span class="text-gray-700 dark:text-gray-200 font-bold pr-2 contact-title">Contact #{{ forloop.counter }}</span>
+        <button class="text-center"
+                type="submit"
+                hx-post="{% url 'users:create_emergency_contact' %}"
+                hx-target="#emergency-contact-list"
+                hx-swap="innerHTML">
+          <i class="fa-solid fa-check text-green-500 font-bold hover:text-green-700"></i>
+        </button>
+        <button id="add-emergency-contact-form"
+                class="text-center"
+                _="on click remove #new-contact-div">
+          <i class="fa-solid fa-x text-red-500 font-bold hover:text-red-700"></i>
+        </button>
+      </div>
+    </div>
+    {% csrf_token %}
+    {% crispy ec_form %}
+  </form>
+</div>

@@ -1,0 +1,13 @@
+{% load group_velo_events_tags %}
+
+<div class="grid flex-grid grid-cols-1 w-full gap-2">
+  {% for event_occurence in pagination.item_list %}
+    {% event_join_status user=user event_occurence=event_occurence as event_join_status %}
+    {% include 'events/ride_card/ride_card.html' with event_occurence=event_occurence is_registered=False %}
+  {% empty %}
+    <span class="font-bold text-gray-700 dark:text-gray-200">
+      No rides available for you to join, <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+    href="{% url 'events:create_event' %}">create one now!</a>
+    </span>
+  {% endfor %}
+</div>
