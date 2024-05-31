@@ -1,0 +1,34 @@
+[
+{
+  "model": "clubs.club",
+  "pk": 1,
+  "fields": {
+    "name": "A Test Club",
+    "abbreviation": "ATC",
+    "url": "sometestclub.com",
+    "logo": "",
+    "city": "Denver",
+    "state": "CO",
+    "zip_code": "80014",
+    "email_address": "atestclub@gmail.com",
+    "phone_number": "(469) 555-1234",
+    "latitude": "39.663530",
+    "longitude": "-104.837810",
+    "private": false,
+    "privacy_level": 3,
+    "create_date": "2024-05-31",
+    "founded_date": "2024-05-31",
+    "created_by": 2,
+    "edited_by": null,
+    "edited_date": null,
+    "slug": "a-test-club-bEoXBfoGYDmHVJ40",
+    "description": "This is the description of the test club that would normally contain general information about the club, the club's goals, etc., but in this test instance, the club description contains no information of any value to any single person - except to take up space and display would a club description would look like.",
+    "active": true,
+    "private_ride_attendence": false,
+    "private_ride_waitlist": false,
+    "allow_ride_discussion": true,
+    "strict_ride_classification": false,
+    "verified": false
+  }
+}
+]

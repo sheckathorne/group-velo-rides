@@ -1,0 +1,10 @@
+[
+{
+  "model": "routes.userroute",
+  "pk": 1,
+  "fields": {
+    "user": 2,
+    "route": 1
+  }
+}
+]

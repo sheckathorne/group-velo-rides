@@ -255,9 +255,7 @@ class Event(EventBase):
 
         success = [i for i, j in notification_results]
 
-        print("made it here")
         if all(success):
-            print("all success")
             messages.success(
                 request,
                 f"Successfully deleted {self.name}. All riders have been notified",
