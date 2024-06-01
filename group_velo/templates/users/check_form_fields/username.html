@@ -10,10 +10,7 @@
            required=""
            id="id_username"
            hx-post="{% url 'users:register_check_username' %}" />
-    <label for="id_username"
-           class="floating-label">
-      Username
-    </label>
+    <label for="id_username" class="floating-label">Username</label>
     {% if not valid %}
       <p id="error_1_username" class="text-red-500 text-xs italic">
         <strong>{{ error_message }}</strong>

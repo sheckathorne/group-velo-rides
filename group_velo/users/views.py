@@ -23,10 +23,10 @@ from group_velo.users.forms import (
     PasswordResetForm,
     ResendEmailForm,
     SetPasswordForm,
+    UserFieldForm,
     UserLoginForm,
     UserProfileForm,
     UserRegistrationForm,
-    UserFieldForm,
 )
 from group_velo.users.models import EmergencyContact
 

@@ -1,21 +1,21 @@
 [
-{
-  "model": "routes.route",
-  "pk": 1,
-  "fields": {
-    "name": "Triple Bypass",
-    "start_location_name": "Buchanan Park Recreation Center",
-    "start_address": "32003 Ellingwood Trail",
-    "start_city": "Evergreen",
-    "start_state": "CO",
-    "start_zip_code": "80439",
-    "url": "https://ridewithgps.com/routes/43773053",
-    "distance": "120.90",
-    "elevation": 10961,
-    "created_by": 2,
-    "shared": true,
-    "club": 1,
-    "date_created": "2024-05-31"
+  {
+    "model": "routes.route",
+    "pk": 1,
+    "fields": {
+      "name": "Triple Bypass",
+      "start_location_name": "Buchanan Park Recreation Center",
+      "start_address": "32003 Ellingwood Trail",
+      "start_city": "Evergreen",
+      "start_state": "CO",
+      "start_zip_code": "80439",
+      "url": "https://ridewithgps.com/routes/43773053",
+      "distance": "120.90",
+      "elevation": 10961,
+      "created_by": 2,
+      "shared": true,
+      "club": 1,
+      "date_created": "2024-05-31"
+    }
   }
-}
 ]

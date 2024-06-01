@@ -1,26 +1,26 @@
 [
-{
-  "model": "events.event",
-  "pk": 1,
-  "fields": {
-    "created_by": 2,
-    "privacy": 5,
-    "club": 1,
-    "ride_time": "17:00:00",
-    "time_zone": "America/Chicago",
-    "surface_type": "R",
-    "drop_designation": 2,
-    "max_riders": 16,
-    "is_canceled": false,
-    "route": 1,
-    "lower_pace_range": "18.0",
-    "upper_pace_range": "21.0",
-    "group_classification": "A",
-    "name": "Triple Bypass",
-    "start_date": "2024-06-03",
-    "end_date": "2025-01-03",
-    "frequency": 7,
-    "weekdays": "[\"4\"]"
+  {
+    "model": "events.event",
+    "pk": 1,
+    "fields": {
+      "created_by": 2,
+      "privacy": 5,
+      "club": 1,
+      "ride_time": "17:00:00",
+      "time_zone": "America/Chicago",
+      "surface_type": "R",
+      "drop_designation": 2,
+      "max_riders": 16,
+      "is_canceled": false,
+      "route": 1,
+      "lower_pace_range": "18.0",
+      "upper_pace_range": "21.0",
+      "group_classification": "A",
+      "name": "Triple Bypass",
+      "start_date": "2024-06-03",
+      "end_date": "2025-01-03",
+      "frequency": 7,
+      "weekdays": "[\"4\"]"
+    }
   }
-}
 ]

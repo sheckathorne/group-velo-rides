@@ -1,26 +1,26 @@
 [
-{
-  "model": "users.user",
-  "pk": 2,
-  "fields": {
-    "password": "argon2$argon2id$v=19$m=102400,t=2,p=8$U3gxamVKbnljeXZoOGVoS1BocEk5Tw$nDnTmsR9qxT5MwTTFZoLV/UtgzOylhp1rSDobXIQEGM",
-    "last_login": "2024-05-31T18:29:06.932Z",
-    "is_superuser": false,
-    "username": "testuser1",
-    "first_name": "",
-    "last_name": "",
-    "is_staff": false,
-    "is_active": true,
-    "date_joined": "2024-05-31T17:48:35Z",
-    "name": "Test User",
-    "email": "testuseremail@email.com",
-    "address": null,
-    "zip_code": "01125",
-    "avatar": "",
-    "about": "",
-    "slug": "test-user-SRaFE2fCjz8WgLND",
-    "groups": [],
-    "user_permissions": []
+  {
+    "model": "users.user",
+    "pk": 2,
+    "fields": {
+      "password": "argon2$argon2id$v=19$m=102400,t=2,p=8$U3gxamVKbnljeXZoOGVoS1BocEk5Tw$nDnTmsR9qxT5MwTTFZoLV/UtgzOylhp1rSDobXIQEGM",
+      "last_login": "2024-05-31T18:29:06.932Z",
+      "is_superuser": false,
+      "username": "testuser1",
+      "first_name": "",
+      "last_name": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2024-05-31T17:48:35Z",
+      "name": "Test User",
+      "email": "testuseremail@email.com",
+      "address": null,
+      "zip_code": "01125",
+      "avatar": "",
+      "about": "",
+      "slug": "test-user-SRaFE2fCjz8WgLND",
+      "groups": [],
+      "user_permissions": []
+    }
   }
-}
 ]

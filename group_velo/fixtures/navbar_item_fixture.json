@@ -1,42 +1,42 @@
 [
-{
-  "model": "data.navbaritem",
-  "pk": 1,
-  "fields": {
-    "title": "Rides",
-    "template_name": "_rides.html",
-    "order": 1,
-    "active": true
+  {
+    "model": "data.navbaritem",
+    "pk": 1,
+    "fields": {
+      "title": "Rides",
+      "template_name": "_rides.html",
+      "order": 1,
+      "active": true
+    }
+  },
+  {
+    "model": "data.navbaritem",
+    "pk": 2,
+    "fields": {
+      "title": "Clubs",
+      "template_name": "_clubs.html",
+      "order": 2,
+      "active": true
+    }
+  },
+  {
+    "model": "data.navbaritem",
+    "pk": 3,
+    "fields": {
+      "title": "Routes",
+      "template_name": "_routes.html",
+      "order": 3,
+      "active": true
+    }
+  },
+  {
+    "model": "data.navbaritem",
+    "pk": 4,
+    "fields": {
+      "title": "Profile",
+      "template_name": "_user_profile.html",
+      "order": 4,
+      "active": true
+    }
   }
-},
-{
-  "model": "data.navbaritem",
-  "pk": 2,
-  "fields": {
-    "title": "Clubs",
-    "template_name": "_clubs.html",
-    "order": 2,
-    "active": true
-  }
-},
-{
-  "model": "data.navbaritem",
-  "pk": 3,
-  "fields": {
-    "title": "Routes",
-    "template_name": "_routes.html",
-    "order": 3,
-    "active": true
-  }
-},
-{
-  "model": "data.navbaritem",
-  "pk": 4,
-  "fields": {
-    "title": "Profile",
-    "template_name": "_user_profile.html",
-    "order": 4,
-    "active": true
-  }
-}
 ]

@@ -5,12 +5,10 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import (
-    AuthenticationForm,
-    PasswordResetForm as PassResetForm,
-    SetPasswordForm as SetPassForm,
-    UserCreationForm,
-)
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import PasswordResetForm as PassResetForm
+from django.contrib.auth.forms import SetPasswordForm as SetPassForm
+from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.forms import NumberInput
 from django.urls import reverse

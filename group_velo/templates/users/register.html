@@ -26,10 +26,7 @@
                      required=""
                      id="id_name"
                      hx-post="{% url 'users:register_check_name' %}" />
-              <label for="id_name"
-                     class="floating-label">
-                Full name
-              </label>
+              <label for="id_name" class="floating-label">Full name</label>
             </div>
           </div>
           <div hx-swap="outerHTML" hx-target="this">
@@ -42,10 +39,7 @@
                      required=""
                      id="id_username"
                      hx-post="{% url 'users:register_check_username' %}" />
-              <label for="id_username"
-                     class="floating-label">
-                Username
-              </label>
+              <label for="id_username" class="floating-label">Username</label>
             </div>
           </div>
           <div hx-swap="outerHTML" hx-target="this">
@@ -58,10 +52,7 @@
                      required=""
                      id="id_email"
                      hx-post="{% url 'users:register_check_email' %}" />
-              <label for="id_email"
-                     class="floating-label">
-                Email
-              </label>
+              <label for="id_email" class="floating-label">Email</label>
             </div>
           </div>
           <div hx-swap="outerHTML" hx-target="this">
@@ -75,10 +66,7 @@
                      required=""
                      id="id_zip_code"
                      hx-post="{% url 'users:register_check_zip_code' %}" />
-              <label for="id_zip_code"
-                     class="floating-label">
-                Zip code
-              </label>
+              <label for="id_zip_code" class="floating-label">Zip code</label>
             </div>
           </div>
           <div id="password-wrapper"
@@ -94,10 +82,7 @@
                      required=""
                      id="id_password1"
                      hx-post="{% url 'users:register_check_password' %}" />
-              <label for="id_password1"
-                     class="floating-label">
-                Password
-              </label>
+              <label for="id_password1" class="floating-label">Password</label>
             </div>
           </div>
           <div class="w-full"
@@ -114,10 +99,7 @@
                      id="id_password2"
                      hx-post="{% url 'users:register_check_password_confirm' %}"
                      hx-trigger="keyup delay:500ms" />
-              <label for="id_password2"
-                     class="floating-label">
-                Password confirmation
-              </label>
+              <label for="id_password2" class="floating-label">Password confirmation</label>
             </div>
           </div>
           <button class="btn w-full inline-block btn-login-signup-color py-3"
