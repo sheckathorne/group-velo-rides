@@ -5,7 +5,12 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import AuthenticationForm, PasswordResetForm, SetPasswordForm, UserCreationForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordResetForm as PassResetForm,
+    SetPasswordForm as SetPassForm,
+    UserCreationForm,
+)
 from django.core.exceptions import ValidationError
 from django.forms import NumberInput
 from django.urls import reverse
@@ -35,44 +40,19 @@ class UserRegistrationForm(UserCreationForm):
         return user
 
 
-class NamePartialForm(forms.ModelForm):
+class UserPartialForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = [
-            "name",
-        ]
+        fields = ["name", "username", "email", "zip_code", "password"]
 
 
-class UsernamePartialForm(forms.ModelForm):
-    class Meta:
-        model = get_user_model()
-        fields = [
-            "username",
-        ]
-
-
-class EmailPartialForm(forms.ModelForm):
-    class Meta:
-        model = get_user_model()
-        fields = [
-            "email",
-        ]
-
-
-class ZipCodePartialForm(forms.ModelForm):
-    class Meta:
-        model = get_user_model()
-        fields = [
-            "zip_code",
-        ]
-
-
-class PasswordPartialForm(forms.ModelForm):
-    class Meta:
-        model = get_user_model()
-        fields = [
-            "password",
-        ]
+class UserFieldForm(UserPartialForm):
+    def __init__(self, *args, **kwargs):
+        field_name = kwargs.pop("field_name", None)
+        super().__init__(*args, **kwargs)
+        for field in self.Meta.fields:
+            if field != field_name:
+                self.fields.pop(field)
 
 
 class PasswordConfirmPartialForm(UserCreationForm):
@@ -105,7 +85,7 @@ class ResendEmailForm(forms.Form):
         )
 
 
-class SetPasswordForm(SetPasswordForm):
+class SetPasswordForm(SetPassForm):
     def __init__(self, *args, **kwargs):
         css = css_container()
         super().__init__(*args, **kwargs)
@@ -140,7 +120,7 @@ class SetPasswordForm(SetPasswordForm):
         fields = ["new_password1", "new_password2"]
 
 
-class PasswordResetForm(PasswordResetForm):
+class PasswordResetForm(PassResetForm):
     captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox())
 
     def __init__(self, *args, **kwargs):

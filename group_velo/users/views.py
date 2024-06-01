@@ -18,19 +18,15 @@ from sqids.sqids import Sqids
 
 from config.settings.base import SQIDS_ALPHABET, SQIDS_MIN_LEN
 from group_velo.users.forms import (
-    EmailPartialForm,
     EmergencyContactForm,
-    NamePartialForm,
     PasswordConfirmPartialForm,
-    PasswordPartialForm,
     PasswordResetForm,
     ResendEmailForm,
     SetPasswordForm,
     UserLoginForm,
-    UsernamePartialForm,
     UserProfileForm,
     UserRegistrationForm,
-    ZipCodePartialForm,
+    UserFieldForm,
 )
 from group_velo.users.models import EmergencyContact
 
@@ -451,7 +447,7 @@ def register_check_email(request):
             error_message = "Email is already in use"
             valid = False
         else:
-            form = EmailPartialForm(request.POST)
+            form = UserFieldForm(request.POST, field_name="email")
             if not form.is_valid():
                 error_message = " ".join([" ".join(x for x in lst) for lst in list(form.errors.values())])
                 valid = False
@@ -462,6 +458,7 @@ def register_check_email(request):
 def register_check_username(request):
     if request.method == "POST":
         username = request.POST.get("username")
+
         User = get_user_model()
         user_username_exists = User.objects.filter(username=username).exists()
         template = "users/check_form_fields/username.html"
@@ -472,7 +469,7 @@ def register_check_username(request):
             error_message = "Username is already in use"
             valid = False
         else:
-            form = UsernamePartialForm(request.POST)
+            form = UserFieldForm(request.POST, field_name="username")
             if not form.is_valid():
                 error_message = " ".join([" ".join(x for x in lst) for lst in list(form.errors.values())])
                 valid = False
@@ -487,7 +484,7 @@ def register_check_name(request):
         valid = True
         error_message = ""
 
-        form = NamePartialForm(request.POST)
+        form = UserFieldForm(request.POST, field_name="name")
         if not form.is_valid():
             error_message = " ".join([" ".join(x for x in lst) for lst in list(form.errors.values())])
             valid = False
@@ -498,7 +495,7 @@ def register_check_name(request):
 def register_check_zip_code(request):
     if request.method == "POST":
         zip_code = request.POST.get("zip_code")
-        form = ZipCodePartialForm(request.POST)
+        form = UserFieldForm(request.POST, field_name="zip_code")
         template = "users/check_form_fields/zip_code.html"
         valid = True
         error_message = ""
@@ -520,7 +517,7 @@ def register_check_password(request):
         valid = True
         template = "users/check_form_fields/password.html"
 
-        form = PasswordPartialForm({"password": password})
+        form = UserFieldForm({"password": password}, field_name="password")
         if not form.is_valid():
             error_message = " ".join([" ".join(x for x in lst) for lst in list(form.errors.values())])
             valid = False

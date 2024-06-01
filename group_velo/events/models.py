@@ -262,7 +262,6 @@ class Event(EventBase):
                 extra_tags="timeout-5000",
             )
         elif not all(success):
-            print("not all success")
             for result, member in list(filter(lambda x: not x[0], notification_results)):
                 user = member.user
                 messages.error(
@@ -275,7 +274,6 @@ class Event(EventBase):
                 f"Successfully deleted {self.name}. Not all riders were successfully notified",
             )
         else:
-            print("else")
             messages.error(request, "Something went wrong and the event was not deleted.")
 
     def delete(self, *args, request=None, deleted_by=None, **kwargs):

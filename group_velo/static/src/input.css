@@ -26,6 +26,22 @@
   .btn-modal-dismiss-x {
     @apply text-gray-400 bg-transparent hover:text-gray-900 dark:hover:text-white dark:text-white;
   }
+
+  .register-base-input {
+      @apply h-10 w-full bg-transparent border-b-2 dark:text-gray-200 placeholder-transparent focus:outline-none
+  }
+
+  .register-valid-input {
+      @apply border-green-500 border-opacity-50 dark:border-opacity-70 dark:border-green-500
+  }
+
+  .register-invalid-input {
+      @apply border-red-500 dark:border-red-500 border-opacity-70 dark:border-opacity-50
+  }
+
+  .floating-label {
+      @apply absolute left-0 -top-3.5 text-gray-400 dark:text-gray-400 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm
+  }
 }
 
 html[data-theme="light"],

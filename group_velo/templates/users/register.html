@@ -22,12 +22,12 @@
                      name="name"
                      maxlength="255"
                      placeholder="Full name"
-                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_name"
                      hx-post="{% url 'users:register_check_name' %}" />
               <label for="id_name"
-                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                     class="floating-label">
                 Full name
               </label>
             </div>
@@ -38,12 +38,12 @@
                      name="username"
                      maxlength="150"
                      placeholder="Username"
-                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_username"
                      hx-post="{% url 'users:register_check_username' %}" />
               <label for="id_username"
-                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                     class="floating-label">
                 Username
               </label>
             </div>
@@ -54,12 +54,12 @@
                      name="email"
                      maxlength="320"
                      placeholder="Email"
-                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_email"
                      hx-post="{% url 'users:register_check_email' %}" />
               <label for="id_email"
-                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                     class="floating-label">
                 Email
               </label>
             </div>
@@ -71,12 +71,12 @@
                      maxlength="5"
                      pattern="[0-9]*"
                      placeholder="Zip code"
-                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_zip_code"
                      hx-post="{% url 'users:register_check_zip_code' %}" />
               <label for="id_zip_code"
-                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                     class="floating-label">
                 Zip code
               </label>
             </div>
@@ -90,12 +90,12 @@
                      name="password1"
                      autocomplete="new-password"
                      placeholder="Password"
-                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_password1"
                      hx-post="{% url 'users:register_check_password' %}" />
               <label for="id_password1"
-                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                     class="floating-label">
                 Password
               </label>
             </div>
@@ -109,13 +109,13 @@
                      name="password2"
                      autocomplete="new-password"
                      placeholder="Password confirmation"
-                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 dark:focus:border-gray-300"
+                     class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_password2"
                      hx-post="{% url 'users:register_check_password_confirm' %}"
                      hx-trigger="keyup delay:500ms" />
               <label for="id_password2"
-                     class="absolute left-0 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-gray-600 peer-focus:dark:text-gray-300 peer-focus:text-sm">
+                     class="floating-label">
                 Password confirmation
               </label>
             </div>

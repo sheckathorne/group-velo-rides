@@ -96,11 +96,6 @@ class ClubForm(forms.ModelForm):
                 ),
                 Fieldset(
                     "Settings",
-                    # Div(
-                    #     Field("private", template="tailwind/checkbox_left.html", wrapper_class="xl:mb-1 w-full"),
-                    #     id="private_check_row",
-                    #     css_class="py-2",
-                    # ),
                     Div(
                         Field("privacy_level", wrapper_class="xl:mb-1 w-full"),
                         id="privacy_level_row",
@@ -202,7 +197,7 @@ class ClubSearchForm(forms.Form):
                 '<label for="club_name_text" class="sr-only">Search Club Name</label>'
                 '<div class="relative mt-1">'
             ),
-            HTML(render_to_string("icons/magnifying_glass.html", {"id": club_fade_id})),
+            HTML(render_to_string("icons/magnifying_glass.html")),
             HTML(render_to_string("animations/request_spinner.html", {"id": club_fade_id})),
             Field(
                 "club_name",
@@ -227,7 +222,7 @@ class ClubSearchForm(forms.Form):
                 '<label for="zip_code_text" class="sr-only">Near Zip Code</label>'
                 '<div class="relative mt-1">'
             ),
-            HTML(render_to_string("icons/magnifying_glass.html", {"id": zip_fade_id})),
+            HTML(render_to_string("icons/magnifying_glass.html")),
             HTML(render_to_string("animations/request_spinner.html", {"id": zip_fade_id})),
             Field(
                 "zip_code",

@@ -67,7 +67,6 @@ class CreateClubView(CreateView):
         return super().form_valid(form)
 
     def form_invalid(self, form):
-        print(form)
         for error in list(form.errors.values()):
             messages.error(self.request, error)
         return super().form_invalid(form)
