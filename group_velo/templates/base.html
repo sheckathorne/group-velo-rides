@@ -56,6 +56,8 @@
       </script>
       <script src="https://unpkg.com/hyperscript.org@0.9.12"></script>
       <meta name="htmx-config" content='{"useTemplateFragments":true}' />
+      <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/morphdom-swap.js"></script>
+      <script src="lib/morphdom-umd.js"></script>
       {% unicorn_scripts %}
     {% endblock javascript %}
   </head>
@@ -64,7 +66,8 @@
         hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
         x-data="{ openMenu: false, filterOpen: false, rideRegistrationModalOpen: false, cancelEventModalOpen: false, cancelEventOccurenceModalOpen: false, joinRideModalOpen: false, cannotJoinRideModalOpen: false, promoteDemoteRiderModalOpen: false, emergencyContactsModalOpen: false, saveFilterModalOpen: false, filterSearchModalOpen: false, routeSelectModalOpen: false, approveMembershipRequestModalOpen: false, rejectMembershipRequestModalOpen: false, membershipModalOpen: false, toggleMembershipModalOpen: false, notificationModalOpen: false, editRouteModalOpen: false, deleteRouteModalOpen: false, messageAlert: true, deleteEmergencyContactModalOpen: false, requestClubVerificationModalOpen: false, clubVerifyModalOpen:false }"
         @keyup.esc="openMenu=false; selected=null; filterOpen=false; rideRegistrationModalOpen=false; cancelEventModalOpen=false; cancelEventOccurenceModalOpen=false; joinRideModalOpen=false; cannotJoinRideModalOpen=false; promoteDemoteRiderModalOpen=false; emergencyContactsModalOpen=false; saveFilterModalOpen=false; filterSearchModalOpen=false; routeSelectModalOpen=false; notificationModalOpen=false; messageAlert=false; deleteEmergencyContactModalOpen=false; requestClubVerificationModalOpen=false; clubVerifyModalOpen=false"
-        x-cloak>
+        x-cloak
+        hx-ext="morphdom-swap">
     <div class="lg:min-h-[calc(100vh-72px)] {% if user.is_authenticated %}min-h-[calc(100vh-76px)]{% else %}min-h-[calc(100vh-72px)]{% endif %}">
       {% csrf_token %}
       {% include 'navbar/navbar.html' %}

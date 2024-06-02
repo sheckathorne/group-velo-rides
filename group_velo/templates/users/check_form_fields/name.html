@@ -1,6 +1,7 @@
 <div hx-swap="outerHTML" hx-target="this">
   <div id="div_id_name" class="relative">
     {% include 'users/check_form_fields/partials/_valid_checkmark.html' %}
+    {% include "animations/request_spinner.html" with id="email" position="right" %}
     <input type="text"
            name="name"
            maxlength="50"
@@ -9,7 +10,9 @@
            class="peer register-base-input {% if valid %}register-valid-input{% else %}register-invalid-input{% endif %}"
            required=""
            id="id_name"
-           hx-post="{% url 'users:register_check_name' %}" />
+           hx-post="{% url 'users:register_check_name' %}" 
+           hx-trigger="input changed delay:500ms"
+           hx-indicator=".name"/>
     <label for="id_name" class="floating-label">Full name</label>
     {% if not valid %}
       <p id="error_1_name" class="text-red-500 text-xs italic">

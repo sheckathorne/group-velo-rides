@@ -18,6 +18,7 @@
         <fieldset class="w-full space-y-8">
           <div hx-swap="outerHTML" hx-target="this">
             <div id="div_id_name" class="relative">
+              {% include "animations/request_spinner.html" with id="name" position="right" %}
               <input type="text"
                      name="name"
                      maxlength="255"
@@ -25,12 +26,15 @@
                      class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_name"
-                     hx-post="{% url 'users:register_check_name' %}" />
+                     hx-post="{% url 'users:register_check_name' %}" 
+                     hx-trigger="input changed delay:500ms" 
+                     hx-indicator=".name"/>
               <label for="id_name" class="floating-label">Full name</label>
             </div>
           </div>
           <div hx-swap="outerHTML" hx-target="this">
             <div id="div_id_username" class="relative">
+              {% include "animations/request_spinner.html" with id="username" position="right" %}
               <input type="text"
                      name="username"
                      maxlength="150"
@@ -38,25 +42,31 @@
                      class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_username"
-                     hx-post="{% url 'users:register_check_username' %}" />
+                     hx-post="{% url 'users:register_check_username' %}" 
+                     hx-trigger="input changed delay:500ms"
+                     hx-indicator=".username"/>
               <label for="id_username" class="floating-label">Username</label>
             </div>
           </div>
           <div hx-swap="outerHTML" hx-target="this">
             <div id="div_id_email" class="relative">
-              <input type="email"
+              {% include "animations/request_spinner.html" with id="email" position="right" %}
+              <input type="text"
                      name="email"
                      maxlength="320"
                      placeholder="Email"
                      class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_email"
-                     hx-post="{% url 'users:register_check_email' %}" />
+                     hx-post="{% url 'users:register_check_email' %}" 
+                     hx-trigger="input changed delay:500ms"
+                     hx-indicator=".email"/>
               <label for="id_email" class="floating-label">Email</label>
             </div>
           </div>
           <div hx-swap="outerHTML" hx-target="this">
             <div id="div_id_zip_code" class="relative">
+              {% include "animations/request_spinner.html" with id="zip_code" position="right" %}
               <input type="text"
                      name="zip_code"
                      maxlength="5"
@@ -65,7 +75,9 @@
                      class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_zip_code"
-                     hx-post="{% url 'users:register_check_zip_code' %}" />
+                     hx-post="{% url 'users:register_check_zip_code' %}" 
+                     hx-trigger="input changed delay:500ms"
+                     hx-indicator=".zip_code"/>
               <label for="id_zip_code" class="floating-label">Zip code</label>
             </div>
           </div>
@@ -74,6 +86,7 @@
                hx-swap="outerHTML"
                hx-target="this">
             <div id="div_id_password" class="relative">
+              {% include "animations/request_spinner.html" with id="password1" position="right" %}
               <input type="password"
                      name="password1"
                      autocomplete="new-password"
@@ -81,7 +94,9 @@
                      class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_password1"
-                     hx-post="{% url 'users:register_check_password' %}" />
+                     hx-post="{% url 'users:register_check_password' %}" 
+                     hx-trigger="input changed delay:500ms"
+                     hx-indicator=".password1"/>
               <label for="id_password1" class="floating-label">Password</label>
             </div>
           </div>
@@ -90,6 +105,7 @@
                hx-target="this"
                id="password-confirm-wrapper">
             <div id="div_id_password2" class="relative">
+              {% include "animations/request_spinner.html" with id="password2" position="right" %}
               <input type="password"
                      name="password2"
                      autocomplete="new-password"
@@ -98,7 +114,8 @@
                      required=""
                      id="id_password2"
                      hx-post="{% url 'users:register_check_password_confirm' %}"
-                     hx-trigger="keyup delay:500ms" />
+                     hx-trigger="input changed delay:500ms"
+                     hx-indicator=".password2"/>
               <label for="id_password2" class="floating-label">Password confirmation</label>
             </div>
           </div>
