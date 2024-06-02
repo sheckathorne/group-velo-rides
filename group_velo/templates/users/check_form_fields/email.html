@@ -12,8 +12,7 @@
            id="id_email"
            hx-post="{% url 'users:register_check_email' %}"
            hx-trigger="input changed delay:500ms"
-           hx-indicator=".email"
-           hx-swap="morphdom" />
+           hx-indicator=".email" />
     <label for="id_email" class="floating-label">Email</label>
     {% if not valid %}
       <p id="error_1_email" class="text-red-500 text-xs italic">
