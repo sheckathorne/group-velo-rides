@@ -26,9 +26,9 @@
                      class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_name"
-                     hx-post="{% url 'users:register_check_name' %}" 
-                     hx-trigger="input changed delay:500ms" 
-                     hx-indicator=".name"/>
+                     hx-post="{% url 'users:register_check_name' %}"
+                     hx-trigger="input changed delay:500ms"
+                     hx-indicator=".name" />
               <label for="id_name" class="floating-label">Full name</label>
             </div>
           </div>
@@ -42,9 +42,9 @@
                      class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_username"
-                     hx-post="{% url 'users:register_check_username' %}" 
+                     hx-post="{% url 'users:register_check_username' %}"
                      hx-trigger="input changed delay:500ms"
-                     hx-indicator=".username"/>
+                     hx-indicator=".username" />
               <label for="id_username" class="floating-label">Username</label>
             </div>
           </div>
@@ -58,9 +58,9 @@
                      class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_email"
-                     hx-post="{% url 'users:register_check_email' %}" 
+                     hx-post="{% url 'users:register_check_email' %}"
                      hx-trigger="input changed delay:500ms"
-                     hx-indicator=".email"/>
+                     hx-indicator=".email" />
               <label for="id_email" class="floating-label">Email</label>
             </div>
           </div>
@@ -75,9 +75,9 @@
                      class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_zip_code"
-                     hx-post="{% url 'users:register_check_zip_code' %}" 
+                     hx-post="{% url 'users:register_check_zip_code' %}"
                      hx-trigger="input changed delay:500ms"
-                     hx-indicator=".zip_code"/>
+                     hx-indicator=".zip_code" />
               <label for="id_zip_code" class="floating-label">Zip code</label>
             </div>
           </div>
@@ -94,9 +94,9 @@
                      class="peer h-10 w-full bg-transparent border-b-2 border-gray-300 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-blue-600 focus:border-opacity-50 dark:focus:border-gray-300"
                      required=""
                      id="id_password1"
-                     hx-post="{% url 'users:register_check_password' %}" 
+                     hx-post="{% url 'users:register_check_password' %}"
                      hx-trigger="input changed delay:500ms"
-                     hx-indicator=".password1"/>
+                     hx-indicator=".password1" />
               <label for="id_password1" class="floating-label">Password</label>
             </div>
           </div>
@@ -115,7 +115,7 @@
                      id="id_password2"
                      hx-post="{% url 'users:register_check_password_confirm' %}"
                      hx-trigger="input changed delay:500ms"
-                     hx-indicator=".password2"/>
+                     hx-indicator=".password2" />
               <label for="id_password2" class="floating-label">Password confirmation</label>
             </div>
           </div>

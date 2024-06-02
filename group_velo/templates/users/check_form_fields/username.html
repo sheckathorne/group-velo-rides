@@ -10,9 +10,9 @@
            class="peer register-base-input {% if valid %}register-valid-input{% else %}register-invalid-input{% endif %}"
            required=""
            id="id_username"
-           hx-post="{% url 'users:register_check_username' %}" 
+           hx-post="{% url 'users:register_check_username' %}"
            hx-trigger="input changed delay:500ms"
-           hx-indicator="username"/>
+           hx-indicator="username" />
     <label for="id_username" class="floating-label">Username</label>
     {% if not valid %}
       <p id="error_1_username" class="text-red-500 text-xs italic">

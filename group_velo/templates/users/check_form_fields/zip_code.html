@@ -11,9 +11,9 @@
            class="peer register-base-input {% if valid %}register-valid-input{% else %}register-invalid-input{% endif %}"
            required=""
            id="id_zip_code"
-           hx-post="{% url 'users:register_check_zip_code' %}" 
+           hx-post="{% url 'users:register_check_zip_code' %}"
            hx-trigger="input changed delay:500ms"
-           hx-indicator="zip_code"/>
+           hx-indicator="zip_code" />
     <label for="id_zip_code" class="floating-label">Zip code</label>
     {% if not valid %}
       <p id="error_1_zip_code" class="text-red-500 text-xs italic">

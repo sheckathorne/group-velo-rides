@@ -198,7 +198,7 @@ class ClubSearchForm(forms.Form):
                 '<div class="relative mt-1">'
             ),
             HTML(render_to_string("icons/magnifying_glass.html")),
-            HTML(render_to_string("animations/request_spinner.html", {"id": club_fade_id, "position": "left" })),
+            HTML(render_to_string("animations/request_spinner.html", {"id": club_fade_id, "position": "left"})),
             Field(
                 "club_name",
                 id="club_name_text",
@@ -223,7 +223,7 @@ class ClubSearchForm(forms.Form):
                 '<div class="relative mt-1">'
             ),
             HTML(render_to_string("icons/magnifying_glass.html")),
-            HTML(render_to_string("animations/request_spinner.html", {"id": zip_fade_id, "position": "left" })),
+            HTML(render_to_string("animations/request_spinner.html", {"id": zip_fade_id, "position": "left"})),
             Field(
                 "zip_code",
                 id="zip_code_text",
