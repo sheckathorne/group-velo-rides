@@ -12,16 +12,15 @@ from django.template.defaultfilters import slugify
 from django.utils import timezone
 from localflavor.us.us_states import STATE_CHOICES
 from phonenumber_field.modelfields import PhoneNumberField
-from sqids.sqids import Sqids
 
-from config.settings.base import SQIDS_ALPHABET, SQIDS_MIN_LEN
 from group_velo.data.choices import GroupClassification, MemberType, PrivacyLevel, RequestStatus, SurfaceType
 from group_velo.data.models import get_coords_of
 from group_velo.data.validators import length_of_five, numeric_chars
 from group_velo.events.fields import CharFieldAllowsMultiSelectSearch
+from group_velo.utils.mixins import SqidMixin
 
 
-class Club(models.Model):
+class Club(models.Model, SqidMixin):
     def image_upload_to(self, instance=None):
         if instance:
             ext = instance.split(".")[-1]
@@ -91,12 +90,9 @@ class Club(models.Model):
             self.latitude, self.longitude = get_coords_of(self.zip_code)
 
         created = self.id is None
+        self.slug = slugify(f"{self.name}") + f"-{self.encode_sqid(self.pk)}"
 
         super().save(*args, **kwargs)
-        if not self.slug:
-            sqids = Sqids(alphabet=SQIDS_ALPHABET, min_length=SQIDS_MIN_LEN)
-            self.slug = slugify(f"{self.name}") + f"-{sqids.encode([self.pk])}"
-            self.save()
 
         if created:
             timezone = pytz.utc

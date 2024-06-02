@@ -11,7 +11,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.views.generic import CreateView, ListView, TemplateView
+from django.views.generic import CreateView, ListView, TemplateView, View
 from sqids.sqids import Sqids
 
 from config.settings.base import SQIDS_ALPHABET, SQIDS_MIN_LEN
@@ -26,6 +26,7 @@ from group_velo.clubs.forms import (
 from group_velo.clubs.models import Club, ClubMembershipRequest, ClubRideClassificationLimit, ClubVerificationRequest
 from group_velo.data.choices import GroupClassification, MemberType, RequestStatus, SurfaceType
 from group_velo.data.models import get_coords_of
+from group_velo.utils.mixins import SqidMixin
 from group_velo.utils.utils import get_members_by_type, search_club_context
 
 
@@ -161,19 +162,19 @@ class SearchClubView(TemplateView):
         return HttpResponse(response)
 
 
-def create_club_membership_request(request, club_sqid):
-    if request.method == "POST":
-        sqids = Sqids(alphabet=SQIDS_ALPHABET, min_length=SQIDS_MIN_LEN)
-        club_id = sqids.decode(club_sqid)[0]
+@method_decorator(login_required(login_url="/login"), name="dispatch")
+class CreateMemberhipRequestView(View, SqidMixin):
+    def post(self, *args, **kwargs):
+        club_id = self.decode_sqid(kwargs.get("club_sqid", ""))
         club = get_object_or_404(Club, pk=club_id)
 
-        existing_membership_requests = ClubMembershipRequest.objects.filter(user=request.user, club=club)
+        existing_membership_requests = ClubMembershipRequest.objects.filter(user=self.request.user, club=club)
         if existing_membership_requests:
             existing_membership_requests.delete()
 
-        message = request.user.create_club_membership_request(club)
+        message = self.request.user.create_club_membership_request(club)
 
-        membership_status_text = request.user.get_club_membership_request_status(club)
+        membership_status_text = self.request.user.get_club_membership_request_status(club)
 
         rendered_template = render_to_string(
             "clubs/members/partials/_create_club_membership_request.html",
@@ -593,11 +594,11 @@ class EditClub(TemplateView):
 
     @staticmethod
     def post(request, **kwargs):
+        print("START OF POST")
         group_classification_form_list = []
         slug = kwargs["slug"]
         club = get_object_or_404(Club, slug=slug)
         existing_limits = ClubRideClassificationLimit.objects.filter(club=club)
-        club_form = ClubForm(instance=club, submit_text="Save")
 
         if request.method == "POST":
             # process club form
@@ -668,13 +669,12 @@ class EditClub(TemplateView):
                         return HttpResponseRedirect(reverse("clubs:edit_club", kwargs={"slug": slug}))
 
                 messages.success(request, "Successfully updated the club.", extra_tags="timeout-5000")
-                return HttpResponseRedirect(reverse("clubs:edit_club", kwargs={"slug": slug}))
+                return HttpResponseRedirect(reverse("home"))
             else:
                 for error in list(gc_form.errors.values()):
                     messages.error(request, error)
 
         group_classification_form_list = []
-        club_form = ClubForm(request.POST, request.FILES, instance=club, submit_text="Save")
 
         # if club form is valid, move on to GC forms
         for list_item in group_classification_generator():
@@ -705,16 +705,7 @@ class EditClub(TemplateView):
                 }
             )
 
-        return render(
-            request=request,
-            template_name="clubs/actions/edit_club.html",
-            context={
-                "form": club_form,
-                "slug": slug,
-                "club": club,
-                "group_classification_form_list": group_classification_form_list,
-            },
-        )
+        return HttpResponseRedirect(reverse("home"))
 
 
 @login_required(login_url="/login")

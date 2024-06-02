@@ -26,7 +26,7 @@ urlpatterns = [
         r"(?:/(?P<longitude>[-.0-9]+))?"
         r"(?:/(?P<club_name>\w+))?"
         r"(?:/(?P<zip_code>[0-9]+))?/$",
-        login_required(views.create_club_membership_request, login_url="/login"),
+        views.CreateMemberhipRequestView.as_view(),
         name="club_membership_request",
     ),
     path(
