@@ -3228,94 +3228,8 @@ html[data-theme="dark"] {
   color: #ea4335;
 }
 
-.animation-ctn {
-  text-align: center;
-}
-
-@-webkit-keyframes checkmark {
-  0% {
-    stroke-dashoffset: 100px;
-  }
-
-  100% {
-    stroke-dashoffset: 200px;
-  }
-}
-
-@keyframes checkmark {
-  0% {
-    stroke-dashoffset: 100px;
-  }
-
-  100% {
-    stroke-dashoffset: 0px;
-  }
-}
-
-@-webkit-keyframes checkmark-circle {
-  0% {
-    stroke-dashoffset: 480px;
-  }
-
-  100% {
-    stroke-dashoffset: 960px;
-  }
-}
-
-@keyframes checkmark-circle {
-  0% {
-    stroke-dashoffset: 480px;
-  }
-
-  100% {
-    stroke-dashoffset: 960px;
-  }
-}
-
-@-webkit-keyframes colored-circle {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 100;
-  }
-}
-
-@keyframes colored-circle {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 100;
-  }
-}
-
-/* other styles */
-
-/* .svg svg {
-    display: none
-}
- */
-
 .inlinesvg .svg svg {
   display: inline;
-}
-
-.icon--order-success svg polyline {
-  -webkit-animation: checkmark 0.25s ease-in-out 0.7s backwards;
-  animation: checkmark 0.25s ease-in-out 0.4s backwards;
-}
-
-.icon--order-success svg circle {
-  -webkit-animation: checkmark-circle 0.3s ease-in-out backwards;
-  animation: checkmark-circle 0.3s ease-in-out backwards;
-}
-
-.icon--order-success svg circle#colored {
-  -webkit-animation: colored-circle 0.4s ease-in-out 0.5s backwards;
-  animation: colored-circle 0.4s ease-in-out 0.5s backwards;
 }
 
 .htmx-request .mag-icon {
@@ -4178,6 +4092,11 @@ html[data-theme="dark"] {
 
 .dark\:checked\:ring-offset-2:checked:is(.dark *) {
   --tw-ring-offset-width: 2px;
+}
+
+.dark\:hover\:border-gray-300:hover:is(.dark *) {
+  --tw-border-opacity: 1;
+  border-color: rgb(209 213 219 / var(--tw-border-opacity));
 }
 
 .dark\:hover\:bg-blue-300:hover:is(.dark *) {

@@ -15,6 +15,7 @@ from django.views.generic import CreateView, ListView, TemplateView, View
 from sqids.sqids import Sqids
 
 from config.settings.base import SQIDS_ALPHABET, SQIDS_MIN_LEN
+from group_velo.clubs.decorators import can_manage_club_or_self
 from group_velo.clubs.forms import (
     ClubForm,
     ClubMembership,
@@ -184,46 +185,99 @@ class CreateMemberhipRequestView(View, SqidMixin):
         return HttpResponse(rendered_template)
 
 
-def deactivate_membership(request, slug, membership_sqid, tab_type):
-    sqids = Sqids(alphabet=SQIDS_ALPHABET, min_length=SQIDS_MIN_LEN)
-    membership_id = sqids.decode(membership_sqid)[0]
-    membership = get_object_or_404(ClubMembership, pk=membership_id, club__active=True)
+# @method_decorator(can_manage_club_or_self,name="dispatch")
+# @method_decorator(login_required(login_url="/login"),name="dispatch")
+# class DeactivateMemberhipView(View, SqidMixin):
+#     def post(self, *args, **kwargs):
+#         tab_type = kwargs.get("tab_type", None)
+#         membership_sqid = kwargs.get("membership_sqid", None)
+#         slug = kwargs.get("slug", None)
+#         membership = get_object_or_404(ClubMembership, pk=self.decode_sqid(membership_sqid), club__active=True)
+#         user = self.request.user
 
-    # Deactivating own membership from the "my clubs" page
-    if tab_type == "self_deactivation":
-        # confirm the request is a self-request
-        if request.user == membership.user and membership.membership_type > MemberType(MemberType.Admin).value:
+#         # Deactivating own membership from the "my clubs" page
+#         if tab_type == "self_deactivation":
+#             # confirm the request is a self-request
+#             if user == membership.user and membership.membership_type > MemberType(MemberType.Admin).value:
+#                 membership.active = not membership.active
+#                 membership.save()
+#                 messages.success(request, "Changed active status.", extra_tags="timeout-5000")
+#                 response = HttpResponse()
+#                 response["HX-Redirect"] = reverse("clubs:my_clubs")
+#                 return response
+#             else:
+#                 message = "You can only deactivate your own membership. Admins may not deactivate their membership."
+#                 messages.error(request, message)
+#                 raise ValidationError(message)
+
+#         requestor_membership = ClubMembership.objects.get(club__slug=slug, club__active=True, user=user)
+
+#         requestor_role = requestor_membership.membership_type
+#         member_role = membership.membership_type
+#         creator_role_type = MemberType(MemberType.Creator).value
+
+#         if member_role == creator_role_type and requestor_role > creator_role_type:
+#             messages.error(request, "Only creators can modify a creator.")
+#             raise ValidationError("Only creators can modify a creator.")
+#         else:
+#             membership.active = not membership.active
+#             membership.save()
+#             messages.success(request, "Changed active status.", extra_tags="timeout-5000")
+
+#             return redirect(
+#                 reverse(
+#                     "clubs:club_member_management",
+#                     kwargs={"slug": slug, "tab_type": "active"},
+#                 )
+#             )
+
+
+@method_decorator(can_manage_club_or_self, name="dispatch")
+@method_decorator(login_required(login_url="/login"), name="dispatch")
+class DeactivateMembershipView(View, SqidMixin):
+    def post(self, request, *args, **kwargs):
+        tab_type = kwargs.get("tab_type")
+        membership_sqid = kwargs.get("membership_sqid")
+        slug = kwargs.get("slug")
+
+        membership = get_object_or_404(ClubMembership, pk=self.decode_sqid(membership_sqid), club__active=True)
+
+        user = request.user
+
+        if tab_type == "self_deactivation":
+            return self._handle_self_deactivation(request, membership, user)
+
+        return self._handle_admin_deactivation(request, slug, membership, user)
+
+    def _handle_self_deactivation(self, request, membership, user):
+        if user == membership.user and membership.membership_type > MemberType(MemberType.Admin).value:
             membership.active = not membership.active
             membership.save()
             messages.success(request, "Changed active status.", extra_tags="timeout-5000")
             response = HttpResponse()
             response["HX-Redirect"] = reverse("clubs:my_clubs")
             return response
-        else:
-            message = "You can only deactivate your own membership. Admins may not deactivate their membership."
-            messages.error(request, message)
-            raise ValidationError(message)
 
-    requestor_membership = ClubMembership.objects.get(club__slug=slug, club__active=True, user=request.user)
+        message = "You can only deactivate your own membership. Admins may not deactivate their membership."
+        messages.error(request, message)
+        raise ValidationError(message)
 
-    requestor_role = requestor_membership.membership_type
-    member_role = membership.membership_type
-    creator_role_type = MemberType(MemberType.Creator).value
+    def _handle_admin_deactivation(self, request, slug, membership, user):
+        requestor_membership = get_object_or_404(ClubMembership, club__slug=slug, club__active=True, user=user)
 
-    if member_role == creator_role_type and requestor_role > creator_role_type:
-        messages.error(request, "Only creators can modify a creator.")
-        raise ValidationError("Only creators can modify a creator.")
-    else:
+        requestor_role = requestor_membership.membership_type
+        member_role = membership.membership_type
+        creator_role_type = MemberType(MemberType.Creator).value
+
+        if member_role == creator_role_type and requestor_role > creator_role_type:
+            messages.error(request, "Only creators can modify a creator.")
+            raise ValidationError("Only creators can modify a creator.")
+
         membership.active = not membership.active
         membership.save()
         messages.success(request, "Changed active status.", extra_tags="timeout-5000")
 
-        return redirect(
-            reverse(
-                "clubs:club_member_management",
-                kwargs={"slug": slug, "tab_type": "active"},
-            )
-        )
+        return redirect(reverse("clubs:club_member_management", kwargs={"slug": slug, "tab_type": "active"}))
 
 
 def reject_membership_request(request, membership_request_sqid, **kwargs):
@@ -340,7 +394,7 @@ class ClubMemberManagement(TemplateView):
 
         inactive_class = {
             "a": "border-b-2 border-transparent rounded-t-lg text-gray-700 hover:text-black dark:text-gray-300 "
-            "dark:hover:text-white hover:border-black group",
+            "dark:hover:text-white dark:hover:border-gray-300 hover:border-black group",
             "svg": "text-gray-700 dark:text-gray-300 group-hover:text-black dark:group-hover:text-white",
         }
 

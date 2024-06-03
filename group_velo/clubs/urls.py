@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.urls import include, path, re_path
 
-from group_velo.clubs.decorators import can_manage_club, can_manage_club_or_self
+from group_velo.clubs.decorators import can_manage_club
 
 from . import views
 
@@ -118,10 +118,7 @@ urlpatterns = [
                             ),
                             path(
                                 "activation/<str:membership_sqid>/<str:tab_type>/",
-                                login_required(
-                                    can_manage_club_or_self(views.deactivate_membership),
-                                    login_url="/login",
-                                ),
+                                views.DeactivateMembershipView.as_view(),
                                 name="club_member_activation",
                             ),
                             path(
