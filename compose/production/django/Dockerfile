@@ -1,4 +1,4 @@
-FROM docker.io/node:20-bookworm-slim as client-builder
+FROM docker.io/node:20-bookworm-slim AS client-builder
 
 ARG APP_HOME=/app
 WORKDIR ${APP_HOME}
@@ -8,30 +8,30 @@ RUN npm install && npm cache clean --force
 COPY . ${APP_HOME}
 RUN npm run build
 # define an alias for the specific python version used in this file.
-FROM docker.io/python:3.11.5-slim-bullseye as python
+FROM docker.io/python:3.11.5-slim-bullseye AS python
 
 # Python build stage
-FROM python as python-build-stage
+FROM python AS python-build-stage
 
 ARG BUILD_ENVIRONMENT=production
 
 # Install apt packages
 RUN apt-get update && apt-get install --no-install-recommends -y \
-  # dependencies for building Python packages
-  build-essential \
-  # psycopg dependencies
-  libpq-dev
+    # dependencies for building Python packages
+    build-essential \
+    # psycopg dependencies
+    libpq-dev
 
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements .
 
 # Create Python Dependency and Sub-Dependency Wheels.
 RUN pip wheel --wheel-dir /usr/src/app/wheels  \
-  -r ${BUILD_ENVIRONMENT}.txt
+    -r ${BUILD_ENVIRONMENT}.txt
 
 
 # Python 'run' stage
-FROM python as python-run-stage
+FROM python AS python-run-stage
 
 ARG BUILD_ENVIRONMENT=production
 ARG APP_HOME=/app
@@ -48,13 +48,13 @@ RUN addgroup --system django \
 
 # Install required system dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
-  # psycopg dependencies
-  libpq-dev \
-  # Translations dependencies
-  gettext \
-  # cleaning up unused files
-  && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
-  && rm -rf /var/lib/apt/lists/*
+    # psycopg dependencies
+    libpq-dev \
+    # Translations dependencies
+    gettext \
+    # cleaning up unused files
+    && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && rm -rf /var/lib/apt/lists/*
 
 # All absolute dir copies ignore workdir instruction. All relative dir copies are wrt to the workdir instruction
 # copy python dependency wheels from python-build-stage
@@ -62,7 +62,7 @@ COPY --from=python-build-stage /usr/src/app/wheels  /wheels/
 
 # use wheels to install python dependencies
 RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
-  && rm -rf /wheels/
+    && rm -rf /wheels/
 
 
 COPY --chown=django:django ./compose/production/django/entrypoint /entrypoint
@@ -92,15 +92,15 @@ RUN chmod +x /start-flower
 COPY --from=client-builder --chown=django:django ${APP_HOME} ${APP_HOME}
 
 
-# make django owner of the WORKDIR directory as well.
+# make django owner of the WORKDIR directory AS well.
 RUN chown -R django:django ${APP_HOME}
 
 USER django
 
 RUN DATABASE_URL="" \
-  CELERY_BROKER_URL="" \
-  DJANGO_SETTINGS_MODULE="config.settings.test" \
-  python manage.py compilemessages
+    CELERY_BROKER_URL="" \
+    DJANGO_SETTINGS_MODULE="config.settings.test" \
+    python manage.py compilemessages
 
 RUN mkdir ${APP_HOME}/group_velo/media && chown django:django ${APP_HOME}/group_velo/media
 

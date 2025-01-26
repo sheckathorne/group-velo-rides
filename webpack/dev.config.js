@@ -9,7 +9,7 @@ module.exports = merge(commonConfig, {
     proxy: [
       {
         context: ["/"],
-        target: "http://django:8000",
+        target: "http://django:8000/",
       },
     ],
     client: {

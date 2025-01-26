@@ -151,6 +151,7 @@ def custom_login(request):
                 username=form.cleaned_data["username"],
                 password=form.cleaned_data["password"],
             )
+
             if user is not None:
                 login(request, user)
                 messages.success(request, "Logged in successfully!", extra_tags="timeout-5000")
