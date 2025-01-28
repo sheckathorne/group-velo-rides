@@ -8,6 +8,7 @@
   GroupVelo | My Clubs
 {% endblock title %}
 {% block content %}
+{% if club_list %}
   {% include 'clubs/modals/request_club_verification/_blank.html' %}
   <div id="clubs-accordion-collapse"
        class="w-full flex-none inline-block h-auto mb-6 mt-4 overflow-hidden"
@@ -126,9 +127,16 @@
             </div>
           </div>
         {% endwith %}
-      {% empty %}
-        <p>no clubs to show</p>
       {% endfor %}
     </div>
   </div>
+  {% else %}
+    <span class="font-bold text-gray-700 dark:text-gray-200">You are not a member of any clubs.
+      <br><br>
+    <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="{% url 'clubs:search_club' %}">Search and join</a>
+    or
+      <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="{% url 'clubs:create_club' %}">create</a>
+    your own now!
+    </span>
+  {% endif %}
 {% endblock content %}
