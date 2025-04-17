@@ -3,7 +3,7 @@
     "model": "events.event",
     "pk": 1,
     "fields": {
-      "created_by": 2,
+      "created_by": 1,
       "privacy": 5,
       "club": 1,
       "ride_time": "17:00:00",

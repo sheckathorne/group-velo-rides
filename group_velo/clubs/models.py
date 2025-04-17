@@ -89,7 +89,7 @@ class Club(models.Model, SqidMixin):
         if length_of_five(self.zip_code) != ValidationError and numeric_chars(self.zip_code) != ValidationError:
             self.latitude, self.longitude = get_coords_of(self.zip_code)
 
-        created = self.id is None
+        created = self.pk is None
         self.slug = slugify(f"{self.name}") + f"-{self.encode_sqid(self.pk)}"
 
         super().save(*args, **kwargs)

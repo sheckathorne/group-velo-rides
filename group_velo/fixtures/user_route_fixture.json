@@ -3,7 +3,7 @@
     "model": "routes.userroute",
     "pk": 1,
     "fields": {
-      "user": 2,
+      "user": 1,
       "route": 1
     }
   }

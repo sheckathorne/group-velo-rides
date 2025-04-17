@@ -1,6 +1,30 @@
 [
   {
     "model": "users.user",
+    "pk": 1,
+    "fields": {
+      "password": "argon2$argon2id$v=19$m=102400,t=2,p=8$Y2NDSEQ2NzJ2TVpBUEVuaEJaTkdFZA$eXXUMcPUG3VjuqVGAnVh8KQHGkNWvRuXx5SiupjSUSM",
+      "last_login": "2025-02-01T16:25:01Z",
+      "is_superuser": true,
+      "username": "sheckathorne",
+      "first_name": "",
+      "last_name": "",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-02-01T16:24:35Z",
+      "name": "Sean Heckathorne",
+      "email": "heckathorne.s@gmail.com",
+      "address": null,
+      "zip_code": "75072",
+      "avatar": "",
+      "about": "",
+      "slug": "-CU4naFB1zR7mPyIN",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "users.user",
     "pk": 2,
     "fields": {
       "password": "argon2$argon2id$v=19$m=102400,t=2,p=8$U3gxamVKbnljeXZoOGVoS1BocEk5Tw$nDnTmsR9qxT5MwTTFZoLV/UtgzOylhp1rSDobXIQEGM",
