@@ -44,7 +44,7 @@ def can_view_user_emergency_contacts(function):
             messages.error(
                 request,
                 "You are not authorized to view this rider's emergency contact information",
-                extra_tags={"timeout-5000"},
+                extra_tags="timeout-5000",
             )
             return HttpResponseRedirect("/")
 

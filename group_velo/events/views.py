@@ -17,7 +17,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
-from django.utils.html import mark_safe
+from django.utils.safestring import mark_safe
 from django.views.generic import DeleteView, TemplateView, UpdateView
 from django.views.generic.base import View
 from django.views.generic.edit import FormMixin
@@ -53,6 +53,9 @@ from group_velo.utils.utils import distinct_errors, get_prev_dates, pagination_c
 
 @method_decorator(login_required(login_url="/login"), name="dispatch")
 class EventView(TemplateView):
+    TABLE_PREFIX = ""
+    ITEMS_PER_PAGE = 4
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.DAYS_IN_FUTURE = 62
@@ -411,6 +414,8 @@ class RideAttendeesView(SqidMixin, TemplateView):
 @method_decorator(login_required(login_url="/login"), name="dispatch")
 class CreateRegistrationBaseView(SqidMixin, FormMixin, View):
     success_url = reverse_lazy("events:available_rides")
+    model = EventOccurenceMember
+    success_message = ""
 
     def get_data(self):
         event_occurence_id = self.decode_sqid(self.kwargs["event_occurence_sqid"])
@@ -464,6 +469,8 @@ class EventOccurenceCommentClickView(SqidMixin, FormMixin, View):
         return super().form_valid(form=None)
 
 
+@method_decorator(login_required(login_url="/login"), name="dispatch")
+@method_decorator(user_is_ride_member, name="dispatch")
 class EventComments(SqidMixin, TemplateView):
     template_name = "events/comments/ride_comments.html"
 
@@ -587,6 +594,8 @@ class CreateEvent(TemplateView):
             )
 
 
+@method_decorator(login_required(login_url="/login"), name="dispatch")
+@method_decorator(user_is_ride_leader, name="dispatch")
 class ModifyEvent(SqidMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         event_occurence_sqid = kwargs.get("event_occurence_sqid", "")

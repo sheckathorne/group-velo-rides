@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.urls import include, path
 
-from group_velo.events.decorators import can_view_user_emergency_contacts, user_is_ride_leader, user_is_ride_member
+from group_velo.events.decorators import can_view_user_emergency_contacts
 
 from . import views
 
@@ -208,12 +208,7 @@ urlpatterns = [
                 ),
                 path(
                     "edit/<str:slug>/",
-                    (
-                        login_required(
-                            user_is_ride_leader(views.ModifyEvent.as_view()),
-                            login_url="/login",
-                        )
-                    ),
+                    views.ModifyEvent.as_view(),
                     name="modify_event",
                 ),
                 path(
@@ -222,10 +217,7 @@ urlpatterns = [
                         [
                             path(
                                 "",
-                                login_required(
-                                    user_is_ride_member(views.EventComments.as_view()),
-                                    login_url="/login",
-                                ),
+                                views.EventComments.as_view(),
                                 name="ride_comments",
                             ),
                             path(
