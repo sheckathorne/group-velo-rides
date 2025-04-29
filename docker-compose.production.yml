@@ -22,6 +22,12 @@ services:
       - ./.envs/.production/.django
       - ./.envs/.production/.postgres
     command: /start
+    healthcheck:
+      test: /bin/bash -c "timeout 1 bash -c '</dev/tcp/localhost/5000' 2>/dev/null"
+      start_period: 100s
+      interval: 30s
+      timeout: 30s
+      retries: 5
 
   postgres:
     build:
@@ -40,7 +46,8 @@ services:
       dockerfile: ./compose/production/traefik/Dockerfile
     image: group_velo_rides_production_traefik
     depends_on:
-      - django
+      django:
+        condition: service_healthy
     volumes:
       - production_traefik:/etc/traefik/acme
     ports:
