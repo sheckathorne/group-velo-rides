@@ -1,0 +1,53 @@
+{% load group_velo_events_tags %}
+{% load to_sqid from group_velo_data_tags %}
+
+{% if is_registered %}
+  {% with new_message_count=ride.comments|get_item:"new" %}
+    {% registration_urls as registration_urls %}
+    {% if request.path == registration_urls.waitlisted %}
+      <button type="button"
+              @click="rideRegistrationModalOpen=true"
+              hx-get="{% url 'events:get_leave_waitlist_form' event_occurence_sqid=event_occurence.id|to_sqid %}"
+              hx-target="#rideRegistrationModalReplace"
+              hx-swap="outerHTML"
+              class="register-button px-3 py-1 btn-danger-color">Leave Waitlist</button>
+    {% elif request.path == registration_urls.registered %}
+      {% if ride.is_ride_leader %}
+        <button type="button"
+                @click="cancelEventOccurenceModalOpen=true"
+                hx-get="{% url 'events:get_cancel_event_occurence_form' event_occurence_sqid=ride.event_occurence.id|to_sqid %}"
+                hx-swap="outerHTML"
+                hx-target="#cancelEventOccurenceModalReplace"
+                class="cancel-ride-button px-3 py-1 btn-danger-color">Cancel Ride</button>
+      {% else %}
+        <button type="button"
+                hx-get="{% url 'events:get_leave_ride_form' event_occurence_sqid=ride.id|to_sqid %}"
+                hx-target="#rideRegistrationModalReplace"
+                hx-swap="outerHTML"
+                class="cancel-registration-button px-3 py-1 btn-danger-color">Cancel Registration</button>
+      {% endif %}
+    {% endif %}
+  {% endwith %}
+{% else %}
+  {% if event_join_status.can_register_to_ride %}
+    {% if event_join_status.ride_is_full %}
+      <button type="button"
+              @click="rideRegistrationModalOpen=true"
+              hx-get="{% url 'events:get_join_waitlist_form' event_occurence_sqid=event_occurence.id|to_sqid %}"
+              hx-target="#rideRegistrationModalReplace"
+              hx-swap="outerHTML"
+              class="register-button px-3 py-1 btn-warning-color">Join Waitlist</button>
+    {% else %}
+      <button type="button"
+              class="register-button px-3 py-1 btn-primary-color"
+              @click="rideRegistrationModalOpen=true"
+              hx-get="{% url 'events:get_join_ride_form' event_occurence_sqid=event_occurence.id|to_sqid %}"
+              hx-target="#rideRegistrationModalReplace"
+              hx-swap="outerHTML">Register Now</button>
+    {% endif %}
+  {% else %}
+    <button type="button"
+            class="register-button px-3 py-1 btn-primary-color"
+            @click="cannotJoinRideModalOpen=true">Register Now</button>
+  {% endif %}
+{% endif %}

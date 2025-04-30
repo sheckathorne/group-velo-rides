@@ -5,11 +5,23 @@
 {% block content %}
   <div class="ride-card" data-ride-id="{{ ride.id }}">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
-      <div class="p-4 sm:p-6">
-        <div class="flex justify-between items-start">
+      <div class="p-4 sm:p-6" x-data="{ expanded: false }">
+        <div class="flex justify-between">
           <div class="cursor-pointer ride-header">
             <h2 class="text-xl font-bold">{{ event_occurence.occurence_name }}</h2>
-            <div class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Hosted by {{ event_occurence.club.name }}</div>
+            <div class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              {% if event_occurence.club is not None %}
+                {% if is_registered %}
+                  Hosted by <a class="underline"
+    href="{% url 'events:my_rides' %}?club={{ event_occurence.club.slug }}">{{ event_occurence.club.name }}</a>
+                {% else %}
+                  Hosted by <a class="underline"
+    href="{% url 'events:available_rides' %}?club={{ event_occurence.club.slug }}">{{ event_occurence.club.name }}</a>
+                {% endif %}
+              {% else %}
+                <small class="fw-bold">No club affiliation</small>
+              {% endif %}
+            </div>
             <div class="flex items-center gap-1 mt-2 text-gray-600 dark:text-gray-300">
               <span>{{ event_occurence.event.route.distance }} miles</span>
               <span class="mx-1">•</span>
@@ -37,76 +49,15 @@
                 </svg>
                 {{ event_occurence.ride_date|date:"M d" }} • {{ event_occurence.ride_time|time:"g:i A" }}
               </div>
-              <div class="flex items-center gap-1 text-sm weather-tooltip"
-                   data-tooltip="{{ ride.weather_condition|title }}, {{ ride.weather_temp_low }}°F - {{ ride.weather_temp_high }}°F">
-                <span class="weather-icon" data-condition="{{ ride.weather_condition }}">
-                  <!-- Weather icon will be inserted by JS -->
-                </span>
-                <span>{{ ride.weather_temp_high }}°F</span>
-              </div>
             </div>
           </div>
-          <div class="flex flex-col items-end gap-4">
-            <div class="flex items-center gap-2">
+          <div class="flex flex-col justify-between items-stretch">
+            <div class="flex items-center justify-end gap-2">
               <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold category-badge {{ event_occurence.return_group_classification_color }}"
                    data-category="{{ event_occurence.group_classification_name }}">
                 {{ event_occurence.group_classification_abbreviation }}
               </div>
-              <div class="relative" x-data="{ open:false }">
-                <button class="action-menu-button h-8 w-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
-                  <svg class="h-4 w-4"
-                       xmlns="http://www.w3.org/2000/svg"
-                       fill="none"
-                       viewBox="0 0 24 24"
-                       stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
-                  </svg>
-                </button>
-                <div class="action-menu hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
-                  <div class="py-1">
-                    <button class="register-button block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                      <svg class="inline-block h-4 w-4 mr-2"
-                           xmlns="http://www.w3.org/2000/svg"
-                           fill="none"
-                           viewBox="0 0 24 24"
-                           stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                      </svg>
-                      Register for ride
-                    </button>
-                    <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                      <svg class="inline-block h-4 w-4 mr-2"
-                           xmlns="http://www.w3.org/2000/svg"
-                           fill="none"
-                           viewBox="0 0 24 24"
-                           stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                      </svg>
-                      Share ride
-                    </button>
-                    <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                      <svg class="inline-block h-4 w-4 mr-2"
-                           xmlns="http://www.w3.org/2000/svg"
-                           fill="none"
-                           viewBox="0 0 24 24"
-                           stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      Add to calendar
-                    </button>
-                    <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
-                      <svg class="inline-block h-4 w-4 mr-2"
-                           xmlns="http://www.w3.org/2000/svg"
-                           fill="none"
-                           viewBox="0 0 24 24"
-                           stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-                      </svg>
-                      Report issue
-                    </button>
-                  </div>
-                </div>
-              </div>
+              {% include 'events/ride_card/partials/_registered_ride_menu.html' %}
             </div>
             <div class="flex flex-col justify-between items-end gap-1">
               {% with num_riders=event_occurence.number_of_riders max_riders=event_occurence.max_riders %}
@@ -130,10 +81,10 @@
           </div>
         </div>
         <div class="mt-4 flex justify-between items-center">
-          <button class="register-button px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md">
-            Register Now
-          </button>
-          <button class="toggle-details text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-300">
+          {% include 'events/ride_card/partials/_quick_action_button.html' %}
+          <button x-show="!expanded"
+                  class="toggle-details text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-300"
+                  @click="expanded = ! expanded">
             <svg class="h-4 w-4"
                  xmlns="http://www.w3.org/2000/svg"
                  fill="none"
@@ -144,160 +95,7 @@
             <span>View Details</span>
           </button>
         </div>
-        <!-- Expanded details section (hidden by default) -->
-        <div class="ride-details hidden mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <p class="text-sm">{{ ride.description }}</p>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div class="flex items-center gap-2">
-              <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-                   xmlns="http://www.w3.org/2000/svg"
-                   fill="none"
-                   viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span class="text-sm">{{ ride.start_time|date:"l, M j, Y, g:i A" }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-                   xmlns="http://www.w3.org/2000/svg"
-                   fill="none"
-                   viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span class="text-sm">{{ ride.start_location }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-                   xmlns="http://www.w3.org/2000/svg"
-                   fill="none"
-                   viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span class="text-sm">{{ ride.estimated_duration }}</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-                   xmlns="http://www.w3.org/2000/svg"
-                   fill="none"
-                   viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-              </svg>
-              <span class="text-sm">{{ ride.elevation }} ft elevation gain</span>
-            </div>
-          </div>
-          <div class="mt-4 p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
-            <h4 class="text-sm font-medium mb-3 flex items-center gap-1.5">
-              <span class="weather-icon-large"
-                    data-condition="{{ ride.weather_condition }}">
-                <!-- Weather icon will be inserted by JS -->
-              </span>
-              <span>Weather Forecast</span>
-            </h4>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="flex flex-col gap-2">
-                <div class="flex items-center gap-2">
-                  <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-                       xmlns="http://www.w3.org/2000/svg"
-                       fill="none"
-                       viewBox="0 0 24 24"
-                       stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                  </svg>
-                  <span class="text-sm">{{ ride.weather_temp_low }}°F - {{ ride.weather_temp_high }}°F</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-                       xmlns="http://www.w3.org/2000/svg"
-                       fill="none"
-                       viewBox="0 0 24 24"
-                       stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                  </svg>
-                  <span class="text-sm">{{ ride.weather_precipitation_chance }}% chance of
-                    {% if ride.weather_precipitation_type %}
-                      {{ ride.weather_precipitation_type }}
-                    {% else %}
-                      precipitation
-                    {% endif %}
-                  </span>
-                </div>
-              </div>
-              <div class="flex flex-col gap-2">
-                <div class="flex items-center gap-2">
-                  <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-                       xmlns="http://www.w3.org/2000/svg"
-                       fill="none"
-                       viewBox="0 0 24 24"
-                       stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
-                  </svg>
-                  <span class="text-sm">{{ ride.weather_wind_speed }} mph {{ ride.weather_wind_direction }}</span>
-                </div>
-                <div class="flex items-center gap-2">
-                  <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-                       xmlns="http://www.w3.org/2000/svg"
-                       fill="none"
-                       viewBox="0 0 24 24"
-                       stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                  </svg>
-                  <span class="text-sm">{{ ride.weather_humidity }}% humidity</span>
-                </div>
-              </div>
-            </div>
-            <div class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-              Weather forecast for {{ ride.start_time|date:"F j" }} at {{ ride.start_location }}
-            </div>
-          </div>
-          <div class="mt-4">
-            <h4 class="text-sm font-medium mb-2">Ride Leader</h4>
-            <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                {{ ride.leader|slice:":1" }}
-              </div>
-              <span>{{ ride.leader }}</span>
-            </div>
-          </div>
-          <div class="mt-4">
-            <h4 class="text-sm font-medium mb-2">Route Map</h4>
-            <div class="bg-gray-200 dark:bg-gray-700/50 rounded-md p-4 h-[300px] flex items-center justify-center">
-              <div class="text-center">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                  Map from
-                  {% if 'ridewithgps' in ride.map_url %}
-                    Ride with GPS
-                  {% else %}
-                    Strava
-                  {% endif %}
-                </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">The actual map would be embedded here from {{ ride.map_url }}</p>
-              </div>
-            </div>
-          </div>
-          <div class="mt-4">
-            <button class="register-button w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md">
-              Register for this Ride
-            </button>
-          </div>
-          <div class="mt-4 flex justify-end">
-            <button class="toggle-details text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-300">
-              <svg class="h-4 w-4"
-                   xmlns="http://www.w3.org/2000/svg"
-                   fill="none"
-                   viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-              </svg>
-              <span>Collapse</span>
-            </button>
-          </div>
-        </div>
+        {% include 'events/ride_card/partials/_expanded_card_body.html' %}
       </div>
     </div>
   </div>

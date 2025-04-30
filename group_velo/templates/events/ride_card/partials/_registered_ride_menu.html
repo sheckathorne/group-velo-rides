@@ -1,0 +1,90 @@
+{% load group_velo_events_tags %}
+{% load to_sqid from group_velo_data_tags %}
+
+<div class="relative" x-data="{ open:false }">
+  {% if is_registered %}
+    {% with new_message_count=ride.comments|get_item:"new" %}
+      {% registration_urls as registration_urls %}
+      {% include 'events/ride_card/partials/_registered_ride_menu_button.html' %}
+      {% if request.path == registration_urls.waitlisted %}
+        <div x-show="open"
+             x-cloak
+             x-transition:enter="transition ease-out duration-100"
+             x-transition:enter-start="transform opacity-0 scale-95"
+             x-transition:enter-end="transform opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-75"
+             x-transition:leave-start="transform opacity-100 scale-100"
+             x-transition:leave-end="transform opacity-0 scale-95"
+             class="z-10 absolute top-5 bg-white divide-y divide-gray-100 dark:divide-gray-600 rounded shadow w-44 dark:bg-gray-700">
+          {% if ride.is_ride_leader or not event_occurence.club.private_ride_waitlist %}
+            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
+                aria-labelledby="dropdownDefaultButton">
+              <li>
+                <a href="{% url 'events:ride_waitlist' event_occurence_sqid=event_occurence.id|to_sqid %}"
+                   class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                View Waitlist</a>
+              </li>
+            </ul>
+          {% endif %}
+          <div class="py-1">
+            <a @click="rideRegistrationModalOpen=true"
+               hx-get="{% url 'events:get_leave_waitlist_form' event_occurence_sqid=event_occurence.id|to_sqid %}"
+               hx-target="#rideRegistrationModalReplace"
+               hx-swap="outerHTML"
+               class="cursor-pointer block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-200 hover:text-red-600 dark:hover:text-red-600">
+              Leave Waitlist
+            </a>
+          </div>
+        </div>
+      {% elif request.path == registration_urls.registered %}
+        <div x-show="open"
+             x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="transform opacity-0 scale-90"
+             x-transition:enter-end="transform opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="transform opacity-100 scale-100"
+             x-transition:leave-end="transform opacity-0 scale-90"
+             class="z-10 absolute top-5 bg-white divide-y divide-gray-100 dark:divide-gray-600 rounded shadow w-44 dark:bg-gray-700">
+          <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
+              aria-labelledby="dropdownDefaultButton">
+            {% include 'events/ride_card/partials/_discussion_menu_item.html' %}
+            {% if ride.is_ride_leader or not event_occurence.club.private_ride_attendence %}
+              <li>
+                <a href="{% url 'events:ride_attendees' event_occurence.id|to_sqid %}"
+                   class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">View Attendees</a>
+              </li>
+            {% endif %}
+            <li>
+              <a @click="rideRegistrationModalOpen=true"
+                 hx-get="{% url 'events:get_leave_ride_form' event_occurence_sqid=ride.id|to_sqid %}"
+                 hx-target="#rideRegistrationModalReplace"
+                 hx-swap="outerHTML"
+                 class="cursor-pointer block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-200 hover:text-red-600 dark:hover:text-red-600">
+                Cancel Registration
+              </a>
+            </li>
+          </ul>
+          <div class="py-1">
+            {% if ride.is_ride_leader %}
+              <a href="{% url 'events:modify_event' event_occurence_sqid=ride.event_occurence.id|to_sqid slug=ride.event_occurence.slug %}"
+                 class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-200 hover:text-yellow-800 dark:hover:text-yellow-800">Modify Ride</a>
+              <a href="#"
+                 @click="cancelEventOccurenceModalOpen=true"
+                 hx-get="{% url 'events:get_cancel_event_occurence_form' event_occurence_sqid=ride.event_occurence.id|to_sqid %}"
+                 hx-swap="outerHTML"
+                 hx-target="#cancelEventOccurenceModalReplace"
+                 class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-200 hover:text-red-600 dark:hover:text-red-600">Cancel Ride</a>
+              <a href="#"
+                 @click="cancelEventModalOpen=true"
+                 hx-get="{% url 'events:get_cancel_event_form' event_sqid=ride.event_occurence.event.id|to_sqid %}"
+                 hx-swap="outerHTML"
+                 hx-target="#cancelEventModalReplace"
+                 class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-200 hover:text-red-600 dark:hover:text-red-600">Cancel Ride Series</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endwith %}
+  {% endif %}
+</div>
