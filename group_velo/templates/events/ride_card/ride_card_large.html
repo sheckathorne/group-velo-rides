@@ -1,159 +1,301 @@
 {% load group_velo_events_tags %}
 {% load to_sqid from group_velo_data_tags %}
 
-<div x-show="showLarge || selected === '{{ event_occurence.id|to_sqid }}'"
-     class="relative mb-6 rounded-lg bg-white shadow-lg border border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600">
-  <div @click="if ( screenIsSmall ) { selected = null }"
-       :class="screenIsSmall ? 'cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600' : ''"
-       class="flex flex-row items-center rounded-t-lg py-3 pl-4 pr-2 bg-gray-200 text-gray-700 text-sm dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
-    <div class="pr-4" x-data="{ open:false }">
-      {% if is_registered %}
-        {% with new_message_count=ride.comments|get_item:"new" %}
-          {% registration_urls as registration_urls %}
-          {% include 'events/ride_card/partials/_registered_ride_menu_button.html' %}
-          {% if request.path == registration_urls.waitlisted %}
-            <div x-show="open"
-                 x-cloak
-                 x-transition:enter="transition ease-out duration-100"
-                 x-transition:enter-start="transform opacity-0 scale-95"
-                 x-transition:enter-end="transform opacity-100 scale-100"
-                 x-transition:leave="transition ease-in duration-75"
-                 x-transition:leave-start="transform opacity-100 scale-100"
-                 x-transition:leave-end="transform opacity-0 scale-95"
-                 class="z-10 absolute top-5 bg-white divide-y divide-gray-100 dark:divide-gray-600 rounded shadow w-44 dark:bg-gray-700">
-              {% if ride.is_ride_leader or not event_occurence.club.private_ride_waitlist %}
-                <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                    aria-labelledby="dropdownDefaultButton">
-                  <li>
-                    <a href="{% url 'events:ride_waitlist' event_occurence_sqid=event_occurence.id|to_sqid %}"
-                       class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                    View Waitlist</a>
-                  </li>
-                </ul>
-              {% endif %}
-              <div class="py-1">
-                <a @click="rideRegistrationModalOpen=true"
-                   hx-get="{% url 'events:get_leave_waitlist_form' event_occurence_sqid=event_occurence.id|to_sqid %}"
-                   hx-target="#rideRegistrationModalReplace"
-                   hx-swap="outerHTML"
-                   class="cursor-pointer block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-200 hover:text-red-600 dark:hover:text-red-600">
-                  Leave Waitlist
-                </a>
+{{ 9|divisibleby:10|floatformat:2|multiply:100 }}
+{% block content %}
+  <div class="ride-card" data-ride-id="{{ ride.id }}">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
+      <div class="p-4 sm:p-6">
+        <div class="flex justify-between items-start">
+          <div class="cursor-pointer ride-header">
+            <h2 class="text-xl font-bold">{{ event_occurence.occurence_name }}</h2>
+            <div class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Hosted by {{ event_occurence.club.name }}</div>
+            <div class="flex items-center gap-1 mt-2 text-gray-600 dark:text-gray-300">
+              <span>{{ event_occurence.event.route.distance }} miles</span>
+              <span class="mx-1">•</span>
+              <span>
+                {% if event_occurence.get_surface_type_display == 'Road' %}
+                  🛣️
+                {% elif event_occurence.get_surface_type_display == 'Mountain' %}
+                  ⛰️
+                {% elif event_occurence.get_surface_type_display == 'Gravel' %}
+                  🪨
+                {% else %}
+                  🚲
+                {% endif %}
+                {{ event_occurence.get_surface_type_display }}
+              </span>
+            </div>
+            <div class="flex items-center gap-3 mt-2">
+              <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                <svg class="h-4 w-4 mr-1"
+                     xmlns="http://www.w3.org/2000/svg"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                {{ event_occurence.ride_date|date:"M d" }} • {{ event_occurence.ride_time|time:"g:i A" }}
+              </div>
+              <div class="flex items-center gap-1 text-sm weather-tooltip"
+                   data-tooltip="{{ ride.weather_condition|title }}, {{ ride.weather_temp_low }}°F - {{ ride.weather_temp_high }}°F">
+                <span class="weather-icon" data-condition="{{ ride.weather_condition }}">
+                  <!-- Weather icon will be inserted by JS -->
+                </span>
+                <span>{{ ride.weather_temp_high }}°F</span>
               </div>
             </div>
-          {% elif request.path == registration_urls.registered %}
-            <div x-show="open"
-                 x-cloak
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="transform opacity-0 scale-90"
-                 x-transition:enter-end="transform opacity-100 scale-100"
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="transform opacity-100 scale-100"
-                 x-transition:leave-end="transform opacity-0 scale-90"
-                 class="z-10 absolute top-5 bg-white divide-y divide-gray-100 dark:divide-gray-600 rounded shadow w-44 dark:bg-gray-700">
-              <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                  aria-labelledby="dropdownDefaultButton">
-                {% include 'events/ride_card/partials/_discussion_menu_item.html' %}
-                {% if ride.is_ride_leader or not event_occurence.club.private_ride_attendence %}
-                  <li>
-                    <a href="{% url 'events:ride_attendees' event_occurence.id|to_sqid %}"
-                       class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">View Attendees</a>
-                  </li>
-                {% endif %}
-                <li>
-                  <a @click="rideRegistrationModalOpen=true"
-                     hx-get="{% url 'events:get_leave_ride_form' event_occurence_sqid=ride.id|to_sqid %}"
-                     hx-target="#rideRegistrationModalReplace"
-                     hx-swap="outerHTML"
-                     class="cursor-pointer block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-200 hover:text-red-600 dark:hover:text-red-600">
-                    Cancel Registration
-                  </a>
-                </li>
-              </ul>
-              <div class="py-1">
-                {% if ride.is_ride_leader %}
-                  <a href="{% url 'events:modify_event' event_occurence_sqid=ride.event_occurence.id|to_sqid slug=ride.event_occurence.slug %}"
-                     class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-yellow-200 hover:text-yellow-800 dark:hover:text-yellow-800">Modify Ride</a>
-                  <a href="#"
-                     @click="cancelEventOccurenceModalOpen=true"
-                     hx-get="{% url 'events:get_cancel_event_occurence_form' event_occurence_sqid=ride.event_occurence.id|to_sqid %}"
-                     hx-swap="outerHTML"
-                     hx-target="#cancelEventOccurenceModalReplace"
-                     class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-200 hover:text-red-600 dark:hover:text-red-600">Cancel Ride</a>
-                  <a href="#"
-                     @click="cancelEventModalOpen=true"
-                     hx-get="{% url 'events:get_cancel_event_form' event_sqid=ride.event_occurence.event.id|to_sqid %}"
-                     hx-swap="outerHTML"
-                     hx-target="#cancelEventModalReplace"
-                     class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-200 hover:text-red-600 dark:hover:text-red-600">Cancel Ride Series</a>
-                {% endif %}
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold category-badge {{ event_occurence.return_group_classification_color }}"
+                 data-category="{{ event_occurence.group_classification_name }}">
+              {{ event_occurence.group_classification_abbreviation }}
+            </div>
+            <div class="relative">
+              <button class="action-menu-button h-8 w-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                <svg class="h-4 w-4"
+                     xmlns="http://www.w3.org/2000/svg"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" />
+                </svg>
+              </button>
+              <div class="action-menu hidden absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg z-10 border border-gray-200 dark:border-gray-700">
+                <div class="py-1">
+                  <button class="register-button block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="inline-block h-4 w-4 mr-2"
+                         xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    Register for ride
+                  </button>
+                  <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="inline-block h-4 w-4 mr-2"
+                         xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                    </svg>
+                    Share ride
+                  </button>
+                  <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="inline-block h-4 w-4 mr-2"
+                         xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Add to calendar
+                  </button>
+                  <button class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">
+                    <svg class="inline-block h-4 w-4 mr-2"
+                         xmlns="http://www.w3.org/2000/svg"
+                         fill="none"
+                         viewBox="0 0 24 24"
+                         stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                    </svg>
+                    Report issue
+                  </button>
+                </div>
               </div>
             </div>
-          {% endif %}
+          </div>
+        </div>
+        {% with num_riders=event_occurence.number_of_riders max_riders=event_occurence.max_riders %}
+          <div class="mt-4 flex justify-between items-center">
+            <div class="flex items-center gap-1">
+              <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                   xmlns="http://www.w3.org/2000/svg"
+                   fill="none"
+                   viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <span class="text-sm">{{ num_riders }}/{{ max_riders }} riders</span>
+            </div>
+            <div class="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div class="h-full bg-blue-500 rounded-full"
+                   style="width: {{ 9|divisibleby:10|floatformat:2|multiply:100 }}%"></div>
+            </div>
+          </div>
         {% endwith %}
-      {% else %}
-        {% if event_join_status.can_register_to_ride %}
-          {% if event_join_status.ride_is_full %}
-            <button type="button"
-                    @click="rideRegistrationModalOpen=true"
-                    hx-get="{% url 'events:get_join_waitlist_form' event_occurence_sqid=event_occurence.id|to_sqid %}"
-                    hx-target="#rideRegistrationModalReplace"
-                    hx-swap="outerHTML"
-                    class="rounded-lg text-gray-700 bg-yellow-300 hover:bg-yellow-200 hover:text-gray-700 px-2 py-1 font-sans font-semibold text-xs">
-              Join Waitlist
+        <div class="mt-4 flex justify-between items-center">
+          <button class="register-button px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md">
+            Register Now
+          </button>
+          <button class="toggle-details text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-300">
+            <svg class="h-4 w-4"
+                 xmlns="http://www.w3.org/2000/svg"
+                 fill="none"
+                 viewBox="0 0 24 24"
+                 stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+            <span>View Details</span>
+          </button>
+        </div>
+        <!-- Expanded details section (hidden by default) -->
+        <div class="ride-details hidden mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <p class="text-sm">{{ ride.description }}</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div class="flex items-center gap-2">
+              <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                   xmlns="http://www.w3.org/2000/svg"
+                   fill="none"
+                   viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span class="text-sm">{{ ride.start_time|date:"l, M j, Y, g:i A" }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                   xmlns="http://www.w3.org/2000/svg"
+                   fill="none"
+                   viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              <span class="text-sm">{{ ride.start_location }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                   xmlns="http://www.w3.org/2000/svg"
+                   fill="none"
+                   viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-sm">{{ ride.estimated_duration }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                   xmlns="http://www.w3.org/2000/svg"
+                   fill="none"
+                   viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+              </svg>
+              <span class="text-sm">{{ ride.elevation }} ft elevation gain</span>
+            </div>
+          </div>
+          <div class="mt-4 p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
+            <h4 class="text-sm font-medium mb-3 flex items-center gap-1.5">
+              <span class="weather-icon-large"
+                    data-condition="{{ ride.weather_condition }}">
+                <!-- Weather icon will be inserted by JS -->
+              </span>
+              <span>Weather Forecast</span>
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                       xmlns="http://www.w3.org/2000/svg"
+                       fill="none"
+                       viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                  </svg>
+                  <span class="text-sm">{{ ride.weather_temp_low }}°F - {{ ride.weather_temp_high }}°F</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                       xmlns="http://www.w3.org/2000/svg"
+                       fill="none"
+                       viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                  <span class="text-sm">{{ ride.weather_precipitation_chance }}% chance of
+                    {% if ride.weather_precipitation_type %}
+                      {{ ride.weather_precipitation_type }}
+                    {% else %}
+                      precipitation
+                    {% endif %}
+                  </span>
+                </div>
+              </div>
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                       xmlns="http://www.w3.org/2000/svg"
+                       fill="none"
+                       viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+                  </svg>
+                  <span class="text-sm">{{ ride.weather_wind_speed }} mph {{ ride.weather_wind_direction }}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
+                       xmlns="http://www.w3.org/2000/svg"
+                       fill="none"
+                       viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                  <span class="text-sm">{{ ride.weather_humidity }}% humidity</span>
+                </div>
+              </div>
+            </div>
+            <div class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+              Weather forecast for {{ ride.start_time|date:"F j" }} at {{ ride.start_location }}
+            </div>
+          </div>
+          <div class="mt-4">
+            <h4 class="text-sm font-medium mb-2">Ride Leader</h4>
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                {{ ride.leader|slice:":1" }}
+              </div>
+              <span>{{ ride.leader }}</span>
+            </div>
+          </div>
+          <div class="mt-4">
+            <h4 class="text-sm font-medium mb-2">Route Map</h4>
+            <div class="bg-gray-200 dark:bg-gray-700/50 rounded-md p-4 h-[300px] flex items-center justify-center">
+              <div class="text-center">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  Map from
+                  {% if 'ridewithgps' in ride.map_url %}
+                    Ride with GPS
+                  {% else %}
+                    Strava
+                  {% endif %}
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">The actual map would be embedded here from {{ ride.map_url }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <button class="register-button w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md">
+              Register for this Ride
             </button>
-          {% else %}
-            <button type="button"
-                    @click="rideRegistrationModalOpen=true"
-                    hx-get="{% url 'events:get_join_ride_form' event_occurence_sqid=event_occurence.id|to_sqid %}"
-                    hx-target="#rideRegistrationModalReplace"
-                    hx-swap="outerHTML"
-                    class="rounded-lg text-white bg-green-500 hover:bg-green-300 hover:text-gray-700 px-2 py-1 font-sans font-semibold text-xs">
-              Join
+          </div>
+          <div class="mt-4 flex justify-end">
+            <button class="toggle-details text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-300">
+              <svg class="h-4 w-4"
+                   xmlns="http://www.w3.org/2000/svg"
+                   fill="none"
+                   viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+              </svg>
+              <span>Collapse</span>
             </button>
-          {% endif %}
-        {% else %}
-          <button type="button"
-                  class="rounded-lg text-white bg-gray-400 px-2 py-1 font-sans font-semibold text-xs"
-                  @click="cannotJoinRideModalOpen=true">Join</button>
-        {% endif %}
-      {% endif %}
-    </div>
-    <div>
-      <p class="align-middle font-bold">
-        {{ event_occurence.ride_date|date:"D - M j" }} - {{ event_occurence.ride_time|time:"g:i A" }} {{ event_occurence.time_until_ride }}
-        {% if ride_is_canceled %}
-          {% include 'events/ride_card/partials/_pill_button.html' with color='bg-red-600' label='Canceled' %}
-        {% else %}
-          {% if event_occurence.is_private %}
-            {% include 'events/ride_card/partials/_pill_button.html' with color='bg-blue-600' label='Private Ride' %}
-          {% else %}
-            {% include 'events/ride_card/partials/_pill_button.html' with color='bg-green-600' label='Open Ride' %}
-          {% endif %}
-        {% endif %}
-      </p>
-    </div>
-    <svg x-show="screenIsSmall"
-         x-tooltip.raw.placement.left="Click to shrink"
-         class="w-6 h-6 shrink-0 club-arrow-svg dark:group-hover:text-blue-400 ml-auto rotate-svg"
-         fill="currentColor"
-         viewBox="0 0 20 20"
-         xmlns="http://www.w3.org/2000/svg">
-      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-    </svg>
-  </div>
-  {% include 'events/ride_card/ride_card_body.html' %}
-  <div class="flex flex-row items-center rounded-b-lg py-3 pl-4 pr-2 bg-gray-200 border-t border-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600">
-    <div class="pr-4">
-      {% if event_occurence.club is not None %}
-        {% if is_registered %}
-          <a href="{% url 'events:my_rides' %}?club={{ event_occurence.club.slug }}"><small class="fw-bolder">{{ event_occurence.club.name }}</small></a>
-        {% else %}
-          <a href="{% url 'events:available_rides' %}?club={{ event_occurence.club.slug }}"><small class="fw-bolder">{{ event_occurence.club.name }}</small></a>
-        {% endif %}
-      {% else %}
-        <small class="fw-bold">No club affiliation</small>
-      {% endif %}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
+{% endblock content %}

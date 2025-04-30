@@ -1,4 +1,7 @@
 <div class="grid flex-grid grid-cols-1 w-full gap-2 text-gray-700 dark:text-gray-200">
+  {% block title %}
+    <h1 class="text-3xl font-bold">Current Ride Registrations</h1>
+  {% endblock title %}
   {% for ride in pagination.item_list %}
     {% with event_occurence=ride.event_occurence %}
       {% include 'events/ride_card/ride_card.html' with is_registered=True user=user %}

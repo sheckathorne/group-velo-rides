@@ -1,0 +1,17 @@
+{% load float_division_percentage from group_velo_events_tags %}
+
+<div class="group lg:w-full md:w-3/4 sm:w-5/6">
+  <div class="w-full shadow-lg bg-gray-200 rounded-full h-3 align-middle">
+    {% float_division_percentage num_riders max_riders as ride_percentage_full %}
+    {% if ride_percentage_full >= 90 %}
+      <div class="bg-red-600 h-3 rounded-full {% if is_registered %}group-hover:bg-red-800{% endif %}"
+           style="width: {{ ride_percentage_full }}%"></div>
+    {% elif ride_percentage_full > 70 %}
+      <div class="bg-yellow-300 h-3 rounded-full {% if is_registered %}group-hover:bg-yellow-500{% endif %}"
+           style="width: {{ ride_percentage_full }}%"></div>
+    {% else %}
+      <div class="bg-blue-600 h-3 rounded-full {% if is_registered %}group-hover:bg-blue-800{% endif %}"
+           style="width: {{ ride_percentage_full }}%"></div>
+    {% endif %}
+  </div>
+</div>

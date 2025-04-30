@@ -334,6 +334,24 @@ class EventOccurence(EventBase):
         )
 
     @property
+    def return_group_classification_color(self):
+        match GroupClassification(self.group_classification).value:
+            case "A":
+                return "bg-red-500 dark:bg-red-600"
+            case "B":
+                return "bg-orange-500 dark:bg-orange-600"
+            case "C":
+                return "bg-yellow-500 dark:bg-yellow-600"
+            case "D":
+                return "bg-green-500 dark:bg-green-600"
+            case "N":
+                return "bg-blue-500 dark:bg-blue-600"
+            case "NA":
+                return "bg-gray-500 dark:bg-gray-600"
+            case _:
+                return "bg-gray-500 dark:bg-gray-600"
+
+    @property
     def ride_leader_users(self):
         leaders = (
             EventOccurenceMember.objects.select_related("user")
@@ -461,6 +479,10 @@ class EventOccurence(EventBase):
     @property
     def group_classification_name(self):
         return GroupClassification(self.group_classification).label
+
+    @property
+    def group_classification_abbreviation(self):
+        return GroupClassification(self.group_classification).value
 
     def comments(self):
         return EventOccurenceMessage.objects.filter(

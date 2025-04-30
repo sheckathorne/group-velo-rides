@@ -77,3 +77,11 @@ def embedded_map_from(url, height=350):
         embedded_map = ""
 
     return mark_safe(embedded_map)
+
+
+@register.filter
+def multiply(value, arg):
+    try:
+        return float(value) * float(arg)
+    except (ValueError, TypeError):
+        return ""
