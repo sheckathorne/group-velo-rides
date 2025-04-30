@@ -1,7 +1,7 @@
 {% load group_velo_events_tags %}
 {% load to_sqid from group_velo_data_tags %}
+{% load float_division_percentage from group_velo_events_tags %}
 
-{{ 9|divisibleby:10|floatformat:2|multiply:100 }}
 {% block content %}
   <div class="ride-card" data-ride-id="{{ ride.id }}">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
@@ -47,11 +47,11 @@
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold category-badge {{ event_occurence.return_group_classification_color }}"
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold category-badge {{ event_occurence.return_group_classification_color }}"
                  data-category="{{ event_occurence.group_classification_name }}">
               {{ event_occurence.group_classification_abbreviation }}
             </div>
-            <div class="relative">
+            <div class="relative" x-data="{ open:false }">
               <button class="action-menu-button h-8 w-8 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
                 <svg class="h-4 w-4"
                      xmlns="http://www.w3.org/2000/svg"
@@ -120,9 +120,10 @@
               </svg>
               <span class="text-sm">{{ num_riders }}/{{ max_riders }} riders</span>
             </div>
+            {% float_division_percentage num_riders max_riders as ride_percentage_full %}
             <div class="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
               <div class="h-full bg-blue-500 rounded-full"
-                   style="width: {{ 9|divisibleby:10|floatformat:2|multiply:100 }}%"></div>
+                   style="width: {{ ride_percentage_full }}%"></div>
             </div>
           </div>
         {% endwith %}
