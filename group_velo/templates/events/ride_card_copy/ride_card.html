@@ -1,6 +1,0 @@
-{% with ride_is_canceled=event_occurence.is_canceled canceled=event_occurence.is_canceled|yesno:" canceled,," %}
-  <div class="w-full">
-    {% include 'events/ride_card/ride_card_large.html' %}
-    {% include 'events/ride_card/ride_card_small.html' %}
-  </div>
-{% endwith %}
