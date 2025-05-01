@@ -85,3 +85,11 @@ def multiply(value, arg):
         return float(value) * float(arg)
     except (ValueError, TypeError):
         return ""
+
+
+@register.filter
+def initials(value):
+    if not value:
+        return ""
+    words = value.split()
+    return "".join(word[0] for word in words if word)

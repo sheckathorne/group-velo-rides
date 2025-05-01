@@ -1781,10 +1781,6 @@ video {
   height: 2rem;
 }
 
-.h-\[300px\] {
-  height: 300px;
-}
-
 .h-\[31px\] {
   height: 31px;
 }
@@ -4059,10 +4055,6 @@ html[data-theme="dark"] {
 .dark\:bg-gray-700:is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(55 65 81 / var(--tw-bg-opacity, 1));
-}
-
-.dark\:bg-gray-700\/50:is(.dark *) {
-  background-color: rgb(55 65 81 / 0.5);
 }
 
 .dark\:bg-gray-800:is(.dark *) {

@@ -648,7 +648,6 @@ class EditClub(TemplateView):
 
     @staticmethod
     def post(request, **kwargs):
-        print("START OF POST")
         group_classification_form_list = []
         slug = kwargs["slug"]
         club = get_object_or_404(Club, slug=slug)

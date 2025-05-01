@@ -6,28 +6,28 @@
     {% registration_urls as registration_urls %}
     {% if request.path == registration_urls.waitlisted %}
       <button type="button"
-              class="register-button px-3 btn-danger-color {{ btn-class }}"
-              x-show="{{ expanded }}"
+              x-show="expanded"
               @click="rideRegistrationModalOpen=true"
               hx-get="{% url 'events:get_leave_waitlist_form' event_occurence_sqid=event_occurence.id|to_sqid %}"
               hx-target="#rideRegistrationModalReplace"
-              hx-swap="outerHTML">Leave Waitlist</button>
+              hx-swap="outerHTML"
+              class="register-button px-3 btn-danger-color w-full py-2">Leave Waitlist</button>
     {% elif request.path == registration_urls.registered %}
       {% if ride.is_ride_leader %}
         <button type="button"
-                class="cancel-ride-button px-3 btn-danger-color {{ btn-class }}"
-                x-show="{{ expanded }}"
                 @click="cancelEventOccurenceModalOpen=true"
+                x-show="expanded"
                 hx-get="{% url 'events:get_cancel_event_occurence_form' event_occurence_sqid=ride.event_occurence.id|to_sqid %}"
                 hx-swap="outerHTML"
-                hx-target="#cancelEventOccurenceModalReplace">Cancel Ride</button>
+                hx-target="#cancelEventOccurenceModalReplace"
+                class="cancel-ride-button px-3 btn-danger-color w-full py-2">Cancel Ride</button>
       {% else %}
         <button type="button"
-                class="cancel-registration-button px-3 btn-danger-color {{ btn-class }}"
-                x-show="{{ expanded }}"
+                x-show="expanded"
                 hx-get="{% url 'events:get_leave_ride_form' event_occurence_sqid=ride.id|to_sqid %}"
                 hx-target="#rideRegistrationModalReplace"
-                hx-swap="outerHTML">Cancel Registration</button>
+                hx-swap="outerHTML"
+                class="cancel-registration-button px-3 btn-danger-color w-full py-2">Cancel Registration</button>
       {% endif %}
     {% endif %}
   {% endwith %}
@@ -35,16 +35,16 @@
   {% if event_join_status.can_register_to_ride %}
     {% if event_join_status.ride_is_full %}
       <button type="button"
-              class="register-button px-3 btn-warning-color {{ btn-class }}"
-              x-show="{{ expanded }}"
+              x-show="expanded"
               @click="rideRegistrationModalOpen=true"
               hx-get="{% url 'events:get_join_waitlist_form' event_occurence_sqid=event_occurence.id|to_sqid %}"
               hx-target="#rideRegistrationModalReplace"
-              hx-swap="outerHTML">Join Waitlist</button>
+              hx-swap="outerHTML"
+              class="register-button px-3 btn-warning-color w-full py-2">Join Waitlist</button>
     {% else %}
       <button type="button"
-              class="register-button px-3 btn-primary-color {{ btn-class }}"
-              x-show="{{ expanded }}"
+              x-show="expanded"
+              class="register-button px-3 btn-primary-color w-full py-2"
               @click="rideRegistrationModalOpen=true"
               hx-get="{% url 'events:get_join_ride_form' event_occurence_sqid=event_occurence.id|to_sqid %}"
               hx-target="#rideRegistrationModalReplace"
@@ -52,8 +52,8 @@
     {% endif %}
   {% else %}
     <button type="button"
-            class="register-button px-3 py-1 btn-primary-color {{ btn-class }}"
-            x-show="{{ expanded }}"
+            x-show="expanded"
+            class="register-button px-3 btn-primary-color w-full py-2"
             @click="cannotJoinRideModalOpen=true">Register Now</button>
   {% endif %}
 {% endif %}
