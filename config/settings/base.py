@@ -97,7 +97,8 @@ LOCAL_APPS = [
     "group_velo.data.apps.DataConfig",
     "group_velo.routes.apps.RoutesConfig",
     "group_velo.events.apps.EventsConfig",
-    "group_velo.WeatherConfig" "group_velo.notifications.apps.NotificationsConfig",
+    "group_velo.weather.apps.WeatherConfig",
+    "group_velo.notifications.apps.NotificationsConfig",
     # Your stuff: custom apps go here
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
