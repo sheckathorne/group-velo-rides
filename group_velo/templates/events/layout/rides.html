@@ -36,10 +36,7 @@
       </div>
     {% endwith %}
   </div>
-  <div class="xl:w-2/3 lg:w-3/5 w-full my-2"
-       x-data="{ screenIsSmall: false, selected: null }"
-       @resize.window=" width = (window.innerWidth > 0) ? window.innerWidth : screen.width; screenIsSmall = (width > 640) ? false : true "
-       x-init=" screenIsSmall=window.innerWidth <= 640; $watch('screenIsSmall', val => $dispatch('screen-change', !val)) ">
+  <div class="xl:w-2/3 lg:w-3/5 w-full my-2">
     {% if pagination.num_pages > 1 %}
       {% include 'pagination.html' with pagination_items=pagination.html_list %}
     {% endif %}

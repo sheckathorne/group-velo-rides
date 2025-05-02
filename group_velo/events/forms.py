@@ -149,6 +149,10 @@ class ModifyEventForm(forms.ModelForm):
                         padding_bottom=row_padding,
                     ),
                     form_row(
+                        text_input("description", "event_occurence", width=width),
+                        padding_bottom=row_padding,
+                    ),
+                    form_row(
                         dropdown("privacy", "event_occurence", width=width),
                         dropdown("club", "event", width=width),
                         padding_bottom=row_padding,
@@ -374,6 +378,10 @@ class CreateEventForm(forms.ModelForm):
                     "Ride Info",
                     form_row(
                         text_input("name", "event", width=width),
+                        padding_bottom=row_padding,
+                    ),
+                    form_row(
+                        text_input("description", "event", width=width),
                         padding_bottom=row_padding,
                     ),
                     form_row(

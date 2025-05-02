@@ -1,6 +1,9 @@
 {% load group_velo_events_tags %}
 
-<div class="grid flex-grid grid-cols-1 w-full gap-2">
+<div class="grid flex-grid grid-cols-1 w-full gap-2 py-2">
+  {% block title %}
+    <h1 class="text-3xl font-bold">Joinable Rides</h1>
+  {% endblock title %}
   {% for event_occurence in pagination.item_list %}
     {% event_join_status user=user event_occurence=event_occurence as event_join_status %}
     {% include 'events/ride_card/ride_card.html' with event_occurence=event_occurence is_registered=False %}

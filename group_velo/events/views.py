@@ -258,6 +258,13 @@ class DeleteRegistrationBaseView(SuccessMessageMixin, FormInvalidMessageMixin, S
         )
         return qs
 
+    def form_valid(self, form, *args, **kwargs):
+        success_url = self.get_success_url()
+        self.object = self.get_object()
+        self.object.delete(request=self.request, deleted_by_other=False)
+        messages.success(self.request, self.success_message)
+        return HttpResponseRedirect(success_url)
+
 
 class DeleteRideRegistrationView(DeleteRegistrationBaseView):
     success_message = "Successfully unregistered from ride."

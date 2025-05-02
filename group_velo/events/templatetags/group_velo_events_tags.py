@@ -77,3 +77,19 @@ def embedded_map_from(url, height=350):
         embedded_map = ""
 
     return mark_safe(embedded_map)
+
+
+@register.filter
+def multiply(value, arg):
+    try:
+        return float(value) * float(arg)
+    except (ValueError, TypeError):
+        return ""
+
+
+@register.filter
+def initials(value):
+    if not value:
+        return ""
+    words = value.split()
+    return "".join(word[0] for word in words if word)

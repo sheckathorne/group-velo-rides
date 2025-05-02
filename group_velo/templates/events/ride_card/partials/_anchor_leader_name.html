@@ -1,11 +1,20 @@
 {% load add_params_dict_to_string from group_velo_users_tags %}
+{% load group_velo_events_tags %}
 
 {% if is_registered %}
-  <a href="{% url 'events:my_rides' %}?{% add_params_dict_to_string filter_data.query_params 'ride_leader' leader.slug %}">
-    {% include 'events/ride_card/partials/_linked_leader_name.html' %}
+  <a class="flex items-center space-x-2"
+     href="{% url 'events:my_rides' %}?{% add_params_dict_to_string filter_data.query_params 'ride_leader' leader.slug %}">
+    <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+      {{ leader.name|initials }}
+    </div>
+    <span>{{ leader.name }}</span>
   </a>
 {% else %}
-  <a href="{% url 'events:available_rides' %}?{% add_params_dict_to_string filter_data.query_params 'ride_leader' leader.slug %}">
-    {% include 'events/ride_card/partials/_linked_leader_name.html' %}
+  <a class="flex items-center space-x-2"
+     href="{% url 'events:available_rides' %}?{% add_params_dict_to_string filter_data.query_params 'ride_leader' leader.slug %}">
+    <div class="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+      {{ leader.name|initials }}
+    </div>
+    <span>{{ leader.name }}</span>
   </a>
 {% endif %}

@@ -1,5 +1,6 @@
 import datetime
 from datetime import timedelta
+from decimal import Decimal
 
 import pytz
 from dateutil.relativedelta import relativedelta
@@ -89,6 +90,7 @@ def create_occurence_from_event(event, event_date):
         group_classification=event.group_classification,
         lower_pace_range=event.lower_pace_range,
         upper_pace_range=event.upper_pace_range,
+        description=event.description,
     )
 
 
@@ -137,6 +139,7 @@ class EventBase(models.Model):
     group_classification = CharFieldAllowsMultiSelectSearch(
         "Classification", choices=GroupClassification.choices, max_length=2
     )
+    description = models.TextField("Description", blank=True, null=True, max_length=2048)
 
     def create_notification(
         self,
@@ -315,6 +318,27 @@ class EventOccurence(EventBase):
     )
     modified_date = models.DateTimeField("Modified Date", blank=True, null=True, auto_now=True)
 
+    @property
+    def estimated_ride_duration(self):
+        MINS_IN_HOUR = Decimal(60.0)
+        MINS_IN_QUARTER_HOUR = Decimal(15.0)
+        ESTIMATED_STOP_PERCENTAGE = Decimal(0.10)
+        distance = self.route.distance
+        average_pace = (self.lower_pace_range + self.upper_pace_range) / 2
+        estimated_duration = distance / average_pace
+        total_minutes = estimated_duration * MINS_IN_HOUR * (1 + ESTIMATED_STOP_PERCENTAGE)
+        rounded_minutes = round(total_minutes / MINS_IN_QUARTER_HOUR) * MINS_IN_QUARTER_HOUR
+        hours = int(rounded_minutes // MINS_IN_HOUR)
+        minutes = int(rounded_minutes % MINS_IN_HOUR)
+        parts = []
+        if hours:
+            parts.append(f"{hours} hr" + ("s" if hours != 1 else ""))
+
+        if minutes:
+            parts.append(f"{minutes} min" + ("s" if minutes != 1 else ""))
+
+        return " ".join(parts)
+
     def waitlist_members(self):
         return (
             EventOccurenceMemberWaitlist.objects.select_related("user")
@@ -332,6 +356,24 @@ class EventOccurence(EventBase):
             .values_list("user", flat=True)
             .distinct()
         )
+
+    @property
+    def return_group_classification_color(self):
+        match GroupClassification(self.group_classification).value:
+            case "A":
+                return "bg-red-500 dark:bg-red-600"
+            case "B":
+                return "bg-orange-500 dark:bg-orange-600"
+            case "C":
+                return "bg-yellow-500 dark:bg-yellow-600"
+            case "D":
+                return "bg-green-500 dark:bg-green-600"
+            case "N":
+                return "bg-blue-500 dark:bg-blue-600"
+            case "NA":
+                return "bg-gray-500 dark:bg-gray-600"
+            case _:
+                return "bg-gray-500 dark:bg-gray-600"
 
     @property
     def ride_leader_users(self):
@@ -461,6 +503,10 @@ class EventOccurence(EventBase):
     @property
     def group_classification_name(self):
         return GroupClassification(self.group_classification).label
+
+    @property
+    def group_classification_abbreviation(self):
+        return GroupClassification(self.group_classification).value
 
     def comments(self):
         return EventOccurenceMessage.objects.filter(
@@ -777,14 +823,14 @@ class EventOccurenceMemberWaitlist(EventOccurenceMemberBase):
     def num_comments(self, user):
         return {"total": 0, "new": 0}
 
-    def delete(self, request=None, deleted_by_other=None):
+    def delete(self, *args, request=None, deleted_by_other=None, **kwargs):
         if deleted_by_other and request:
             member_list_type = MemberListType.WAITLIST
             self.notify_member_list(
                 request,
                 member_list_type,
             )
-        super().delete()
+        return super().delete()
 
     def __str__(self):
         role = RoleType(self.role).label
@@ -867,17 +913,19 @@ class EventOccurenceMember(EventOccurenceMemberBase):
                 expiration_date = membership.membership_expires
                 membership_is_expired(expiration_date.date(), self.event_occurence.ride_date)
 
-    def delete(self, request=None, deleted_by_other=None):
+    def delete(self, using=None, keep_parents=False, request=None, deleted_by_other=None):
+        # Your custom deletion logic
         if deleted_by_other and request:
             member_list_type = MemberListType.RIDE
             self.notify_member_list(request, member_list_type)
 
         if self.is_only_ride_leader() and request:
             messages.error(request, "Cannot leave ride until another ride leader is appointed.")
-            return False
+            return (0, {})
 
         self.event_occurence.promote_from_waitlist_to_ride()
-        super().delete()
+
+        return super().delete(using=using, keep_parents=keep_parents)
 
     def __str__(self):
         role = RoleType(self.role).label
