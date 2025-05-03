@@ -4340,6 +4340,14 @@ html[data-theme="dark"] {
     width: auto;
   }
 
+  .sm\:gap-2 {
+    gap: 0.5rem;
+  }
+
+  .sm\:gap-3 {
+    gap: 0.75rem;
+  }
+
   .sm\:p-6 {
     padding: 1.5rem;
   }
@@ -4413,6 +4421,10 @@ html[data-theme="dark"] {
 
   .md\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .md\:gap-2 {
+    gap: 0.5rem;
   }
 
   .md\:border-0 {

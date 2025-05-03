@@ -1,4 +1,5 @@
 import datetime
+from datetime import timedelta
 
 from better_elided_pagination.paginators import BetterElidedPaginator
 from braces.views import FormInvalidMessageMixin
@@ -18,6 +19,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
+from django.utils.timezone import localdate
 from django.views.generic import DeleteView, TemplateView, UpdateView
 from django.views.generic.base import View
 from django.views.generic.edit import FormMixin
@@ -54,7 +56,8 @@ from group_velo.utils.utils import distinct_errors, get_prev_dates, pagination_c
 @method_decorator(login_required(login_url="/login"), name="dispatch")
 class EventView(TemplateView):
     TABLE_PREFIX = ""
-    ITEMS_PER_PAGE = 4
+    ITEMS_PER_PAGE = 8
+    WEATHER_FORECAST_DAY_COUNT = 3
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -164,7 +167,7 @@ class EventView(TemplateView):
 
 class MyRidesView(EventView):
     TABLE_PREFIX = "event_occurence__"
-    ITEMS_PER_PAGE = 5
+    # ITEMS_PER_PAGE = 8
 
     def get_ride_data(self):
         rides = self.request.user.upcoming_rides(self.DAYS_IN_FUTURE).order_by("event_occurence__ride_date")
@@ -174,12 +177,33 @@ class MyRidesView(EventView):
             self.TABLE_PREFIX,
         )
 
+        self.get_unique_zip_codes(filtered_rides, self.WEATHER_FORECAST_DAY_COUNT)
+
         return rides, ride_filter, filtered_rides, RideType.Registered
+
+    def get_unique_zip_codes(self, filtered_rides, forecast_day_count):
+        cutoff_start = localdate()
+        cutoff_end = cutoff_start + timedelta(days=forecast_day_count - 1)
+
+        # still need to exclude zip codes already in the weather data
+        distinct_zip_codes = (
+            filtered_rides.filter(
+                **{
+                    f"{self.TABLE_PREFIX}ride_date__gte": cutoff_start,
+                    f"{self.TABLE_PREFIX}ride_date__lte": cutoff_end,
+                }
+            )
+            .order_by(f"{self.TABLE_PREFIX}route__start_zip_code")
+            .values_list(f"{self.TABLE_PREFIX}route__start_zip_code", flat=True)
+            .distinct()
+        )
+
+        print(distinct_zip_codes)
 
 
 class AvailableRidesView(EventView):
     TABLE_PREFIX = ""
-    ITEMS_PER_PAGE = 4
+    # ITEMS_PER_PAGE = 8
 
     def get_ride_data(self):
         rides = self.request.user.available_rides(self.DAYS_IN_FUTURE)

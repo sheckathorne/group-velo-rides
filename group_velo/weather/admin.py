@@ -1,3 +1,6 @@
-# from django.contrib import admin
+from django.contrib import admin
 
-# Register your models here.
+from group_velo.weather.models import WeatherForecastDay, WeatherForecastHour
+
+admin.site.register(WeatherForecastDay)
+admin.site.register(WeatherForecastHour)
