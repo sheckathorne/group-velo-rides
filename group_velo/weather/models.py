@@ -5,8 +5,8 @@ from django.utils import timezone
 
 
 class WeatherForecastConditionBase(models.Model):
-    condition_text = models.TextField("Condition", max_length=20)
-    condition_icon_url = models.TextField("Icon URL", max_length=255)
+    condition_text = models.CharField("Condition", max_length=20)
+    condition_icon_url = models.CharField("Icon URL", max_length=255)
     condition_code = models.IntegerField()
 
     class Meta:
@@ -53,7 +53,7 @@ class WeatherForecastDay(WeatherForecastConditionBase):
         }
 
     @classmethod
-    def get_cached_weather(cls, zipcode=None, forecast_date=None, max_age_hours=12):
+    def get_cached_weather(cls, zip_code=None, max_age_hours=12):
         """
         Retrieve cached weather data if it exists and is recent enough
 
@@ -67,13 +67,10 @@ class WeatherForecastDay(WeatherForecastConditionBase):
             WeatherData object if valid cache exists, None otherwise
         """
         cutoff_time = timezone.now() - timedelta(hours=max_age_hours)
-        forecast_date = forecast_date or timezone.now().date()
+        # forecast_date = timezone.now().date()
 
         # Build query based on available parameters
-        query = cls.objects.filter(last_fetched__gte=cutoff_time, forecast_date=forecast_date)
-
-        if zipcode:
-            query = query.filter(zipcode=zipcode)
+        query = cls.objects.filter(last_fetched__gte=cutoff_time, zip_code__in=zip_code)
 
         # Return most recently fetched result if it exists
         return query.order_by("-last_fetched").first()

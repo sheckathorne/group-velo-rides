@@ -51,6 +51,8 @@ from group_velo.events.models import (
 from group_velo.users.models import SavedFilter
 from group_velo.utils.mixins import SqidMixin
 from group_velo.utils.utils import distinct_errors, get_prev_dates, pagination_css
+from group_velo.weather.models import WeatherForecastDay
+from group_velo.weather.tasks import fetch_weather_data
 
 
 @method_decorator(login_required(login_url="/login"), name="dispatch")
@@ -75,6 +77,10 @@ class EventView(TemplateView):
         context["save_filter_form"] = save_filter_form
 
         rides, ride_filter, filtered_rides, ride_type = self.get_ride_data()
+        unique_zip_codes = self.get_unique_zip_codes(filtered_rides, self.WEATHER_FORECAST_DAY_COUNT)
+        weather_data = self.get_weather_data(unique_zip_codes)
+        print(weather_data)
+
         calendar = self.generate_calendar(ride_filter, filtered_rides, self.TABLE_PREFIX)
         pagination = BetterElidedPaginator(
             self.request,
@@ -164,6 +170,42 @@ class EventView(TemplateView):
     def get_ride_data(self):
         raise NotImplementedError("Subclasses must implement get_ride_data method")
 
+    def get_unique_zip_codes(self, filtered_rides, forecast_day_count):
+        cutoff_start = localdate()
+        cutoff_end = cutoff_start + timedelta(days=forecast_day_count - 1)
+
+        distinct_zip_codes = (
+            filtered_rides.filter(
+                **{
+                    f"{self.TABLE_PREFIX}ride_date__gte": cutoff_start,
+                    f"{self.TABLE_PREFIX}ride_date__lte": cutoff_end,
+                }
+            )
+            .order_by(f"{self.TABLE_PREFIX}route__start_zip_code")
+            .values_list(f"{self.TABLE_PREFIX}route__start_zip_code", flat=True)
+            .distinct()
+        )
+
+        return set(distinct_zip_codes)
+
+    def get_weather_data(self, zip_codes):
+        # Check if we already have this data in our cache
+        cached_data = []
+        zip_codes_in_cache = set()
+        for zip_code in zip_codes:
+            zip_code_data = WeatherForecastDay.get_cached_weather(zip_code)
+            if zip_code_data:
+                cached_data.append(zip_code_data)
+                zip_codes_in_cache.add(zip_code)
+
+        # Check if we already have this data in our cache
+        tasks = []
+        for zip_code in zip_codes - zip_codes_in_cache:
+            task = fetch_weather_data.delay(zip_code)
+            tasks.append(task)
+
+        return cached_data, tasks
+
 
 class MyRidesView(EventView):
     TABLE_PREFIX = "event_occurence__"
@@ -177,28 +219,7 @@ class MyRidesView(EventView):
             self.TABLE_PREFIX,
         )
 
-        self.get_unique_zip_codes(filtered_rides, self.WEATHER_FORECAST_DAY_COUNT)
-
         return rides, ride_filter, filtered_rides, RideType.Registered
-
-    def get_unique_zip_codes(self, filtered_rides, forecast_day_count):
-        cutoff_start = localdate()
-        cutoff_end = cutoff_start + timedelta(days=forecast_day_count - 1)
-
-        # still need to exclude zip codes already in the weather data
-        distinct_zip_codes = (
-            filtered_rides.filter(
-                **{
-                    f"{self.TABLE_PREFIX}ride_date__gte": cutoff_start,
-                    f"{self.TABLE_PREFIX}ride_date__lte": cutoff_end,
-                }
-            )
-            .order_by(f"{self.TABLE_PREFIX}route__start_zip_code")
-            .values_list(f"{self.TABLE_PREFIX}route__start_zip_code", flat=True)
-            .distinct()
-        )
-
-        print(distinct_zip_codes)
 
 
 class AvailableRidesView(EventView):
