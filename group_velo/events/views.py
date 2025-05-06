@@ -77,22 +77,11 @@ class EventView(TemplateView):
         context["save_filter_form"] = save_filter_form
 
         rides, ride_filter, filtered_rides, ride_type = self.get_ride_data()
-        unique_zip_codes = self.get_unique_zip_codes(filtered_rides, self.WEATHER_FORECAST_DAY_COUNT)
+        events_having_forecast = self.get_events_having_forecast(filtered_rides)
+        unique_zip_codes = self.get_unique_zip_codes(events_having_forecast)
         weather_data, zip_codes_to_fetch_from_api = self.get_weather_data(unique_zip_codes)
         task_ids = self.fetch_weather_data_from_api(zip_codes_to_fetch_from_api)
-
-        # Attach immediately available weather data to each event
-        for event_occurence_member in filtered_rides:
-            event_occurence_member.event_occurence.weather = weather_data.get(
-                f"{event_occurence_member.event_occurence.route.start_zip_code} "
-                + f"- {event_occurence_member.event_occurence.ride_date}"
-            )
-
-            # Include task ID for events that are being updated
-            if event_occurence_member.event_occurence.route.start_zip_code in task_ids:
-                event_occurence_member.event_occurence.weather_task_id = task_ids[
-                    event_occurence_member.event_occurence.route.start_zip_code
-                ]
+        self.add_weather_data_to_events(filtered_rides, events_having_forecast, task_ids, weather_data)
 
         calendar = self.generate_calendar(ride_filter, filtered_rides, self.TABLE_PREFIX)
         pagination = BetterElidedPaginator(
@@ -117,6 +106,33 @@ class EventView(TemplateView):
         )
 
         return context
+
+    def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids, weather_data):
+        for event_occurence_member in filtered_rides:
+            if event_occurence_member.pk in [event.pk for event in events_having_forecast]:
+                event_occurence_member.event_occurence.has_forecast = True
+
+            event_occurence_member.event_occurence.weather = weather_data.get(
+                f"{event_occurence_member.event_occurence.route.start_zip_code} "
+                + f"- {event_occurence_member.event_occurence.ride_date}"
+            )
+
+            # Include task ID for events that are being updated
+            if event_occurence_member.event_occurence.route.start_zip_code in task_ids:
+                event_occurence_member.event_occurence.weather_task_id = task_ids[
+                    event_occurence_member.event_occurence.route.start_zip_code
+                ]
+
+    def get_events_having_forecast(self, filtered_rides):
+        cutoff_start = localdate()
+        cutoff_end = cutoff_start + timedelta(days=self.WEATHER_FORECAST_DAY_COUNT - 1)
+
+        return filtered_rides.filter(
+            **{
+                f"{self.TABLE_PREFIX}ride_date__gte": cutoff_start,
+                f"{self.TABLE_PREFIX}ride_date__lte": cutoff_end,
+            }
+        )
 
     def generate_calendar(self, ride_filter, filtered_rides, table_prefix):
         TODAY = datetime.datetime.today()
@@ -183,22 +199,15 @@ class EventView(TemplateView):
     def get_ride_data(self):
         raise NotImplementedError("Subclasses must implement get_ride_data method")
 
-    def get_unique_zip_codes(self, filtered_rides, forecast_day_count):
-        cutoff_start = localdate()
-        cutoff_end = cutoff_start + timedelta(days=forecast_day_count - 1)
-
-        distinct_zip_codes = set(
-            filtered_rides.filter(
-                **{
-                    f"{self.TABLE_PREFIX}ride_date__gte": cutoff_start,
-                    f"{self.TABLE_PREFIX}ride_date__lte": cutoff_end,
-                }
+    def get_unique_zip_codes(self, rides_with_forecast):
+        if rides_with_forecast:
+            distinct_zip_codes = set(
+                rides_with_forecast.values_list(f"{self.TABLE_PREFIX}route__start_zip_code", flat=True).distinct()
             )
-            .values_list(f"{self.TABLE_PREFIX}route__start_zip_code", flat=True)
-            .distinct()
-        )
 
-        return distinct_zip_codes
+            return distinct_zip_codes
+        else:
+            return set()
 
     def get_weather_data(self, zip_codes):
         weather_data = {}

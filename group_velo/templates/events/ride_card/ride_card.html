@@ -53,36 +53,21 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     {{ event_occurence.ride_date|date:"M d" }} • {{ event_occurence.ride_time|time:"g:i A" }}
-                    {% if event_occurence.weather %}
-                      <div class="flex items-center gap-1 text-sm"
-                           x-tooltip.raw.placement.right="{{ event_occurence.weather.condition_text }}">
-                        <span class="ml-1 text-small text-gray-500">•</span>
-                        <span class="weather-icon">
-                          <!--  clear -->
-                          {% if event_occurence.weather.condition_code == 1000 %}
-                            {% include 'events/ride_card/weather_icons/_clear.html' %}
-                            <!--  partly cloudy -->
-                          {% elif event_occurence.weather.condition_code == 1003 %}
-                            {% include 'events/ride_card/weather_icons/_partly_cloudy.html' %}
-                            <!--  fog/mist -->
-                          {% elif event_occurence.weather.condition_code == 1030 or event_occurence.weather.condition_code == 1135 %}
-                            {% include 'events/ride_card/weather_icons/_fog.html' %}
-                            <!--  thunderstorm -->
-                          {% elif event_occurence.weather.condition_code == 1087 or event_occurence.weather.condition_code >= 1273 %}
-                            {% include 'events/ride_card/weather_icons/_thunderstorms.html' %}
-                            <!--  cloudy -->
-                          {% elif event_occurence.weather.condition_code >= 1006 and event_occurence.weather.condition_code <= 1009 %}
-                            {% include 'events/ride_card/weather_icons/_cloudy.html' %}
-                            <!--  rain -->
-                          {% elif event_occurence.weather.condition_code >= 1030 and event_occurence.weather.condition_code <= 1282 %}
-                            {% include 'events/ride_card/weather_icons/_rain.html' %}
-                            <!--  default -->
-                          {% else %}
-                            {% include 'events/ride_card/weather_icons/_default.html' %}
-                          {% endif %}
-                        </span>
-                        <span>{{ event_occurence.weather.maxtemp_f }}°F</span>
-                      </div>
+                    {% if event_occurence.has_forecast %}
+                      {% if event_occurence.weather.condition_code or event_occurence.weather.maxtemp_f %}
+                        {% include 'events/ride_card/weather/_day.html' %}
+                      {% else %}
+                        <div class="flex items-center gap-1 text-sm">
+                          <span class="ml-1 text-small text-gray-500">•</span>
+                          <svg class="h-4 w-4 text-gray-500"
+                               viewBox="0 0 24 24"
+                               xmlns="http://www.w3.org/2000/svg">
+                            <path fill="currentColor" d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" />
+                            <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
+                          </svg>
+                          <span class="text-gray-500 text-xs">Loading weather...</span>
+                        </div>
+                      {% endif %}
                     {% endif %}
                   </div>
                 </div>
