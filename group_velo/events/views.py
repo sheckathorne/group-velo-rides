@@ -83,12 +83,14 @@ class EventView(TemplateView):
 
         # Attach immediately available weather data to each event
         for event_occurence_member in filtered_rides:
-            event_occurence_member.weather = weather_data.get(
-                event_occurence_member.event_occurence.route.start_zip_code
+            event_occurence_member.event_occurence.weather = weather_data.get(
+                f"{event_occurence_member.event_occurence.route.start_zip_code} "
+                + f"- {event_occurence_member.event_occurence.ride_date}"
             )
+
             # Include task ID for events that are being updated
             if event_occurence_member.event_occurence.route.start_zip_code in task_ids:
-                event_occurence_member.weather_task_id = task_ids[
+                event_occurence_member.event_occurence.weather_task_id = task_ids[
                     event_occurence_member.event_occurence.route.start_zip_code
                 ]
 
@@ -205,12 +207,14 @@ class EventView(TemplateView):
         # Check cache for each zip code
         for zip_code in zip_codes:
             if WeatherForecastDay.is_fresh(zip_code):
-                weather_data[zip_code] = WeatherForecastDay.get_forecast(zip_code)
+                weather_forecast = WeatherForecastDay.get_forecast(zip_code)
+                if weather_forecast:
+                    for forecast_day in weather_forecast:
+                        weather_data[f"{zip_code} - {forecast_day.forecast_date}"] = forecast_day
             else:
                 # Add to the list to be fetched
                 zip_codes_to_fetch_from_api.append(zip_code)
 
-        print("THESE ARE THE ZIP CODES TO FETCH FROM API", zip_codes_to_fetch_from_api)
         return weather_data, zip_codes_to_fetch_from_api
 
     def fetch_weather_data_from_api(self, zip_codes):

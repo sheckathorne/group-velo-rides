@@ -27,6 +27,8 @@ class WeatherForecastDay(WeatherForecastConditionBase):
     maxtemp_f = models.FloatField()
     mintemp_c = models.FloatField()
     mintemp_f = models.FloatField()
+    maxwind_mph = models.FloatField()
+    maxwind_kph = models.FloatField()
     description = models.CharField(max_length=200)
 
     class Meta:

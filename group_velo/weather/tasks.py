@@ -32,7 +32,6 @@ def fetch_weather_for_zip(self, zip_code):
 
             for fd in forecast:
                 forecast_day = fd["day"]
-                print(zip_code, fd["date"])
                 weather_forecast_day_object = WeatherForecastDay.objects.create(
                     zip_code=zip_code,
                     forecast_date=fd["date"],
@@ -40,6 +39,8 @@ def fetch_weather_for_zip(self, zip_code):
                     maxtemp_f=forecast_day["maxtemp_f"],
                     mintemp_c=forecast_day["mintemp_c"],
                     mintemp_f=forecast_day["mintemp_f"],
+                    maxwind_mph=forecast_day["maxwind_mph"],
+                    maxwind_kph=forecast_day["maxwind_kph"],
                     condition_text=forecast_day["condition"]["text"],
                     condition_icon_url=forecast_day["condition"]["icon"],
                     condition_code=forecast_day["condition"]["code"],
