@@ -57,17 +57,10 @@
                       {% if event_occurence.weather.condition_code or event_occurence.weather.maxtemp_f %}
                         {% include 'events/ride_card/weather/_day.html' %}
                       {% else %}
-                        <div class="flex items-center gap-1 text-sm">
-                          <span class="ml-1 text-small text-gray-500">•</span>
-                          <svg class="h-4 w-4 text-gray-500"
-                               viewBox="0 0 24 24"
-                               xmlns="http://www.w3.org/2000/svg">
-                            <path fill="currentColor" d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" />
-                            <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
-                          </svg>
-                          <span class="text-gray-500 text-xs">Loading weather...</span>
-                        </div>
+                        {% include 'events/ride_card/weather/_loading_day.html' %}
                       {% endif %}
+                    {% else %}
+                      {% include 'events/ride_card/weather/_loading_day.html' %}
                     {% endif %}
                   </div>
                 </div>
