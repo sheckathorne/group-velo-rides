@@ -52,7 +52,7 @@ from group_velo.users.models import SavedFilter
 from group_velo.utils.mixins import SqidMixin
 from group_velo.utils.utils import distinct_errors, get_prev_dates, pagination_css
 from group_velo.weather.models import WeatherForecastDay
-from group_velo.weather.tasks import fetch_weather_data
+from group_velo.weather.tasks import fetch_weather_for_zip
 
 
 @method_decorator(login_required(login_url="/login"), name="dispatch")
@@ -78,8 +78,19 @@ class EventView(TemplateView):
 
         rides, ride_filter, filtered_rides, ride_type = self.get_ride_data()
         unique_zip_codes = self.get_unique_zip_codes(filtered_rides, self.WEATHER_FORECAST_DAY_COUNT)
-        weather_data = self.get_weather_data(unique_zip_codes)
-        print(weather_data)
+        weather_data, zip_codes_to_fetch_from_api = self.get_weather_data(unique_zip_codes)
+        task_ids = self.fetch_weather_data_from_api(zip_codes_to_fetch_from_api)
+
+        # Attach immediately available weather data to each event
+        for event_occurence_member in filtered_rides:
+            event_occurence_member.weather = weather_data.get(
+                event_occurence_member.event_occurence.route.start_zip_code
+            )
+            # Include task ID for events that are being updated
+            if event_occurence_member.event_occurence.route.start_zip_code in task_ids:
+                event_occurence_member.weather_task_id = task_ids[
+                    event_occurence_member.event_occurence.route.start_zip_code
+                ]
 
         calendar = self.generate_calendar(ride_filter, filtered_rides, self.TABLE_PREFIX)
         pagination = BetterElidedPaginator(
@@ -174,37 +185,44 @@ class EventView(TemplateView):
         cutoff_start = localdate()
         cutoff_end = cutoff_start + timedelta(days=forecast_day_count - 1)
 
-        distinct_zip_codes = (
+        distinct_zip_codes = set(
             filtered_rides.filter(
                 **{
                     f"{self.TABLE_PREFIX}ride_date__gte": cutoff_start,
                     f"{self.TABLE_PREFIX}ride_date__lte": cutoff_end,
                 }
             )
-            .order_by(f"{self.TABLE_PREFIX}route__start_zip_code")
             .values_list(f"{self.TABLE_PREFIX}route__start_zip_code", flat=True)
             .distinct()
         )
 
-        return set(distinct_zip_codes)
+        return distinct_zip_codes
 
     def get_weather_data(self, zip_codes):
-        # Check if we already have this data in our cache
-        cached_data = []
-        zip_codes_in_cache = set()
+        weather_data = {}
+        zip_codes_to_fetch_from_api = []
+
+        # Check cache for each zip code
         for zip_code in zip_codes:
-            zip_code_data = WeatherForecastDay.get_cached_weather(zip_code)
-            if zip_code_data:
-                cached_data.append(zip_code_data)
-                zip_codes_in_cache.add(zip_code)
+            if WeatherForecastDay.is_fresh(zip_code):
+                weather_data[zip_code] = WeatherForecastDay.get_forecast(zip_code)
+            else:
+                # Add to the list to be fetched
+                zip_codes_to_fetch_from_api.append(zip_code)
 
-        # Check if we already have this data in our cache
-        tasks = []
-        for zip_code in zip_codes - zip_codes_in_cache:
-            task = fetch_weather_data.delay(zip_code)
-            tasks.append(task)
+        print("THESE ARE THE ZIP CODES TO FETCH FROM API", zip_codes_to_fetch_from_api)
+        return weather_data, zip_codes_to_fetch_from_api
 
-        return cached_data, tasks
+    def fetch_weather_data_from_api(self, zip_codes):
+        # Launch Celery tasks for zip codes that need fresh data
+        task_ids = {}
+        if zip_codes:
+            for zip_code in zip_codes:
+                # Launch individual tasks and store their IDs
+                task = fetch_weather_for_zip.delay(zip_code)
+                task_ids[zip_code] = task.id
+
+        return task_ids
 
 
 class MyRidesView(EventView):

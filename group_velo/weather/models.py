@@ -5,7 +5,7 @@ from django.utils import timezone
 
 
 class WeatherForecastConditionBase(models.Model):
-    condition_text = models.CharField("Condition", max_length=20)
+    condition_text = models.CharField("Condition", max_length=60)
     condition_icon_url = models.CharField("Icon URL", max_length=255)
     condition_code = models.IntegerField()
 
@@ -23,7 +23,6 @@ class WeatherForecastDay(WeatherForecastConditionBase):
     # When was this record created in our DB
     createdatetime = models.DateTimeField(default=timezone.now)
 
-    location = models.CharField(max_length=100, db_index=True)
     maxtemp_c = models.FloatField()
     maxtemp_f = models.FloatField()
     mintemp_c = models.FloatField()
@@ -31,12 +30,34 @@ class WeatherForecastDay(WeatherForecastConditionBase):
     description = models.CharField(max_length=200)
 
     class Meta:
-        # Unique constraint to prevent duplicate forecasts for the same location/date
-        unique_together = ("zip_code", "forecast_date")
+        constraints = [models.UniqueConstraint(fields=["zip_code", "forecast_date"], name="unique_zip_forecastdate")]
         indexes = [
-            # Index for faster querying of recent forecasts
             models.Index(fields=["last_fetched"]),
         ]
+
+    @classmethod
+    def is_fresh(cls, zip_code):
+        """Check if forecast is less than 12 hours old"""
+        try:
+            forecast = cls.objects.filter(zip_code=zip_code).first()
+            if forecast is None:
+                return False
+
+            if timezone.now() - forecast.last_fetched < timedelta(hours=12):
+                return True
+            else:
+                forecast.delete()
+                return False
+        except cls.DoesNotExist:
+            return False
+
+    @classmethod
+    def get_forecast(cls, zip_code):
+        """Get forecast data if it exists"""
+        try:
+            return cls.objects.filter(zip_code=zip_code)
+        except cls.DoesNotExist:
+            return None
 
     def __str__(self):
         date_str = self.forecast_date.strftime("%Y-%m-%d")
@@ -44,7 +65,7 @@ class WeatherForecastDay(WeatherForecastConditionBase):
 
     def to_dict(self):
         return {
-            "id": self.id,
+            "id": self.pk,
             "zip_code": self.zip_code,
             "temperature": (self.mintemp_f, self.maxtemp_f),
             "forecast_date": self.forecast_date.strftime("%Y-%m-%d"),
@@ -79,8 +100,8 @@ class WeatherForecastDay(WeatherForecastConditionBase):
 class WeatherForecastHour(WeatherForecastConditionBase):
     forecast = models.ForeignKey(WeatherForecastDay, on_delete=models.CASCADE)
     time = models.DateTimeField(default=timezone.now)
-    teperature_f = models.FloatField()
-    teperature_c = models.FloatField()
+    temperature_f = models.FloatField()
+    temperature_c = models.FloatField()
     wind_mph = models.IntegerField()
     wind_kph = models.IntegerField()
     wind_direction = models.TextField("Wind Direction", max_length=3)
@@ -89,13 +110,12 @@ class WeatherForecastHour(WeatherForecastConditionBase):
     feelslike_f = models.FloatField()
 
     class Meta:
-        # Unique constraint to prevent duplicate forecasts for the same location/date
-        unique_together = ("forecast", "time")
+        constraints = [models.UniqueConstraint(fields=["forecast", "time"], name="unique_forecast_time")]
         indexes = [
             # Index for faster querying of recent forecasts
             models.Index(fields=["time"]),
         ]
 
     def __str__(self):
-        date_str = f"{self.forecast.date.strftime('%Y-%m-%d')} {self.forecast.time.strftime('%H:%mm')}"
+        date_str = f"{self.forecast.forecast_date.strftime('%Y-%m-%d')} {self.time.strftime('%H:%mm')}"
         return f"{self.forecast.zip_code} Weather - {date_str}"
