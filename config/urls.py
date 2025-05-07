@@ -20,7 +20,7 @@ urlpatterns = [
     path("events/", include("group_velo.events.urls", namespace="events")),
     path("clubs/", include("group_velo.clubs.urls", namespace="clubs")),
     path("routes/", include("group_velo.routes.urls", namespace="routes")),
-    path("weather/", include("group_velo.routes.urls", namespace="weather")),
+    path("weather/", include("group_velo.weather.urls", namespace="weather")),
     path("accounts/", include("allauth.urls")),
     path("initials-avatar/", include("django_initials_avatar.urls")),
     path("unicorn/", include("django_unicorn.urls")),

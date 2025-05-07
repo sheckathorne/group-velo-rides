@@ -1,7 +1,7 @@
 {# djlint:off H017 #}
-<div hx-get="{% url 'weather:check_task_status' task_id=1 %}"
-     hx-trigger="every 1s"
+<div hx-get="{% url 'weather:check_task_status' task_id=task_id %}"
      hx-swap="outerHTML"
+     hx-trigger="every 1s"
      class="flex items-center gap-1 text-sm">
   <span class="ml-1 text-small text-gray-500">•</span>
   <svg class="h-4 w-4 text-gray-500"
@@ -14,3 +14,13 @@
   <span class="text-gray-500 text-xs">Loading weather...</span>
 </div>
 {# djlint:on #}
+<script>
+  document.body.addEventListener('htmx:afterRequest', function(evt) {
+    const status = evt.detail.xhr.status;
+    const target = evt.detail.target;
+
+    if (status !== 202) {
+      evt.detail.shouldSwap = false;
+    }
+  });
+</script>

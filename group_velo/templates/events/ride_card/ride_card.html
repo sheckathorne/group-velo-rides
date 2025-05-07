@@ -57,10 +57,8 @@
                       {% if event_occurence.weather.condition_code or event_occurence.weather.maxtemp_f %}
                         {% include 'events/ride_card/weather/_day.html' %}
                       {% else %}
-                        {% include 'events/ride_card/weather/_loading_day.html' %}
+                        {% include 'events/ride_card/weather/_loading_day.html' with task_id=event_occurence.weather_task_id %}
                       {% endif %}
-                    {% else %}
-                      {% include 'events/ride_card/weather/_loading_day.html' %}
                     {% endif %}
                   </div>
                 </div>
