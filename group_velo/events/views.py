@@ -1116,3 +1116,38 @@ def save_filter(request):
                 messages.error(request.error, "There was an unexpected problem, please try again.")
         return HttpResponseRedirect(request.headers["referer"])
     return HttpResponseRedirect(request.headers["referer"])
+
+
+@login_required(login_url="/login")
+def get_weather_data_for_zip_and_date(request):
+    zip_code = request.GET.get("zip_code")
+    event_date = request.GET.get("event_date")
+    task_id = request.GET.get("task_id")
+
+    if zip_code and event_date:
+        try:
+            print("GETTING THE WEATHER FORECAST DAY")
+            weather_data = WeatherForecastDay.objects.get(zip_code=zip_code, forecast_date=event_date)
+            condition_text = weather_data.condition_text
+            condition_code = weather_data.condition_code
+            maxtemp_f = weather_data.maxtemp_f
+            print(condition_text, condition_code, maxtemp_f)
+
+            response = render_to_string(
+                "events/ride_card/weather/_day.html",
+                {
+                    "condition_text": condition_text,
+                    "condition_code": condition_code,
+                    "maxtemp_f": maxtemp_f,
+                },
+            )
+            return HttpResponse(response)
+        except WeatherForecastDay.DoesNotExist:
+            # In case the data isn't available yet, show the loading spinner again
+            response = render_to_string(
+                "events/ride_card/weather/_loading_day.html",
+                {"task_id": task_id, "zip_code": zip_code, "event_date": event_date},
+            )
+            return HttpResponse(response)
+    else:
+        return HttpResponse("", content_type="text/html")

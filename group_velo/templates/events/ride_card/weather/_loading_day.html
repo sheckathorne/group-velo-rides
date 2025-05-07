@@ -1,8 +1,13 @@
 {# djlint:off H017 #}
-<div hx-get="{% url 'weather:check_task_status' task_id=task_id %}"
+<div id="day-weather-spinner-{{ ride_id }}"
+     hx-get="{% url 'weather:check_task_status' task_id=task_id %}"
      hx-swap="outerHTML"
      hx-trigger="every 1s"
-     class="flex items-center gap-1 text-sm">
+     data-zip-code="{{ zip_code }}"
+     data-event-date="{{ event_date }}"
+     data-task-id="{{ task_id }}"
+     data-weather-url="{% url 'events:get_weather_data_for_zip_and_date' %}"
+     class="weather-spinner flex items-center gap-1 text-sm">
   <span class="ml-1 text-small text-gray-500">•</span>
   <svg class="h-4 w-4 text-gray-500"
        viewBox="0 0 24 24"
@@ -14,13 +19,3 @@
   <span class="text-gray-500 text-xs">Loading weather...</span>
 </div>
 {# djlint:on #}
-<script>
-  document.body.addEventListener('htmx:afterRequest', function(evt) {
-    const status = evt.detail.xhr.status;
-    const target = evt.detail.target;
-
-    if (status !== 202) {
-      evt.detail.shouldSwap = false;
-    }
-  });
-</script>

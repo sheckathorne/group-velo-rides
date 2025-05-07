@@ -11,6 +11,11 @@ urlpatterns = [
     path("", views.AvailableRidesView.as_view(), name="available_rides"),
     path("save_filter/", views.save_filter, name="save_filter"),
     path(
+        "get_weather_data_for_zip_and_date",
+        views.get_weather_data_for_zip_and_date,
+        name="get_weather_data_for_zip_and_date",
+    ),
+    path(
         "get_promote_demote_rider_disabled_button/",
         views.get_promote_demote_rider_disabled_button,
         name="get_promote_demote_rider_disabled_button",

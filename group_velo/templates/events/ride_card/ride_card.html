@@ -55,9 +55,9 @@
                     {{ event_occurence.ride_date|date:"M d" }} • {{ event_occurence.ride_time|time:"g:i A" }}
                     {% if event_occurence.has_forecast %}
                       {% if event_occurence.weather.condition_code or event_occurence.weather.maxtemp_f %}
-                        {% include 'events/ride_card/weather/_day.html' %}
+                        {% include 'events/ride_card/weather/_day.html' with condition_text=event_occurence.weather.condition_text condition_code=event_occurence.weather.condition_code maxtemp_f=event_occurence.weather.maxtemp_f %}
                       {% else %}
-                        {% include 'events/ride_card/weather/_loading_day.html' with task_id=event_occurence.weather_task_id %}
+                        {% include 'events/ride_card/weather/_loading_day.html' with task_id=event_occurence.weather_task_id zip_code=event_occurence.event.route.start_zip_code event_date=event_occurence.ride_date|date:"Y-m-d" ride_id=event_occurence.id %}
                       {% endif %}
                     {% endif %}
                   </div>
@@ -114,3 +114,75 @@
     {% endblock content %}
   </div>
 {% endwith %}
+<script>
+  document.body.addEventListener('htmx:afterRequest', function(evt) {
+    // First, make sure evt and evt.detail exist
+    if (!evt || !evt.detail) {
+      console.error('Event or event detail is undefined');
+      return;
+    }
+
+    const status = evt.detail.xhr ? evt.detail.xhr.status : null;
+    const target = evt.detail.target;
+
+    // Validate that we have everything we need before proceeding
+    if (!status || !target) {
+      console.error('Missing status or target in htmx:afterRequest event');
+      return;
+    }
+
+    // Check if this is a weather spinner by looking for the class
+    if (target.classList.contains('weather-spinner')) {
+      console.log('Weather spinner request completed with status:', status, 'for spinner:', target.id);
+
+      if (status === 200) {
+        // Task is complete, load the weather data
+        const zipCode = target.dataset.zipCode;
+        const eventDate = target.dataset.eventDate;
+        const taskId = target.dataset.taskId;
+        const weatherUrl = target.dataset.weatherUrl;
+        const targetId = target.id;
+
+        if (!zipCode || !eventDate || !taskId || !weatherUrl || !targetId) {
+          console.error('Missing required data attributes:', {
+            zipCode,
+            eventDate,
+            taskId,
+            weatherUrl,
+            targetId
+          });
+          return;
+        }
+
+        console.log('Loading weather data for spinner:', targetId, {
+          zipCode,
+          eventDate,
+          taskId
+        });
+
+        // First, store a reference to the target
+        const originalElement = document.getElementById(targetId);
+
+        if (!originalElement) {
+          console.error('Could not find element with ID:', targetId);
+          return;
+        }
+
+        // Make the request
+        fetch(`${weatherUrl}?zip_code=${zipCode}&event_date=${eventDate}&task_id=${taskId}`)
+          .then(response => response.text())
+          .then(html => {
+            // Replace the spinner with the new HTML
+            originalElement.outerHTML = html;
+          })
+          .catch(error => {
+            console.error('Error fetching weather data:', error);
+          });
+      } else if (status === 202) {
+        // Still processing, don't swap content
+        evt.detail.shouldSwap = false;
+      }
+    }
+  });
+  //# sourceMappingURL=
+</script>
