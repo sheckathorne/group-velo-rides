@@ -1,5 +1,3 @@
-# import time
-
 import requests
 from celery import shared_task
 from django.conf import settings
@@ -16,9 +14,6 @@ def fetch_weather_for_zip(self, zip_code):
     Includes retry logic and simulated delay for demo purposes.
     """
     try:
-        # time.sleep(5)
-        # return {"success": True, "zip_code": zip_code}
-
         # Make API request
         api_url = (
             f"{settings.WEATHER_API_BASE_URL}?key={settings.WEATHER_API_KEY}&days=3&q={zip_code}&alerts=no&aqi=no"

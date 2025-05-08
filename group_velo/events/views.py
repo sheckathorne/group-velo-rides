@@ -1130,6 +1130,9 @@ def get_weather_data_for_zip_and_date(request):
             weather_data = WeatherForecastDay.objects.get(zip_code=zip_code, forecast_date=event_date)
             condition_text = weather_data.condition_text
             condition_code = weather_data.condition_code
+            mintemp_c = weather_data.mintemp_c
+            maxtemp_c = weather_data.maxtemp_c
+            mintemp_f = weather_data.mintemp_f
             maxtemp_f = weather_data.maxtemp_f
             print(condition_text, condition_code, maxtemp_f)
 
@@ -1138,6 +1141,9 @@ def get_weather_data_for_zip_and_date(request):
                 {
                     "condition_text": condition_text,
                     "condition_code": condition_code,
+                    "mintemp_c": mintemp_c,
+                    "maxtemp_c": maxtemp_c,
+                    "mintemp_f": mintemp_f,
                     "maxtemp_f": maxtemp_f,
                 },
             )

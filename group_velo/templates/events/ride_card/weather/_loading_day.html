@@ -1,21 +1,16 @@
 {# djlint:off H017 #}
-<div id="day-weather-spinner-{{ ride_id }}"
-     hx-get="{% url 'weather:check_task_status' task_id=task_id %}"
-     hx-swap="outerHTML"
-     hx-trigger="every 1s"
-     data-zip-code="{{ zip_code }}"
-     data-event-date="{{ event_date }}"
-     data-task-id="{{ task_id }}"
-     data-weather-url="{% url 'events:get_weather_data_for_zip_and_date' %}"
+<div id="weather-day-spinner-{{ ride_id }}"
      class="weather-spinner flex items-center gap-1 text-sm">
   <span class="ml-1 text-small text-gray-500">•</span>
-  <svg class="h-4 w-4 text-gray-500"
+  <svg class="h-4 w-4 text-gray-500 animate-spin"
        viewBox="0 0 24 24"
        xmlns="http://www.w3.org/2000/svg">
-    <path fill="currentColor" d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z">
-    <animateTransform attributeName="transform" type="rotate" dur="0.75s" values="0 12 12;360 12 12" repeatCount="indefinite" />
-    </path>
+    <path fill="currentColor" d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" />
   </svg>
-  <span class="text-gray-500 text-xs">Loading weather...</span>
+  <span id="weather-day-spinner-loading-label-{{ ride_id }}"
+        class="text-gray-500 text-xs"
+        hx-get="{% url 'weather:check_task_status' task_id=task_id %}?zip_code={{ zip_code }}&event_date={{ event_date }}&ride_id={{ ride_id }}"
+        hx-trigger="every 2s"
+        hx-swap="outerHTML">Loading weather...</span>
 </div>
 {# djlint:on #}
