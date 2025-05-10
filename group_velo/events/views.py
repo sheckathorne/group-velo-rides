@@ -81,8 +81,6 @@ class EventView(TemplateView):
         unique_zip_codes = self.get_unique_zip_codes(events_having_forecast)
         weather_data, zip_codes_to_fetch_from_api = self.get_weather_data(unique_zip_codes)
 
-        print(weather_data)
-
         task_ids = self.fetch_weather_data_from_api(zip_codes_to_fetch_from_api)
         self.add_weather_data_to_events(filtered_rides, events_having_forecast, task_ids, weather_data)
 
