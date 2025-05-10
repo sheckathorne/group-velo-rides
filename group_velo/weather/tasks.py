@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import requests
 from celery import shared_task
 from django.conf import settings
@@ -14,6 +16,9 @@ def fetch_weather_for_zip(self, zip_code):
     Includes retry logic and simulated delay for demo purposes.
     """
     try:
+        # time.sleep(10)
+        # return {"success": True, "zip_code": zip_code}
+
         # Make API request
         api_url = (
             f"{settings.WEATHER_API_BASE_URL}?key={settings.WEATHER_API_KEY}&days=3&q={zip_code}&alerts=no&aqi=no"
@@ -47,9 +52,12 @@ def fetch_weather_for_zip(self, zip_code):
                 )
 
                 for forecast_hour in fd["hour"]:
+                    time_str = forecast_hour["time"]
+                    dt_obj = datetime.strptime(time_str, "%Y-%m-%d %H:%M")
+                    hour = dt_obj.hour
                     weather_forecast_hour_object = WeatherForecastHour.objects.create(
                         forecast=weather_forecast_day_object,
-                        time=forecast_hour["time"],
+                        hour=hour,
                         temperature_f=forecast_hour["temp_f"],
                         temperature_c=forecast_hour["temp_c"],
                         wind_mph=forecast_hour["wind_mph"],

@@ -101,7 +101,7 @@ class WeatherForecastDay(WeatherForecastConditionBase):
 
 class WeatherForecastHour(WeatherForecastConditionBase):
     forecast = models.ForeignKey(WeatherForecastDay, on_delete=models.CASCADE)
-    time = models.DateTimeField(default=timezone.now)
+    hour = models.SmallIntegerField(default=0)
     temperature_f = models.FloatField()
     temperature_c = models.FloatField()
     wind_mph = models.IntegerField()
@@ -112,10 +112,10 @@ class WeatherForecastHour(WeatherForecastConditionBase):
     feelslike_f = models.FloatField()
 
     class Meta:
-        constraints = [models.UniqueConstraint(fields=["forecast", "time"], name="unique_forecast_time")]
+        constraints = [models.UniqueConstraint(fields=["forecast", "hour"], name="unique_forecast_time")]
         indexes = [
             # Index for faster querying of recent forecasts
-            models.Index(fields=["time"]),
+            models.Index(fields=["hour"]),
         ]
 
     @classmethod
@@ -127,5 +127,5 @@ class WeatherForecastHour(WeatherForecastConditionBase):
             return None
 
     def __str__(self):
-        date_str = f"{self.forecast.forecast_date.strftime('%Y-%m-%d')} {self.time.strftime('%H:%mm')}"
+        date_str = f"{self.forecast.forecast_date.strftime('%Y-%m-%d')} {self.hour}"
         return f"{self.forecast.zip_code} Weather - {date_str}"

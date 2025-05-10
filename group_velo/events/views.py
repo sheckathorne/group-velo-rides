@@ -80,6 +80,9 @@ class EventView(TemplateView):
         events_having_forecast = self.get_events_having_forecast(filtered_rides)
         unique_zip_codes = self.get_unique_zip_codes(events_having_forecast)
         weather_data, zip_codes_to_fetch_from_api = self.get_weather_data(unique_zip_codes)
+
+        print(weather_data)
+
         task_ids = self.fetch_weather_data_from_api(zip_codes_to_fetch_from_api)
         self.add_weather_data_to_events(filtered_rides, events_having_forecast, task_ids, weather_data)
 
@@ -219,15 +222,15 @@ class EventView(TemplateView):
                 weather_forecast = WeatherForecastDay.get_forecast(zip_code)
                 if weather_forecast:
                     for forecast_day in weather_forecast:
-                        weather_data[f"{zip_code} - {forecast_day.forecast_date}"] = {"day": forecast_day, "hours": []}
+                        weather_data[f"{zip_code} - {forecast_day.forecast_date}"] = {"day": forecast_day, "hours": {}}
                         weather_forecast_hour = WeatherForecastHour.get_forecast_hour(
                             zip_code, forecast_day.forecast_date
                         )
                         if weather_forecast_hour:
                             for forecast_hour in weather_forecast_hour:
-                                weather_data[f"{zip_code} - {forecast_day.forecast_date}"]["hours"].append(
-                                    forecast_hour
-                                )
+                                weather_data[f"{zip_code} - {forecast_day.forecast_date}"]["hours"][
+                                    f"{forecast_hour.hour}"
+                                ] = forecast_hour
             else:
                 # Add to the list to be fetched
                 zip_codes_to_fetch_from_api.append(zip_code)
@@ -1134,7 +1137,6 @@ def get_weather_data_for_zip_and_date(request):
 
     if zip_code and event_date:
         try:
-            print("GETTING THE WEATHER FORECAST DAY")
             weather_data = WeatherForecastDay.objects.get(zip_code=zip_code, forecast_date=event_date)
             condition_text = weather_data.condition_text
             condition_code = weather_data.condition_code
@@ -1142,7 +1144,6 @@ def get_weather_data_for_zip_and_date(request):
             maxtemp_c = weather_data.maxtemp_c
             mintemp_f = weather_data.mintemp_f
             maxtemp_f = weather_data.maxtemp_f
-            print(condition_text, condition_code, maxtemp_f)
 
             response = render_to_string(
                 "events/ride_card/weather/_day.html",
