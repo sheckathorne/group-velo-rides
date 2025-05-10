@@ -118,6 +118,14 @@ class WeatherForecastHour(WeatherForecastConditionBase):
             models.Index(fields=["time"]),
         ]
 
+    @classmethod
+    def get_forecast_hour(cls, zip_code, forecast_date):
+        """Get forecast data if it exists"""
+        try:
+            return cls.objects.filter(forecast__zip_code=zip_code, forecast__forecast_date=forecast_date)
+        except cls.DoesNotExist:
+            return None
+
     def __str__(self):
         date_str = f"{self.forecast.forecast_date.strftime('%Y-%m-%d')} {self.time.strftime('%H:%mm')}"
         return f"{self.forecast.zip_code} Weather - {date_str}"

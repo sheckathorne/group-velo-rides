@@ -51,7 +51,7 @@ from group_velo.events.models import (
 from group_velo.users.models import SavedFilter
 from group_velo.utils.mixins import SqidMixin
 from group_velo.utils.utils import distinct_errors, get_prev_dates, pagination_css
-from group_velo.weather.models import WeatherForecastDay
+from group_velo.weather.models import WeatherForecastDay, WeatherForecastHour
 from group_velo.weather.tasks import fetch_weather_for_zip
 
 
@@ -219,7 +219,15 @@ class EventView(TemplateView):
                 weather_forecast = WeatherForecastDay.get_forecast(zip_code)
                 if weather_forecast:
                     for forecast_day in weather_forecast:
-                        weather_data[f"{zip_code} - {forecast_day.forecast_date}"] = forecast_day
+                        weather_data[f"{zip_code} - {forecast_day.forecast_date}"] = {"day": forecast_day, "hours": []}
+                        weather_forecast_hour = WeatherForecastHour.get_forecast_hour(
+                            zip_code, forecast_day.forecast_date
+                        )
+                        if weather_forecast_hour:
+                            for forecast_hour in weather_forecast_hour:
+                                weather_data[f"{zip_code} - {forecast_day.forecast_date}"]["hours"].append(
+                                    forecast_hour
+                                )
             else:
                 # Add to the list to be fetched
                 zip_codes_to_fetch_from_api.append(zip_code)
