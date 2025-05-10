@@ -3,10 +3,12 @@ import datetime
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
-from localflavor.us.us_states import STATE_CHOICES
+from localflavor.us.us_states import STATE_CHOICES as RAW_STATE_CHOICES
 
 from group_velo.clubs.models import Club
 from group_velo.data.validators import length_of_five, numeric_chars
+
+STATE_CHOICES = tuple(RAW_STATE_CHOICES)
 
 
 class RouteManager(models.Manager):
