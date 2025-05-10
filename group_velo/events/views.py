@@ -108,15 +108,43 @@ class EventView(TemplateView):
 
         return context
 
+    def filter_weather_hours(self, event_occurence, weather_data):
+        hours = event_occurence.ride_rounded_start_and_end_hour()
+        hours_list = [str(h) for h in range(hours[0], hours[1])]
+        weather_hours = {}
+
+        weather_hours = []
+
+        if hours_list and weather_data:
+            weather_hours = [weather_data["hours"][key] for key in hours_list]
+            # weather_hours = {key: weather_data["hours"][key] for key in hours_list}
+
+        return weather_hours
+
     def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids, weather_data):
         for event_occurence_member in filtered_rides:
             if event_occurence_member.pk in [event.pk for event in events_having_forecast]:
                 event_occurence_member.event_occurence.has_forecast = True
 
-            event_occurence_member.event_occurence.weather = weather_data.get(
+            zip_and_date_weather = weather_data.get(
                 f"{event_occurence_member.event_occurence.route.start_zip_code} "
                 + f"- {event_occurence_member.event_occurence.ride_date}"
             )
+
+            # event_weather_hours_data = {}
+            # event_weather_day_data = {}
+            if zip_and_date_weather:
+                event_weather_hours_data = zip_and_date_weather["hours"]
+                filtered_hours_data = self.filter_weather_hours(
+                    event_occurence_member.event_occurence, zip_and_date_weather
+                )
+                if filtered_hours_data:
+                    event_weather_hours_data = filtered_hours_data
+
+                event_occurence_member.event_occurence.weather = {
+                    "day": zip_and_date_weather["day"],
+                    "hours": event_weather_hours_data,
+                }
 
             # Include task ID for events that are being updated
             if event_occurence_member.event_occurence.route.start_zip_code in task_ids:

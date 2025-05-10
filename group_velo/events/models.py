@@ -330,18 +330,20 @@ class EventOccurence(EventBase):
         estimated_duration = distance / average_pace
         total_minutes = estimated_duration * self.MINS_IN_HOUR * (1 + ESTIMATED_STOP_PERCENTAGE)
         rounded_minutes = round(total_minutes / MINS_IN_QUARTER_HOUR) * MINS_IN_QUARTER_HOUR
-        return rounded_minutes
+        return int(rounded_minutes)
 
     def ride_rounded_start_and_end_hour(self):
         estimated_duration_mins = self.estimated_ride_duration_mins()
-        ride_start_time = self.ride_time
-        estimated_ride_end_time = ride_start_time + timedelta(minutes=estimated_duration_mins)
+        ride_start_dt = datetime.datetime.combine(self.ride_date, self.ride_time)
+        estimated_ride_end_dt = ride_start_dt + timedelta(minutes=estimated_duration_mins)
 
         # Round down to the start of the hour
-        starting_hour = ride_start_time.replace(minute=0, second=0, microsecond=0)
-        ending_hour = estimated_ride_end_time.replace(minute=0, second=0, microsecond=0)
+        starting_hour = ride_start_dt.replace(minute=0, second=0, microsecond=0)
+        ending_hour = estimated_ride_end_dt.replace(minute=0, second=0, microsecond=0)
+        if estimated_ride_end_dt > ending_hour:
+            ending_hour += timedelta(hours=1)
 
-        return starting_hour, ending_hour
+        return starting_hour.hour, ending_hour.hour
 
     @property
     def estimated_ride_duration(self):
