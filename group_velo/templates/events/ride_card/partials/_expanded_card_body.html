@@ -1,5 +1,5 @@
 {% load humanize %}
-{% load embedded_map_from from group_velo_events_tags %}
+{% load embedded_map_from integer_to_hour_text from group_velo_events_tags %}
 
 <div class="ride-details mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
      x-show="expanded"
@@ -116,115 +116,36 @@
         <div class="flex gap-5 min-w-max">
           {% for forecast in event_occurence.weather.hours %}
             <div class="flex flex-col items-center bg-background/50 dark:bg-background/20 rounded-md p-2 min-w-[80px]">
-              <span class="text-xs font-medium">{{ forecast.time|time:"g:i A" }}</span>
-              <span class="weather-icon {{ ride.get_weather_color }} my-1">
-                {% if forecast.condition_text == 'sunny' or forecast.condition_text == 'clear' %}
-                  <svg xmlns="http://www.w3.org/2000/svg"
-                       width="24"
-                       height="24"
-                       viewBox="0 0 24 24"
-                       fill="none"
-                       stroke="currentColor"
-                       stroke-width="2"
-                       stroke-linecap="round"
-                       stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="4"></circle>
-                    <path d="M12 2v2" />
-                    <path d="M12 20v2" />
-                    <path d="m4.93 4.93 1.41 1.41" />
-                    <path d="m17.66 17.66 1.41 1.41" />
-                    <path d="M2 12h2" />
-                    <path d="M20 12h2" />
-                    <path d="m6.34 17.66-1.41 1.41" />
-                    <path d="m19.07 4.93-1.41 1.41" />
-                  </svg>
-                {% elif forecast.condition_text == 'partly-cloudy' %}
-                  <svg xmlns="http://www.w3.org/2000/svg"
-                       width="24"
-                       height="24"
-                       viewBox="0 0 24 24"
-                       fill="none"
-                       stroke="currentColor"
-                       stroke-width="2"
-                       stroke-linecap="round"
-                       stroke-linejoin="round">
-                    <path d="M12 2v2" />
-                    <path d="M12 8v2" />
-                    <path d="m4.93 4.93 1.41 1.41" />
-                    <path d="m17.66 4.93-1.41 1.41" />
-                    <path d="M2 12h2" />
-                    <path d="M20 12h2" />
-                    <circle cx="12" cy="12" r="4"></circle>
-                    <path d="M12 16v2" />
-                  </svg>
-                {% elif forecast.condition_text == 'cloudy' %}
-                  <svg xmlns="http://www.w3.org/2000/svg"
-                       width="24"
-                       height="24"
-                       viewBox="0 0 24 24"
-                       fill="none"
-                       stroke="currentColor"
-                       stroke-width="2"
-                       stroke-linecap="round"
-                       stroke-linejoin="round">
-                    <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
-                  </svg>
-                {% elif forecast.condition_text == 'rain' %}
-                  <svg xmlns="http://www.w3.org/2000/svg"
-                       width="24"
-                       height="24"
-                       viewBox="0 0 24 24"
-                       fill="none"
-                       stroke="currentColor"
-                       stroke-width="2"
-                       stroke-linecap="round"
-                       stroke-linejoin="round">
-                    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
-                    <path d="M16 14v6" />
-                    <path d="M8 14v6" />
-                    <path d="M12 16v6" />
-                  </svg>
-                {% elif forecast.condition_text == 'drizzle' %}
-                  <svg xmlns="http://www.w3.org/2000/svg"
-                       width="24"
-                       height="24"
-                       viewBox="0 0 24 24"
-                       fill="none"
-                       stroke="currentColor"
-                       stroke-width="2"
-                       stroke-linecap="round"
-                       stroke-linejoin="round">
-                    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
-                    <path d="M8 19v1" />
-                    <path d="M8 14v1" />
-                    <path d="M16 19v1" />
-                    <path d="M16 14v1" />
-                    <path d="M12 21v1" />
-                    <path d="M12 16v1" />
-                  </svg>
-                {% else %}
-                  <svg xmlns="http://www.w3.org/2000/svg"
-                       width="24"
-                       height="24"
-                       viewBox="0 0 24 24"
-                       fill="none"
-                       stroke="currentColor"
-                       stroke-width="2"
-                       stroke-linecap="round"
-                       stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="4"></circle>
-                    <path d="M12 2v2" />
-                    <path d="M12 20v2" />
-                    <path d="m4.93 4.93 1.41 1.41" />
-                    <path d="m17.66 17.66 1.41 1.41" />
-                    <path d="M2 12h2" />
-                    <path d="M20 12h2" />
-                    <path d="m6.34 17.66-1.41 1.41" />
-                    <path d="m19.07 4.93-1.41 1.41" />
-                  </svg>
-                {% endif %}
+              <span class="text-xs font-medium">{{ forecast.hour|integer_to_hour_text }}</span>
+              <span class="weather-icon my-1"
+                    x-tooltip.raw="{{ forecast.condition_text }}">
+                {% with size=24 %}
+                  <!--  clear -->
+                  {% if condition_code == 1000 %}
+                    {% include 'events/ride_card/weather/icons/_clear.html' with size=size %}
+                    <!--  partly cloudy -->
+                  {% elif condition_code == 1003 %}
+                    {% include 'events/ride_card/weather/icons/_partly_cloudy.html' with size=size %}
+                    <!--  fog/mist -->
+                  {% elif condition_code == 1030 or condition_code == 1135 %}
+                    {% include 'events/ride_card/weather/icons/_fog.html' with size=size %}
+                    <!--  thunderstorm -->
+                  {% elif condition_code == 1087 or condition_code >= 1273 %}
+                    {% include 'events/ride_card/weather/icons/_thunderstorms.html' with size=size %}
+                    <!--  cloudy -->
+                  {% elif condition_code >= 1006 and condition_code <= 1009 %}
+                    {% include 'events/ride_card/weather/icons/_cloudy.html' with size=size %}
+                    <!--  rain -->
+                  {% elif condition_code >= 1030 and condition_code <= 1282 %}
+                    {% include 'events/ride_card/weather/icons/_rain.html' with size=size %}
+                    <!--  default -->
+                  {% else %}
+                    {% include 'events/ride_card/weather/icons/_default.html' with size=size %}
+                  {% endif %}
+                {% endwith %}
               </span>
-              <span class="text-sm font-medium">{{ forecast.temperature_f }}°F</span>
+              <span class="text-sm font-medium">{{ forecast.temperature_f|floatformat:0 }}°F</span>
+              <span class="text-xs text-muted-foreground">Feels {{ forecast.feelslike_f|floatformat:0 }}°F</span>
               <div class="flex items-center gap-1 mt-1">
                 <svg xmlns="http://www.w3.org/2000/svg"
                      width="12"
