@@ -344,7 +344,7 @@ class EventOccurence(EventBase):
             ending_hour += timedelta(hours=1)
 
         if ending_hour.hour < starting_hour.hour:
-            return starting_hour.hour, 23
+            return (starting_hour.hour, 24)
 
         return (starting_hour.hour, ending_hour.hour)
 

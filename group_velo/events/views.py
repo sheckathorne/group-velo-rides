@@ -110,17 +110,12 @@ class EventView(TemplateView):
 
     def filter_weather_hours(self, event_occurence, weather_data):
         hours = event_occurence.ride_rounded_start_and_end_hour()
-        print(hours, type(hours))
-
         hours_list = [str(h) for h in range(hours[0], hours[1])]
-        print(hours_list)
 
         weather_hours = []
 
         if hours_list and weather_data:
             weather_hours = [weather_data["hours"][key] for key in hours_list]
-            print(weather_hours)
-            # weather_hours = {key: weather_data["hours"][key] for key in hours_list}
 
         return weather_hours
 

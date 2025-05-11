@@ -8,9 +8,15 @@ class WeatherForecastConditionBase(models.Model):
     condition_text = models.CharField("Condition", max_length=60)
     condition_icon_url = models.CharField("Icon URL", max_length=255)
     condition_code = models.IntegerField()
+    chance_of_rain = models.IntegerField("Rain Chance", default=0)
+    chance_of_snow = models.IntegerField("Snow Chance", default=0)
 
     class Meta:
         abstract = True
+
+    @property
+    def chance_of_precip(self):
+        return max(self.chance_of_rain, self.chance_of_snow)
 
 
 class WeatherForecastDay(WeatherForecastConditionBase):
@@ -125,6 +131,10 @@ class WeatherForecastHour(WeatherForecastConditionBase):
             return cls.objects.filter(forecast__zip_code=zip_code, forecast__forecast_date=forecast_date)
         except cls.DoesNotExist:
             return None
+
+    @property
+    def chance_of_precip(self):
+        return max(self.chance_of_rain, self.chance_of_snow)
 
     def __str__(self):
         date_str = f"{self.forecast.forecast_date.strftime('%Y-%m-%d')} {self.hour}"
