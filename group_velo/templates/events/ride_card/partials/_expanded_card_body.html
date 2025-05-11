@@ -119,30 +119,10 @@
               <span class="text-xs font-medium">{{ forecast.hour|integer_to_hour_text }}</span>
               <span class="weather-icon my-1"
                     x-tooltip.raw="{{ forecast.condition_text }}">
-                {% with size=24 %}
-                  <!--  clear -->
-                  {% if condition_code == 1000 %}
-                    {% include 'events/ride_card/weather/icons/_clear.html' with size=size %}
-                    <!--  partly cloudy -->
-                  {% elif condition_code == 1003 %}
-                    {% include 'events/ride_card/weather/icons/_partly_cloudy.html' with size=size %}
-                    <!--  fog/mist -->
-                  {% elif condition_code == 1030 or condition_code == 1135 %}
-                    {% include 'events/ride_card/weather/icons/_fog.html' with size=size %}
-                    <!--  thunderstorm -->
-                  {% elif condition_code == 1087 or condition_code >= 1273 %}
-                    {% include 'events/ride_card/weather/icons/_thunderstorms.html' with size=size %}
-                    <!--  cloudy -->
-                  {% elif condition_code >= 1006 and condition_code <= 1009 %}
-                    {% include 'events/ride_card/weather/icons/_cloudy.html' with size=size %}
-                    <!--  rain -->
-                  {% elif condition_code >= 1030 and condition_code <= 1282 %}
-                    {% include 'events/ride_card/weather/icons/_rain.html' with size=size %}
-                    <!--  default -->
-                  {% else %}
-                    {% include 'events/ride_card/weather/icons/_default.html' with size=size %}
-                  {% endif %}
-                {% endwith %}
+                <img src="http:{{ forecast.condition_icon_url }}"
+                     width="36"
+                     height="36"
+                     alt="Hourly Weather Icon - {{ forecast.condition_text }}" />
               </span>
               <span class="text-sm font-medium">{{ forecast.temperature_f|floatformat:0 }}°F</span>
               <span class="text-xs text-muted-foreground">Feels {{ forecast.feelslike_f|floatformat:0 }}°F</span>

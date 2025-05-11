@@ -56,7 +56,7 @@
                     {% if event_occurence.has_forecast %}
                       {% with day_weather=event_occurence.weather.day %}
                         {% if day_weather.condition_code or day_weather.maxtemp_f %}
-                          {% include 'events/ride_card/weather/_day.html' with condition_text=day_weather.condition_text condition_code=day_weather.condition_code maxtemp_f=day_weather.maxtemp_f mintemp_f=day_weather.mintemp_f maxtemp_c=day_weather.maxtemp_c mintemp_c=day_weather.weather.mintemp_c %}
+                          {% include 'events/ride_card/weather/_day.html' with condition_text=day_weather.condition_text condition_code=day_weather.condition_code condition_url=day_weather.condition_icon_url maxtemp_f=day_weather.maxtemp_f mintemp_f=day_weather.mintemp_f maxtemp_c=day_weather.maxtemp_c mintemp_c=day_weather.weather.mintemp_c %}
                         {% else %}
                           {% include 'events/ride_card/weather/_loading_day.html' with task_id=event_occurence.weather_task_id zip_code=event_occurence.event.route.start_zip_code event_date=event_occurence.ride_date|date:"Y-m-d" ride_id=event_occurence.id %}
                         {% endif %}

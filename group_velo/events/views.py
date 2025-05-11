@@ -110,13 +110,16 @@ class EventView(TemplateView):
 
     def filter_weather_hours(self, event_occurence, weather_data):
         hours = event_occurence.ride_rounded_start_and_end_hour()
+        print(hours, type(hours))
+
         hours_list = [str(h) for h in range(hours[0], hours[1])]
-        weather_hours = {}
+        print(hours_list)
 
         weather_hours = []
 
         if hours_list and weather_data:
             weather_hours = [weather_data["hours"][key] for key in hours_list]
+            print(weather_hours)
             # weather_hours = {key: weather_data["hours"][key] for key in hours_list}
 
         return weather_hours
@@ -131,13 +134,13 @@ class EventView(TemplateView):
                 + f"- {event_occurence_member.event_occurence.ride_date}"
             )
 
-            # event_weather_hours_data = {}
-            # event_weather_day_data = {}
             if zip_and_date_weather:
                 event_weather_hours_data = zip_and_date_weather["hours"]
+
                 filtered_hours_data = self.filter_weather_hours(
                     event_occurence_member.event_occurence, zip_and_date_weather
                 )
+
                 if filtered_hours_data:
                     event_weather_hours_data = filtered_hours_data
 
@@ -1166,6 +1169,7 @@ def get_weather_data_for_zip_and_date(request):
             weather_data = WeatherForecastDay.objects.get(zip_code=zip_code, forecast_date=event_date)
             condition_text = weather_data.condition_text
             condition_code = weather_data.condition_code
+            condition_url = weather_data.condition_icon_url
             mintemp_c = weather_data.mintemp_c
             maxtemp_c = weather_data.maxtemp_c
             mintemp_f = weather_data.mintemp_f
@@ -1176,6 +1180,7 @@ def get_weather_data_for_zip_and_date(request):
                 {
                     "condition_text": condition_text,
                     "condition_code": condition_code,
+                    "condition_url": condition_url,
                     "mintemp_c": mintemp_c,
                     "maxtemp_c": maxtemp_c,
                     "mintemp_f": mintemp_f,
