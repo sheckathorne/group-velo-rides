@@ -110,6 +110,7 @@ class EventView(TemplateView):
 
     def filter_weather_hours(self, event_occurence, weather_data):
         star_hour, end_hour = event_occurence.ride_rounded_start_and_end_hour()
+        end_hour = end_hour + 1 if end_hour < 23 else end_hour
         hours_list = [str(h) for h in range(star_hour, end_hour)]
         weather_hours = []
 
@@ -1157,6 +1158,7 @@ def get_weather_data_for_zip_and_date(request):
     zip_code = request.GET.get("zip_code")
     event_date = request.GET.get("event_date")
     task_id = request.GET.get("task_id")
+    ride_id = request.GET.get("ride_id")
 
     if zip_code and event_date:
         try:
@@ -1169,6 +1171,12 @@ def get_weather_data_for_zip_and_date(request):
             mintemp_f = weather_data.mintemp_f
             maxtemp_f = weather_data.maxtemp_f
 
+            event_occurence = EventOccurence.objects.get(pk=ride_id)
+            start_hour, end_hour = event_occurence.ride_rounded_start_and_end_hour()
+            forecast_hours = WeatherForecastHour.objects.filter(
+                forecast=weather_data, hour__gte=start_hour, hour__lte=end_hour
+            )
+
             response = render_to_string(
                 "events/ride_card/weather/_day.html",
                 {
@@ -1179,6 +1187,15 @@ def get_weather_data_for_zip_and_date(request):
                     "maxtemp_c": maxtemp_c,
                     "mintemp_f": mintemp_f,
                     "maxtemp_f": maxtemp_f,
+                },
+            )
+
+            response += render_to_string(
+                "events/ride_card/weather/_hour.html",
+                {
+                    "forecast_hours": forecast_hours,
+                    "start_location_name": event_occurence.route.start_location_name,
+                    "ride_id": ride_id,
                 },
             )
             return HttpResponse(response)

@@ -31,7 +31,7 @@ def check_task_status(request, task_id):
         else:
             # complete
             response = render_to_string(
-                "events/ride_card/weather/_load_weather_on_ready.html",
+                "events/ride_card/weather/_load_day_weather_on_ready.html",
                 {
                     "zip_code": request.GET.get("zip_code"),
                     "event_date": request.GET.get("event_date"),

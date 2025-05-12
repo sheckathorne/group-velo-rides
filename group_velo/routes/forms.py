@@ -68,6 +68,7 @@ class RouteForm(forms.ModelForm):
     def fields_required(self, fields):
         for field in fields:
             if not self.cleaned_data.get(field, ""):
+                print("the field required that's missing is", field)
                 msg = forms.ValidationError("This field is required.")
                 self.add_error(field, msg)
 
