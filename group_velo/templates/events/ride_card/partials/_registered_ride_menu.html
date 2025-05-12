@@ -9,7 +9,7 @@
       {% if request.path == registration_urls.waitlisted %}
         <div x-show="open"
              x-cloak
-             x-transition:enter="transition ease-out duration-100"
+             x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="transform opacity-0 scale-95"
              x-transition:enter-end="transform opacity-100 scale-100"
              x-transition:leave="transition ease-in duration-75"
@@ -45,7 +45,7 @@
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="transform opacity-100 scale-100"
              x-transition:leave-end="transform opacity-0 scale-90"
-             class="z-10 absolute top-5 bg-white divide-y divide-gray-100 dark:divide-gray-600 rounded shadow w-44 dark:bg-gray-700">
+             class="z-10 absolute top-5 right-0 bg-white divide-y divide-gray-100 dark:divide-gray-600 rounded shadow w-44 dark:bg-gray-700">
           <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
               aria-labelledby="dropdownDefaultButton">
             {% include 'events/ride_card/partials/_discussion_menu_item.html' %}
