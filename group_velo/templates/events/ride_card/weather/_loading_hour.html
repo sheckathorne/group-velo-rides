@@ -1,0 +1,61 @@
+{% load embedded_map_from integer_to_hour_text from group_velo_events_tags %}
+
+{% with blur_value="blur-sm" %}
+  <div class="w-full">
+    <div class="weather-spinner flex items-center gap-1 mb-2">
+      <svg class="h-4 w-4 text-gray-500 animate-spin"
+           viewBox="0 0 24 24"
+           xmlns="http://www.w3.org/2000/svg">
+        <path fill="currentColor" d="M12,4a8,8,0,0,1,7.89,6.7A1.53,1.53,0,0,0,21.38,12h0a1.5,1.5,0,0,0,1.48-1.75,11,11,0,0,0-21.72,0A1.5,1.5,0,0,0,2.62,12h0a1.53,1.53,0,0,0,1.49-1.3A8,8,0,0,1,12,4Z" />
+      </svg>
+      <h5 id="weather-hour-spinner-loading-label-{{ ride_id }}"
+          class="text-sm font-medium">Loading Hourly Forecast...</h5>
+    </div>
+    <div class="overflow-x-auto pb-2">
+      <div class="flex gap-5 min-w-max">
+        {% for forecast_hour in event_occurence.hours_range_of_start_and_end %}
+          <div class="flex flex-col items-center bg-background/50 dark:bg-background/20 rounded-md p-2 min-w-[80px]">
+            <span class="text-xs font-medium">{{ forecast_hour|integer_to_hour_text }}</span>
+            <span class="weather-icon my-1">
+              <img class="{{ blur_value }}"
+                   src="https://cdn.weatherapi.com/weather/64x64/day/113.png"
+                   width="36"
+                   height="36"
+                   alt="Hourly Weather Icon Placeholder" />
+            </span>
+            <span class="text-sm font-medium {{ blur_value }}">70°F</span>
+            <span class="text-xs text-muted-foreground {{ blur_value }}">Feels 70°F</span>
+            <div class="flex items-center gap-1 mt-1 {{ blur_value }}">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                   width="24"
+                   height="24"
+                   viewBox="0 0 24 24"
+                   fill="none"
+                   stroke="currentColor"
+                   stroke-width="2"
+                   stroke-linecap="round"
+                   stroke-linejoin="round"
+                   class="lucide lucide-droplets h-3 w-3 text-blue-400">
+                <path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z" />
+                <path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97" />
+              </svg>
+              <span class="text-xs">0%</span>
+            </div>
+            <div class="flex items-center gap-1 mt-3 {{ blur_value }}">
+              <svg width="48" height="48" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="45" stroke="black" stroke-width="2" fill="none" />
+                <g transform="rotate(0, 50, 50)">
+                <polygon points="50,20, 40,50 50,45 58,50" fill="red" />
+                </g>
+              </svg>
+            </div>
+            <div class="flex items-center gap-1 mt-1 {{ blur_value }}">
+              <span class="text-xs">2 mph</span>
+            </div>
+            <span class="text-xs text-muted-foreground {{ blur_value }}">N</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endwith %}

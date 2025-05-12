@@ -332,6 +332,12 @@ class EventOccurence(EventBase):
         rounded_minutes = round(total_minutes / MINS_IN_QUARTER_HOUR) * MINS_IN_QUARTER_HOUR
         return int(rounded_minutes)
 
+    @property
+    def hours_range_of_start_and_end(self):
+        start_hour, end_hour = self.ride_rounded_start_and_end_hour()
+        hours_list = [h for h in range(start_hour, end_hour)]
+        return hours_list
+
     def ride_rounded_start_and_end_hour(self):
         estimated_duration_mins = self.estimated_ride_duration_mins()
         ride_start_dt = datetime.datetime.combine(self.ride_date, self.ride_time)

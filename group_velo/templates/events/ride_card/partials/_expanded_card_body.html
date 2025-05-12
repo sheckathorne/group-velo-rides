@@ -48,10 +48,15 @@
       <span class="text-sm">{{ event_occurence.event.route.elevation|intcomma }} ft elevation gain</span>
     </div>
   </div>
-  {% if event_occurence.has_forecast and event_occurence.weather.hours %}
+  {% if event_occurence.has_forecast %}
     {% with event_weather=event_occurence.weather %}
       {% if event_weather.day.condition_code and event_weather.day.maxtemp_f %}
-        {% include 'events/ride_card/weather/_hour.html' with forecast_hours=event_occurence.weather.hours event_record=event_occurence %}
+        <div class="mt-4 p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
+          {% include 'events/ride_card/weather/_hour.html' with forecast_hours=event_occurence.weather.hours %}
+          <div class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+            Weather forecast at {{ event_occurence.route.start_location_name }}
+          </div>
+        </div>
       {% else %}
         {% include 'events/ride_card/weather/_loading_hour.html' with task_id=event_occurence.weather_task_id zip_code=event_occurence.event.route.start_zip_code event_date=event_occurence.ride_date|date:"Y-m-d" ride_id=event_occurence.id %}
       {% endif %}

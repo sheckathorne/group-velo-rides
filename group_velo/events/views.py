@@ -109,9 +109,8 @@ class EventView(TemplateView):
         return context
 
     def filter_weather_hours(self, event_occurence, weather_data):
-        hours = event_occurence.ride_rounded_start_and_end_hour()
-        hours_list = [str(h) for h in range(hours[0], hours[1])]
-
+        star_hour, end_hour = event_occurence.ride_rounded_start_and_end_hour()
+        hours_list = [str(h) for h in range(star_hour, end_hour)]
         weather_hours = []
 
         if hours_list and weather_data:
