@@ -1,7 +1,7 @@
 {% load group_velo_events_tags %}
 {% load to_sqid from group_velo_data_tags %}
 
-<div class="relative" x-data="{ open:false }">
+<div class="relative" x-data="{ open:false }" @click.stop>
   {% if is_registered %}
     {% with new_message_count=ride.comments|get_item:"new" %}
       {% registration_urls as registration_urls %}

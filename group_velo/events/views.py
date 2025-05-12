@@ -751,6 +751,7 @@ class ModifyEvent(SqidMixin, TemplateView):
             )
 
     def post(self, request, **kwargs):
+        print(request.POST)
         event_occurence_sqid = kwargs.get("event_occurence_sqid", "")
         event_occurence_id = self.decode_sqid(event_occurence_sqid)
         event_occurence = get_object_or_404(EventOccurence.objects.select_related("route"), pk=event_occurence_id)
@@ -780,6 +781,9 @@ class ModifyEvent(SqidMixin, TemplateView):
 
             return HttpResponseRedirect(reverse("events:my_rides"))
         else:
+            print("Form validation failed")
+            print(f"Form errors: {form.errors}")  # Print full error dict
+            print(f"Form data: {form.data}")  # Print submitted data
             errors = distinct_errors(form.errors.values())
             for error in errors:
                 messages.error(request, error)
