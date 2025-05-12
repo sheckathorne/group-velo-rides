@@ -85,7 +85,6 @@ def create_occurence_from_event(event, event_date):
         max_riders=event.max_riders,
         is_canceled=event.is_canceled,
         route=event.route,
-        start_zip_code=event.route.start_zip_code,
         surface_type=event.surface_type,
         drop_designation=event.drop_designation,
         group_classification=event.group_classification,
@@ -312,7 +311,6 @@ class EventOccurence(EventBase):
     occurence_name = models.CharField("Event Name", max_length=100)
     slug = models.SlugField(max_length=255, blank=True)
     ride_date = models.DateField("Ride Date")
-    start_zip_code = models.CharField(max_length=10)
     modified_by = models.ForeignKey(
         get_user_model(),
         null=True,
@@ -744,10 +742,6 @@ class EventOccurence(EventBase):
     def save(self, *args, **kwargs):
         created = self.pk is None
 
-        # Set attributes before initial save
-        if self.route:
-            self.start_zip_code = self.route.start_zip_code
-
         if not self.slug:
             self.slug = slugify(self.occurence_name)
 
@@ -767,7 +761,7 @@ class EventOccurence(EventBase):
 
     class Meta:
         indexes = [
-            models.Index(fields=["ride_date", "start_zip_code"]),
+            models.Index(fields=["ride_date"]),
         ]
 
 
