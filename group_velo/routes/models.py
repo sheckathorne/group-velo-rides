@@ -24,8 +24,8 @@ class Route(models.Model):
     start_state = models.CharField("State", max_length=2, choices=STATE_CHOICES, null=True, blank=True)
     start_zip_code = models.CharField(
         "Zip Code",
-        null=True,
-        blank=True,
+        null=False,
+        blank=False,
         max_length=5,
         validators=[numeric_chars, length_of_five],
     )

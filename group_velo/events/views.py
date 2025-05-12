@@ -751,7 +751,6 @@ class ModifyEvent(SqidMixin, TemplateView):
             )
 
     def post(self, request, **kwargs):
-        print(request.POST)
         event_occurence_sqid = kwargs.get("event_occurence_sqid", "")
         event_occurence_id = self.decode_sqid(event_occurence_sqid)
         event_occurence = get_object_or_404(EventOccurence.objects.select_related("route"), pk=event_occurence_id)
@@ -761,6 +760,11 @@ class ModifyEvent(SqidMixin, TemplateView):
         user_routes = user.self_and_club_routes()
         user_clubs = user.route_clubs(MemberType.RideLeader)
 
+        print("User clubs:", user_clubs)
+        print("User routes:", user_routes)
+        print("Registered rider count:", registered_rider_count)
+        print("POST data:", request.POST)
+
         form = ModifyEventForm(
             user_clubs,
             user_routes,
@@ -768,6 +772,10 @@ class ModifyEvent(SqidMixin, TemplateView):
             request.POST,
             instance=event_occurence,
         )
+
+        print("Form fields:", [field for field in form.fields])
+        print("Required fields:", [field for field in form.fields if form.fields[field].required])
+
         if form.is_valid():
             modified_occurence = form.save(commit=False)
             modified_occurence.modified_by = user
