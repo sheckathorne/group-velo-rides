@@ -12,18 +12,13 @@ def fetch_weather_for_zip(self, zip_code):
     """
     Celery task to fetch weather data for a zip code
     and update the database cache.
-
-    Includes retry logic and simulated delay for demo purposes.
     """
     try:
-        # time.sleep(10)
-        # return {"success": True, "zip_code": zip_code}
-
-        # Make API request
         api_url = (
             f"{settings.WEATHER_API_BASE_URL}?key={settings.WEATHER_API_KEY}&days=3&q={zip_code}&alerts=no&aqi=no"
         )
         response = requests.get(api_url)
+        print("the response status code is", response.status_code)
 
         if response.status_code == 200:
             forecast_data = response.json()

@@ -41,5 +41,4 @@ def check_task_status(request, task_id):
             )
             return HttpResponse(response)
     else:
-        # pending
-        HttpResponseNoContent()
+        return HttpResponseNoContent()
