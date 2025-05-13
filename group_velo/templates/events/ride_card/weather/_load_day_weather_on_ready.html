@@ -1,0 +1,6 @@
+<span id="weather-day-spinner-loading-label-load-{{ ride_id }}"
+      class="text-gray-500 text-xs"
+      hx-get="{% url 'events:get_weather_data_for_zip_and_date' %}?zip_code={{ zip_code }}&event_date={{ event_date }}&task_id={{ task_id }}&ride_id={{ ride_id }}"
+      hx-trigger="load"
+      hx-swap="outerHTML"
+      hx-target="#weather-day-spinner-{{ ride_id }}">Loading weather..</span>

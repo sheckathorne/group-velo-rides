@@ -48,71 +48,15 @@
       <span class="text-sm">{{ event_occurence.event.route.elevation|intcomma }} ft elevation gain</span>
     </div>
   </div>
-  <div class="mt-4 p-4 bg-gray-100 dark:bg-gray-800/50 rounded-lg">
-    <h4 class="text-sm font-medium mb-3 flex items-center gap-1.5">
-      <span class="weather-icon-large"
-            data-condition="{{ ride.weather_condition }}">
-        <!-- Weather icon will be inserted by JS -->
-      </span>
-      <span>Weather Forecast</span>
-    </h4>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-               xmlns="http://www.w3.org/2000/svg"
-               fill="none"
-               viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-          </svg>
-          <span class="text-sm">{{ ride.weather_temp_low }}°F - {{ ride.weather_temp_high }}°F</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-               xmlns="http://www.w3.org/2000/svg"
-               fill="none"
-               viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-          <span class="text-sm">{{ ride.weather_precipitation_chance }}% chance of
-            {% if ride.weather_precipitation_type %}
-              {{ ride.weather_precipitation_type }}
-            {% else %}
-              precipitation
-            {% endif %}
-          </span>
-        </div>
-      </div>
-      <div class="flex flex-col gap-2">
-        <div class="flex items-center gap-2">
-          <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-               xmlns="http://www.w3.org/2000/svg"
-               fill="none"
-               viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
-          </svg>
-          <span class="text-sm">{{ ride.weather_wind_speed }} mph {{ ride.weather_wind_direction }}</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
-               xmlns="http://www.w3.org/2000/svg"
-               fill="none"
-               viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-          <span class="text-sm">{{ ride.weather_humidity }}% humidity</span>
-        </div>
-      </div>
-    </div>
-    <div class="mt-3 text-xs text-gray-500 dark:text-gray-400">
-      Weather forecast for {{ event_occurence.start_time|date:"F j" }} at {{ event_occurence.route.start_location_name }}
-    </div>
-  </div>
+  {% if event_occurence.has_forecast %}
+    {% with event_weather=event_occurence.weather %}
+      {% if event_weather.day.condition_code and event_weather.day.maxtemp_f %}
+        {% include 'events/ride_card/weather/_hour.html' with forecast_hours=event_occurence.weather.hours ride_id=event_occurence.id start_location_name=event_occurence.route.start_location_name %}
+      {% else %}
+        {% include 'events/ride_card/weather/_loading_hour.html' with task_id=event_occurence.weather_task_id zip_code=event_occurence.event.route.start_zip_code event_date=event_occurence.ride_date|date:"Y-m-d" ride_id=event_occurence.id start_location_name=event_occurence.route.start_location_name %}
+      {% endif %}
+    {% endwith %}
+  {% endif %}
   <div class="mt-4">
     <h4 class="text-sm font-medium mb-2">Ride Leader</h4>
     <div class="flex items-center gap-2">{% include 'events/ride_card/partials/_ride_leader_list.html' %}</div>

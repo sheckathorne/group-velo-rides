@@ -10,7 +10,7 @@ from django.db import models
 from django.db.models import Count
 from django.template.defaultfilters import slugify
 from django.utils import timezone
-from localflavor.us.us_states import STATE_CHOICES
+from localflavor.us.us_states import STATE_CHOICES as RAW_STATE_CHOICES
 from phonenumber_field.modelfields import PhoneNumberField
 
 from group_velo.data.choices import GroupClassification, MemberType, PrivacyLevel, RequestStatus, SurfaceType
@@ -18,6 +18,8 @@ from group_velo.data.models import get_coords_of
 from group_velo.data.validators import length_of_five, numeric_chars
 from group_velo.events.fields import CharFieldAllowsMultiSelectSearch
 from group_velo.utils.mixins import SqidMixin
+
+STATE_CHOICES = tuple(RAW_STATE_CHOICES)
 
 
 class Club(models.Model, SqidMixin):

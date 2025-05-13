@@ -1,5 +1,5 @@
 # Translations for the Group Velo Rides project
-# Copyright (C) 2024 Sean Heckathorne
+# Copyright (C) 2025 Sean Heckathorne
 # Sean Heckathorne <groupvelorides@gmail.com>, 2024.
 #
 #, fuzzy

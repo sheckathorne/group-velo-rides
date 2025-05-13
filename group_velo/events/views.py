@@ -1,4 +1,5 @@
 import datetime
+from datetime import timedelta
 
 from better_elided_pagination.paginators import BetterElidedPaginator
 from braces.views import FormInvalidMessageMixin
@@ -18,6 +19,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
+from django.utils.timezone import localdate
 from django.views.generic import DeleteView, TemplateView, UpdateView
 from django.views.generic.base import View
 from django.views.generic.edit import FormMixin
@@ -49,12 +51,15 @@ from group_velo.events.models import (
 from group_velo.users.models import SavedFilter
 from group_velo.utils.mixins import SqidMixin
 from group_velo.utils.utils import distinct_errors, get_prev_dates, pagination_css
+from group_velo.weather.models import WeatherForecastDay, WeatherForecastHour
+from group_velo.weather.tasks import fetch_weather_for_zip
 
 
 @method_decorator(login_required(login_url="/login"), name="dispatch")
 class EventView(TemplateView):
     TABLE_PREFIX = ""
-    ITEMS_PER_PAGE = 4
+    ITEMS_PER_PAGE = 8
+    WEATHER_FORECAST_DAY_COUNT = 3
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -72,6 +77,13 @@ class EventView(TemplateView):
         context["save_filter_form"] = save_filter_form
 
         rides, ride_filter, filtered_rides, ride_type = self.get_ride_data()
+        events_having_forecast = self.get_events_having_forecast(filtered_rides)
+        unique_zip_codes = self.get_unique_zip_codes(events_having_forecast)
+        weather_data, zip_codes_to_fetch_from_api = self.get_weather_data(unique_zip_codes)
+
+        task_ids = self.fetch_weather_data_from_api(zip_codes_to_fetch_from_api)
+        self.add_weather_data_to_events(filtered_rides, events_having_forecast, task_ids, weather_data)
+
         calendar = self.generate_calendar(ride_filter, filtered_rides, self.TABLE_PREFIX)
         pagination = BetterElidedPaginator(
             self.request,
@@ -95,6 +107,59 @@ class EventView(TemplateView):
         )
 
         return context
+
+    def filter_weather_hours(self, event_occurence, weather_data):
+        star_hour, end_hour = event_occurence.ride_rounded_start_and_end_hour()
+        end_hour = end_hour + 1 if end_hour < 23 else end_hour
+        hours_list = [str(h) for h in range(star_hour, end_hour)]
+        weather_hours = []
+
+        if hours_list and weather_data:
+            weather_hours = [weather_data["hours"][key] for key in hours_list]
+
+        return weather_hours
+
+    def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids, weather_data):
+        for event_occurence_member in filtered_rides:
+            if event_occurence_member.pk in [event.pk for event in events_having_forecast]:
+                event_occurence_member.event_occurence.has_forecast = True
+
+            zip_and_date_weather = weather_data.get(
+                f"{event_occurence_member.event_occurence.route.start_zip_code} "
+                + f"- {event_occurence_member.event_occurence.ride_date}"
+            )
+
+            if zip_and_date_weather:
+                event_weather_hours_data = zip_and_date_weather["hours"]
+
+                filtered_hours_data = self.filter_weather_hours(
+                    event_occurence_member.event_occurence, zip_and_date_weather
+                )
+
+                if filtered_hours_data:
+                    event_weather_hours_data = filtered_hours_data
+
+                event_occurence_member.event_occurence.weather = {
+                    "day": zip_and_date_weather["day"],
+                    "hours": event_weather_hours_data,
+                }
+
+            # Include task ID for events that are being updated
+            if event_occurence_member.event_occurence.route.start_zip_code in task_ids:
+                event_occurence_member.event_occurence.weather_task_id = task_ids[
+                    event_occurence_member.event_occurence.route.start_zip_code
+                ]
+
+    def get_events_having_forecast(self, filtered_rides):
+        cutoff_start = localdate()
+        cutoff_end = cutoff_start + timedelta(days=self.WEATHER_FORECAST_DAY_COUNT - 1)
+
+        return filtered_rides.filter(
+            **{
+                f"{self.TABLE_PREFIX}ride_date__gte": cutoff_start,
+                f"{self.TABLE_PREFIX}ride_date__lte": cutoff_end,
+            }
+        )
 
     def generate_calendar(self, ride_filter, filtered_rides, table_prefix):
         TODAY = datetime.datetime.today()
@@ -161,10 +226,56 @@ class EventView(TemplateView):
     def get_ride_data(self):
         raise NotImplementedError("Subclasses must implement get_ride_data method")
 
+    def get_unique_zip_codes(self, rides_with_forecast):
+        if rides_with_forecast:
+            distinct_zip_codes = set(
+                rides_with_forecast.values_list(f"{self.TABLE_PREFIX}route__start_zip_code", flat=True).distinct()
+            )
+
+            return distinct_zip_codes
+        else:
+            return set()
+
+    def get_weather_data(self, zip_codes):
+        weather_data = {}
+        zip_codes_to_fetch_from_api = []
+
+        # Check cache for each zip code
+        for zip_code in zip_codes:
+            if WeatherForecastDay.is_fresh(zip_code):
+                weather_forecast = WeatherForecastDay.get_forecast(zip_code)
+                if weather_forecast:
+                    for forecast_day in weather_forecast:
+                        weather_data[f"{zip_code} - {forecast_day.forecast_date}"] = {"day": forecast_day, "hours": {}}
+                        weather_forecast_hour = WeatherForecastHour.get_forecast_hour(
+                            zip_code, forecast_day.forecast_date
+                        )
+                        if weather_forecast_hour:
+                            for forecast_hour in weather_forecast_hour:
+                                weather_data[f"{zip_code} - {forecast_day.forecast_date}"]["hours"][
+                                    f"{forecast_hour.hour}"
+                                ] = forecast_hour
+            else:
+                # Add to the list to be fetched
+                zip_codes_to_fetch_from_api.append(zip_code)
+
+        return weather_data, zip_codes_to_fetch_from_api
+
+    def fetch_weather_data_from_api(self, zip_codes):
+        # Launch Celery tasks for zip codes that need fresh data
+        task_ids = {}
+        if zip_codes:
+            for zip_code in zip_codes:
+                # Launch individual tasks and store their IDs
+                task = fetch_weather_for_zip.delay(zip_code)
+                task_ids[zip_code] = task.id
+
+        return task_ids
+
 
 class MyRidesView(EventView):
     TABLE_PREFIX = "event_occurence__"
-    ITEMS_PER_PAGE = 5
+    # ITEMS_PER_PAGE = 8
 
     def get_ride_data(self):
         rides = self.request.user.upcoming_rides(self.DAYS_IN_FUTURE).order_by("event_occurence__ride_date")
@@ -179,7 +290,7 @@ class MyRidesView(EventView):
 
 class AvailableRidesView(EventView):
     TABLE_PREFIX = ""
-    ITEMS_PER_PAGE = 4
+    # ITEMS_PER_PAGE = 8
 
     def get_ride_data(self):
         rides = self.request.user.available_rides(self.DAYS_IN_FUTURE)
@@ -656,6 +767,7 @@ class ModifyEvent(SqidMixin, TemplateView):
             request.POST,
             instance=event_occurence,
         )
+
         if form.is_valid():
             modified_occurence = form.save(commit=False)
             modified_occurence.modified_by = user
@@ -1040,3 +1152,60 @@ def save_filter(request):
                 messages.error(request.error, "There was an unexpected problem, please try again.")
         return HttpResponseRedirect(request.headers["referer"])
     return HttpResponseRedirect(request.headers["referer"])
+
+
+@login_required(login_url="/login")
+def get_weather_data_for_zip_and_date(request):
+    zip_code = request.GET.get("zip_code")
+    event_date = request.GET.get("event_date")
+    task_id = request.GET.get("task_id")
+    ride_id = request.GET.get("ride_id")
+
+    if zip_code and event_date:
+        try:
+            weather_data = WeatherForecastDay.objects.get(zip_code=zip_code, forecast_date=event_date)
+            condition_text = weather_data.condition_text
+            condition_code = weather_data.condition_code
+            condition_url = weather_data.condition_icon_url
+            mintemp_c = weather_data.mintemp_c
+            maxtemp_c = weather_data.maxtemp_c
+            mintemp_f = weather_data.mintemp_f
+            maxtemp_f = weather_data.maxtemp_f
+
+            event_occurence = EventOccurence.objects.get(pk=ride_id)
+            start_hour, end_hour = event_occurence.ride_rounded_start_and_end_hour()
+            forecast_hours = WeatherForecastHour.objects.filter(
+                forecast=weather_data, hour__gte=start_hour, hour__lte=end_hour
+            )
+
+            response = render_to_string(
+                "events/ride_card/weather/_day.html",
+                {
+                    "condition_text": condition_text,
+                    "condition_code": condition_code,
+                    "condition_url": condition_url,
+                    "mintemp_c": mintemp_c,
+                    "maxtemp_c": maxtemp_c,
+                    "mintemp_f": mintemp_f,
+                    "maxtemp_f": maxtemp_f,
+                },
+            )
+
+            response += render_to_string(
+                "events/ride_card/weather/_hour.html",
+                {
+                    "forecast_hours": forecast_hours,
+                    "start_location_name": event_occurence.route.start_location_name,
+                    "ride_id": ride_id,
+                },
+            )
+            return HttpResponse(response)
+        except WeatherForecastDay.DoesNotExist:
+            # In case the data isn't available yet, show the loading spinner again
+            response = render_to_string(
+                "events/ride_card/weather/_loading_day.html",
+                {"task_id": task_id, "zip_code": zip_code, "event_date": event_date},
+            )
+            return HttpResponse(response)
+    else:
+        return HttpResponse("", content_type="text/html")

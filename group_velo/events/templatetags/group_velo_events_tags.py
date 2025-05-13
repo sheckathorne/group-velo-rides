@@ -93,3 +93,18 @@ def initials(value):
         return ""
     words = value.split()
     return "".join(word[0] for word in words if word)
+
+
+@register.filter
+def integer_to_hour_text(val):
+    if not val:
+        return "12 AM"
+
+    if val == 0:
+        return "12 AM"
+    elif val > 0 and val < 12:
+        return f"{val + 1} AM"
+    elif val == 12:
+        return "12 PM"
+    else:
+        return f"{val - 12} PM"

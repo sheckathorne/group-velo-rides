@@ -302,6 +302,8 @@ class Event(EventBase):
 
 
 class EventOccurence(EventBase):
+    MINS_IN_HOUR = Decimal(60.0)
+
     class MaxRidersField(models.PositiveIntegerField):
         default_validators = []
 
@@ -318,18 +320,43 @@ class EventOccurence(EventBase):
     )
     modified_date = models.DateTimeField("Modified Date", blank=True, null=True, auto_now=True)
 
-    @property
-    def estimated_ride_duration(self):
-        MINS_IN_HOUR = Decimal(60.0)
+    def estimated_ride_duration_mins(self):
         MINS_IN_QUARTER_HOUR = Decimal(15.0)
         ESTIMATED_STOP_PERCENTAGE = Decimal(0.10)
         distance = self.route.distance
         average_pace = (self.lower_pace_range + self.upper_pace_range) / 2
         estimated_duration = distance / average_pace
-        total_minutes = estimated_duration * MINS_IN_HOUR * (1 + ESTIMATED_STOP_PERCENTAGE)
+        total_minutes = estimated_duration * self.MINS_IN_HOUR * (1 + ESTIMATED_STOP_PERCENTAGE)
         rounded_minutes = round(total_minutes / MINS_IN_QUARTER_HOUR) * MINS_IN_QUARTER_HOUR
-        hours = int(rounded_minutes // MINS_IN_HOUR)
-        minutes = int(rounded_minutes % MINS_IN_HOUR)
+        return int(rounded_minutes)
+
+    @property
+    def hours_range_of_start_and_end(self):
+        start_hour, end_hour = self.ride_rounded_start_and_end_hour()
+        hours_list = [h for h in range(start_hour, end_hour)]
+        return hours_list
+
+    def ride_rounded_start_and_end_hour(self):
+        estimated_duration_mins = self.estimated_ride_duration_mins()
+        ride_start_dt = datetime.datetime.combine(self.ride_date, self.ride_time)
+        estimated_ride_end_dt = ride_start_dt + timedelta(minutes=estimated_duration_mins)
+
+        # Round down to the start of the hour
+        starting_hour = ride_start_dt.replace(minute=0, second=0, microsecond=0)
+        ending_hour = estimated_ride_end_dt.replace(minute=0, second=0, microsecond=0)
+        if estimated_ride_end_dt > ending_hour:
+            ending_hour += timedelta(hours=1)
+
+        if ending_hour.hour < starting_hour.hour:
+            return (starting_hour.hour, 24)
+
+        return (starting_hour.hour, ending_hour.hour)
+
+    @property
+    def estimated_ride_duration(self):
+        rounded_minutes = self.estimated_ride_duration_mins()
+        hours = int(rounded_minutes // self.MINS_IN_HOUR)
+        minutes = int(rounded_minutes % self.MINS_IN_HOUR)
         parts = []
         if hours:
             parts.append(f"{hours} hr" + ("s" if hours != 1 else ""))
@@ -714,13 +741,15 @@ class EventOccurence(EventBase):
 
     def save(self, *args, **kwargs):
         created = self.pk is None
+
+        if not self.slug:
+            self.slug = slugify(self.occurence_name)
+
+        # Save the model
         super().save(*args, **kwargs)
+
+        # Create EventOccurenceMember if this is a new instance
         if created:
-
-            def save(self, *args, **kwargs):
-                if not self.slug:
-                    self.slug = slugify(self.occurence_name)
-
             EventOccurenceMember.objects.create(
                 event_occurence=self,
                 user=self.created_by,
@@ -729,6 +758,11 @@ class EventOccurence(EventBase):
 
     def __str__(self):
         return f'{self.occurence_name} - {self.ride_date.strftime("%b %d %Y")}'
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["ride_date"]),
+        ]
 
 
 class EventOccurenceMemberBase(models.Model):

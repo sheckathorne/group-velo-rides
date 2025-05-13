@@ -3,10 +3,12 @@ import datetime
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
-from localflavor.us.us_states import STATE_CHOICES
+from localflavor.us.us_states import STATE_CHOICES as RAW_STATE_CHOICES
 
 from group_velo.clubs.models import Club
 from group_velo.data.validators import length_of_five, numeric_chars
+
+STATE_CHOICES = tuple(RAW_STATE_CHOICES)
 
 
 class RouteManager(models.Manager):
@@ -22,8 +24,8 @@ class Route(models.Model):
     start_state = models.CharField("State", max_length=2, choices=STATE_CHOICES, null=True, blank=True)
     start_zip_code = models.CharField(
         "Zip Code",
-        null=True,
-        blank=True,
+        null=False,
+        blank=False,
         max_length=5,
         validators=[numeric_chars, length_of_five],
     )

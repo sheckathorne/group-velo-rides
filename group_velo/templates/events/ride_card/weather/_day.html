@@ -1,0 +1,15 @@
+<div class="flex items-center gap-1 text-sm"
+     x-tooltip.raw.placement.right="{{ condition_text }}">
+  <span class="ml-1 text-small text-gray-500">•</span>
+  <span class="weather-icon">
+    <img src="http:{{ condition_url }}"
+         width="16"
+         height="16"
+         alt="Weather Icon - {{ condition_text }}" />
+  </span>
+  <span class="flex items-center">
+    <span class="text-blue-500">{{ mintemp_f|floatformat:0 }}°F</span>
+    <span class="mx-0.5 text-gray-400">/</span>
+    <span class="text-red-500">{{ maxtemp_f|floatformat:0 }}°F</span>
+  </span>
+</div>

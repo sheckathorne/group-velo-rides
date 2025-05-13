@@ -29,7 +29,7 @@ django.setup()
 # -- Project information -----------------------------------------------------
 
 project = "Group Velo Rides"
-copyright = """2024, Sean Heckathorne"""
+copyright = """2025, Sean Heckathorne"""
 author = "Sean Heckathorne"
 
 
