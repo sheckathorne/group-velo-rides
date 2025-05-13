@@ -333,6 +333,7 @@ class EventOccurence(EventBase):
     @property
     def hours_range_of_start_and_end(self):
         start_hour, end_hour = self.ride_rounded_start_and_end_hour()
+        end_hour = end_hour + 1 if end_hour < 23 else end_hour
         hours_list = [h for h in range(start_hour, end_hour)]
         return hours_list
 

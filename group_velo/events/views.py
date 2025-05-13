@@ -109,13 +109,9 @@ class EventView(TemplateView):
         return context
 
     def filter_weather_hours(self, event_occurence, weather_data):
-        star_hour, end_hour = event_occurence.ride_rounded_start_and_end_hour()
-        end_hour = end_hour + 1 if end_hour < 23 else end_hour
-        hours_list = [str(h) for h in range(star_hour, end_hour)]
-        weather_hours = []
-
-        if hours_list and weather_data:
-            weather_hours = [weather_data["hours"][key] for key in hours_list]
+        start_hour, end_hour = event_occurence.ride_rounded_start_and_end_hour()
+        end_hour = end_hour - 1 if end_hour > 23 else end_hour
+        weather_hours = weather_data["hours"].filter(hour__gte=start_hour, hour__lte=end_hour)
 
         return weather_hours
 
@@ -250,11 +246,7 @@ class EventView(TemplateView):
                         weather_forecast_hour = WeatherForecastHour.get_forecast_hour(
                             zip_code, forecast_day.forecast_date
                         )
-                        if weather_forecast_hour:
-                            for forecast_hour in weather_forecast_hour:
-                                weather_data[f"{zip_code} - {forecast_day.forecast_date}"]["hours"][
-                                    f"{forecast_hour.hour}"
-                                ] = forecast_hour
+                        weather_data[f"{zip_code} - {forecast_day.forecast_date}"]["hours"] = weather_forecast_hour
             else:
                 # Add to the list to be fetched
                 zip_codes_to_fetch_from_api.append(zip_code)
@@ -1174,6 +1166,7 @@ def get_weather_data_for_zip_and_date(request):
 
             event_occurence = EventOccurence.objects.get(pk=ride_id)
             start_hour, end_hour = event_occurence.ride_rounded_start_and_end_hour()
+            end_hour = end_hour - 1 if end_hour > 23 else end_hour
             forecast_hours = WeatherForecastHour.objects.filter(
                 forecast=weather_data, hour__gte=start_hour, hour__lte=end_hour
             )
