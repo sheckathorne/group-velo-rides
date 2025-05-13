@@ -354,6 +354,10 @@ class EventOccurence(EventBase):
         return (starting_hour.hour, ending_hour.hour)
 
     @property
+    def pace_range_text(self):
+        return f"{self.lower_pace_range.normalize()} - {self.upper_pace_range.normalize()} mph"
+
+    @property
     def estimated_ride_duration(self):
         rounded_minutes = self.estimated_ride_duration_mins()
         hours = int(rounded_minutes // self.MINS_IN_HOUR)

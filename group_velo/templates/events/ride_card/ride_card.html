@@ -69,7 +69,7 @@
                 <div class="flex items-center justify-end gap-2">
                   <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold category-badge {{ event_occurence.return_group_classification_color }}"
                        data-category="{{ event_occurence.group_classification_name }}"
-                       x-tooltip.raw="{{ event_occurence.lower_pace_range }} - {{ event_occurence.upper_pace_range }} mph">
+                       x-tooltip.raw="{{ event_occurence.pace_range_text }}">
                     {{ event_occurence.group_classification_abbreviation }}
                   </div>
                   {% include 'events/ride_card/partials/_registered_ride_menu.html' %}
