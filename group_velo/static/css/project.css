@@ -4054,6 +4054,10 @@ html[data-theme="dark"] {
   background-color: rgb(202 138 4 / var(--tw-bg-opacity, 1));
 }
 
+.dark\:bg-gray-900\/50:is(.dark *) {
+  background-color: rgb(17 24 39 / 0.5);
+}
+
 .dark\:stroke-gray-400:is(.dark *) {
   stroke: #9ca3af;
 }

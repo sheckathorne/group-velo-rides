@@ -5,7 +5,12 @@
      x-show="expanded"
      x-collapse>
   {% if event_occurence.description %}<p class="text-sm">{{ event_occurence.description }}</p>{% endif %}
+  <div class="mt-4">
+    <h4 class="text-sm font-medium mb-2">Ride Leader</h4>
+    <div class="flex items-center gap-2">{% include 'events/ride_card/partials/_ride_leader_list.html' %}</div>
+  </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+    <h4 class="text-sm font-medium mb-2">Ride Details</h4>
     <div class="flex items-center gap-2">
       <svg class="h-4 w-4 text-gray-500 dark:text-gray-400"
            xmlns="http://www.w3.org/2000/svg"
@@ -57,10 +62,6 @@
       {% endif %}
     {% endwith %}
   {% endif %}
-  <div class="mt-4">
-    <h4 class="text-sm font-medium mb-2">Ride Leader</h4>
-    <div class="flex items-center gap-2">{% include 'events/ride_card/partials/_ride_leader_list.html' %}</div>
-  </div>
   <div class="mt-4">
     <h4 class="text-sm font-medium mb-2">Route Map</h4>
     {% embedded_map_from event_occurence.route.url height=350 %}
