@@ -28,6 +28,7 @@ from group_velo.data.choices import (
     SurfaceType,
 )
 from group_velo.routes.models import Route
+from group_velo.weather.models import WeatherForecastDay, WeatherForecastHour
 
 from .fields import CharFieldAllowsMultiSelectSearch, ChoiceArrayField, DaysOfWeek
 
@@ -320,6 +321,63 @@ class EventOccurence(EventBase):
     )
     modified_date = models.DateTimeField("Modified Date", blank=True, null=True, auto_now=True)
 
+    def estimated_ride_end_dtetime(self):
+        estimated_duration_mins = self.estimated_ride_duration_mins()
+        ride_start_dt = datetime.datetime.combine(self.ride_date, self.ride_time)
+        estimated_ride_end_dt = ride_start_dt + timedelta(minutes=estimated_duration_mins)
+        return estimated_ride_end_dt
+
+    def get_actual_weather_day(self):
+        """
+        Get weather forecast hours that cover the duration of this ride/event.
+        Properly handles events that span multiple days.
+
+        Args:
+            max_hours (int): Maximum number of hours to return, defaults to 24
+
+        Returns:
+            QuerySet: Weather forecast hours ordered chronologically, limited to max_hours
+        """
+
+        return WeatherForecastDay.get_forecast(self.route.start_zip_code)
+
+    def get_actual_weather_hours(self, max_hours=24):
+        """
+        Get weather forecast hours that cover the duration of this ride/event.
+        Properly handles events that span multiple days.
+
+        Args:
+            max_hours (int): Maximum number of hours to return, defaults to 24
+
+        Returns:
+            QuerySet: Weather forecast hours ordered chronologically, limited to max_hours
+        """
+        start_datetime = datetime.datetime.combine(self.ride_date, self.ride_time)
+        end_datetime = self.estimated_ride_end_dtetime()
+
+        zip_query = Q(forecast__zip_code=self.route.start_zip_code)
+        query = Q()
+
+        # Get all dates between start and end (inclusive)
+        current_date = start_datetime.date()
+        while current_date <= end_datetime.date():
+            if current_date == start_datetime.date():
+                # First day - from start hour to end of day
+                day_query = Q(forecast__forecast_date=current_date, hour__gte=start_datetime.hour)
+            elif current_date == end_datetime.date():
+                # Last day - from start of day to end hour
+                day_query = Q(forecast__forecast_date=current_date, hour__lte=end_datetime.hour)
+            else:
+                # Middle days - all hours
+                day_query = Q(forecast__forecast_date=current_date)
+
+            # Add this day's query to the main query with OR
+            query |= day_query
+            current_date += datetime.timedelta(days=1)
+
+        hour_data = WeatherForecastHour.objects.filter(zip_query, query).order_by("forecast__forecast_date", "hour")
+        return hour_data[:max_hours]
+
     def estimated_ride_duration_mins(self):
         MINS_IN_QUARTER_HOUR = Decimal(15.0)
         ESTIMATED_STOP_PERCENTAGE = Decimal(0.10)
@@ -338,12 +396,11 @@ class EventOccurence(EventBase):
         return hours_list
 
     def ride_rounded_start_and_end_hour(self):
-        estimated_duration_mins = self.estimated_ride_duration_mins()
-        ride_start_dt = datetime.datetime.combine(self.ride_date, self.ride_time)
-        estimated_ride_end_dt = ride_start_dt + timedelta(minutes=estimated_duration_mins)
+        estimated_ride_end_dt = self.estimated_ride_end_dtetime()
+        ride_start_dtetime = datetime.datetime.combine(self.ride_date, self.ride_time)
 
         # Round down to the start of the hour
-        starting_hour = ride_start_dt.replace(minute=0, second=0, microsecond=0)
+        starting_hour = ride_start_dtetime.replace(minute=0, second=0, microsecond=0)
         ending_hour = estimated_ride_end_dt.replace(minute=0, second=0, microsecond=0)
         if estimated_ride_end_dt > ending_hour:
             ending_hour += timedelta(hours=1)
@@ -352,6 +409,45 @@ class EventOccurence(EventBase):
             return (starting_hour.hour, 24)
 
         return (starting_hour.hour, ending_hour.hour)
+
+    def get_placeholder_weather_hours(self, max_hours=24):
+        """
+        Get the expected structure of hours for this ride/event when no actual weather data exists.
+        Returns a list of dictionaries with date and hour information.
+
+        Args:
+            max_hours (int): Maximum number of hours to return, defaults to 24
+
+        Returns:
+            list: List of dictionaries with date and hour information
+        """
+        start_datetime = datetime.datetime.combine(self.ride_date, self.ride_time)
+        end_datetime = self.estimated_ride_end_dtetime()
+
+        # Create a list of all hours needed
+        all_hours = []
+
+        # Get all dates between start and end (inclusive)
+        current_date = start_datetime.date()
+        while current_date <= end_datetime.date():
+            if current_date == start_datetime.date():
+                # First day - from start hour to end of day
+                for h in range(start_datetime.hour, 24):
+                    all_hours.append({"date": current_date, "hour": h, "has_data": False})
+            elif current_date == end_datetime.date():
+                # Last day - from start of day to end hour
+                for h in range(0, end_datetime.hour + 1):
+                    all_hours.append({"date": current_date, "hour": h, "has_data": False})
+            else:
+                # Middle days - all hours
+                for h in range(0, 24):
+                    all_hours.append({"date": current_date, "hour": h, "has_data": False})
+
+            # Move to next day
+            current_date += datetime.timedelta(days=1)
+
+        # Limit to max_hours
+        return all_hours[:max_hours]
 
     @property
     def pace_range_text(self):

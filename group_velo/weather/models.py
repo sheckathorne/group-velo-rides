@@ -11,12 +11,12 @@ class WeatherForecastConditionBase(models.Model):
     chance_of_rain = models.IntegerField("Rain Chance", default=0)
     chance_of_snow = models.IntegerField("Snow Chance", default=0)
 
-    class Meta:
-        abstract = True
-
     @property
     def chance_of_precip(self):
         return max(self.chance_of_rain, self.chance_of_snow)
+
+    class Meta:
+        abstract = True
 
 
 class WeatherForecastDay(WeatherForecastConditionBase):
@@ -36,12 +36,6 @@ class WeatherForecastDay(WeatherForecastConditionBase):
     maxwind_mph = models.FloatField()
     maxwind_kph = models.FloatField()
     description = models.CharField(max_length=200)
-
-    class Meta:
-        constraints = [models.UniqueConstraint(fields=["zip_code", "forecast_date"], name="unique_zip_forecastdate")]
-        indexes = [
-            models.Index(fields=["last_fetched"]),
-        ]
 
     @classmethod
     def is_fresh(cls, zip_code):
@@ -63,7 +57,10 @@ class WeatherForecastDay(WeatherForecastConditionBase):
     def get_forecast(cls, zip_code):
         """Get forecast data if it exists"""
         try:
-            return cls.objects.filter(zip_code=zip_code)
+            if cls.is_fresh(zip_code):
+                return cls.objects.filter(zip_code=zip_code)
+            else:
+                return None
         except cls.DoesNotExist:
             return None
 
@@ -103,6 +100,9 @@ class WeatherForecastDay(WeatherForecastConditionBase):
 
         # Return most recently fetched result if it exists
         return query.order_by("-last_fetched").first()
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["zip_code", "forecast_date"], name="unique_zip_forecastdate")]
 
 
 class WeatherForecastHour(WeatherForecastConditionBase):

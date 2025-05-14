@@ -80,7 +80,6 @@ class EventView(TemplateView):
         events_having_forecast = self.get_events_having_forecast(filtered_rides)
         unique_zip_codes = self.get_unique_zip_codes(events_having_forecast)
         weather_data, zip_codes_to_fetch_from_api = self.get_weather_data(unique_zip_codes)
-
         task_ids = self.fetch_weather_data_from_api(zip_codes_to_fetch_from_api)
         self.add_weather_data_to_events(filtered_rides, events_having_forecast, task_ids, weather_data)
 
@@ -126,18 +125,19 @@ class EventView(TemplateView):
             )
 
             if zip_and_date_weather:
-                event_weather_hours_data = zip_and_date_weather["hours"]
+                day_data = zip_and_date_weather["day"]
+                hours_data = zip_and_date_weather["hours"]
 
                 filtered_hours_data = self.filter_weather_hours(
                     event_occurence_member.event_occurence, zip_and_date_weather
                 )
 
                 if filtered_hours_data:
-                    event_weather_hours_data = filtered_hours_data
+                    hours_data = filtered_hours_data
 
                 event_occurence_member.event_occurence.weather = {
-                    "day": zip_and_date_weather["day"],
-                    "hours": event_weather_hours_data,
+                    "day": day_data,
+                    "hours": hours_data,
                 }
 
             # Include task ID for events that are being updated
