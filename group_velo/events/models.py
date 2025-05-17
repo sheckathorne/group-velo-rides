@@ -339,7 +339,9 @@ class EventOccurence(EventBase):
             QuerySet: Weather forecast hours ordered chronologically, limited to max_hours
         """
 
-        return WeatherForecastDay.get_forecast(self.route.start_zip_code)
+        return WeatherForecastDay.objects.filter(
+            zip_code=self.route.start_zip_code, forecast_date=self.ride_date
+        ).first()
 
     def get_actual_weather_hours(self, max_hours=24):
         """

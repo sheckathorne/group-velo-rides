@@ -79,9 +79,10 @@ class EventView(TemplateView):
         rides, ride_filter, filtered_rides, ride_type = self.get_ride_data()
         events_having_forecast = self.get_events_having_forecast(filtered_rides)
         unique_zip_codes = self.get_unique_zip_codes(events_having_forecast)
-        weather_data, zip_codes_to_fetch_from_api = self.get_weather_data(unique_zip_codes)
+
+        zip_codes_to_fetch_from_api = self.build_zip_list_to_fetch(unique_zip_codes)
         task_ids = self.fetch_weather_data_from_api(zip_codes_to_fetch_from_api)
-        self.add_weather_data_to_events(filtered_rides, events_having_forecast, task_ids, weather_data)
+        self.add_weather_data_to_events(filtered_rides, events_having_forecast, task_ids)
 
         calendar = self.generate_calendar(ride_filter, filtered_rides, self.TABLE_PREFIX)
         pagination = BetterElidedPaginator(
@@ -107,44 +108,15 @@ class EventView(TemplateView):
 
         return context
 
+    def add_weather_data_to_events(self):
+        raise NotImplementedError("Subclasses must implement add_weather_data_to_events")
+
     def filter_weather_hours(self, event_occurence, weather_data):
         start_hour, end_hour = event_occurence.ride_rounded_start_and_end_hour()
         end_hour = end_hour - 1 if end_hour > 23 else end_hour
         weather_hours = weather_data["hours"].filter(hour__gte=start_hour, hour__lte=end_hour)
 
         return weather_hours
-
-    def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids, weather_data):
-        for event_occurence_member in filtered_rides:
-            if event_occurence_member.pk in [event.pk for event in events_having_forecast]:
-                event_occurence_member.event_occurence.has_forecast = True
-
-            zip_and_date_weather = weather_data.get(
-                f"{event_occurence_member.event_occurence.route.start_zip_code} "
-                + f"- {event_occurence_member.event_occurence.ride_date}"
-            )
-
-            if zip_and_date_weather:
-                day_data = zip_and_date_weather["day"]
-                hours_data = zip_and_date_weather["hours"]
-
-                filtered_hours_data = self.filter_weather_hours(
-                    event_occurence_member.event_occurence, zip_and_date_weather
-                )
-
-                if filtered_hours_data:
-                    hours_data = filtered_hours_data
-
-                event_occurence_member.event_occurence.weather = {
-                    "day": day_data,
-                    "hours": hours_data,
-                }
-
-            # Include task ID for events that are being updated
-            if event_occurence_member.event_occurence.route.start_zip_code in task_ids:
-                event_occurence_member.event_occurence.weather_task_id = task_ids[
-                    event_occurence_member.event_occurence.route.start_zip_code
-                ]
 
     def get_events_having_forecast(self, filtered_rides):
         cutoff_start = localdate()
@@ -232,26 +204,15 @@ class EventView(TemplateView):
         else:
             return set()
 
-    def get_weather_data(self, zip_codes):
-        weather_data = {}
+    def build_zip_list_to_fetch(self, zip_codes):
         zip_codes_to_fetch_from_api = []
 
         # Check cache for each zip code
         for zip_code in zip_codes:
-            if WeatherForecastDay.is_fresh(zip_code):
-                weather_forecast = WeatherForecastDay.get_forecast(zip_code)
-                if weather_forecast:
-                    for forecast_day in weather_forecast:
-                        weather_data[f"{zip_code} - {forecast_day.forecast_date}"] = {"day": forecast_day, "hours": {}}
-                        weather_forecast_hour = WeatherForecastHour.get_forecast_hour(
-                            zip_code, forecast_day.forecast_date
-                        )
-                        weather_data[f"{zip_code} - {forecast_day.forecast_date}"]["hours"] = weather_forecast_hour
-            else:
-                # Add to the list to be fetched
+            if not WeatherForecastDay.is_fresh(zip_code):
                 zip_codes_to_fetch_from_api.append(zip_code)
 
-        return weather_data, zip_codes_to_fetch_from_api
+        return zip_codes_to_fetch_from_api
 
     def fetch_weather_data_from_api(self, zip_codes):
         # Launch Celery tasks for zip codes that need fresh data
@@ -265,19 +226,24 @@ class EventView(TemplateView):
         return task_ids
 
 
-class MyRidesView(EventView):
-    TABLE_PREFIX = "event_occurence__"
-    # ITEMS_PER_PAGE = 8
+class EventOccurenceBaseView(EventView):
+    def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids):
+        for event_occurence_member in filtered_rides:
+            if event_occurence_member.pk in [event.pk for event in events_having_forecast]:
+                event_occurence_member.event_occurence.has_forecast = True
 
-    def get_ride_data(self):
-        rides = self.request.user.upcoming_rides(self.DAYS_IN_FUTURE).order_by("event_occurence__ride_date")
-        ride_filter = get_ride_filter(self.request, rides, self.TABLE_PREFIX)
-        filtered_rides = self.filter_by_day(
-            ride_filter.qs.order_by(f"{self.TABLE_PREFIX}ride_date", f"{self.TABLE_PREFIX}ride_time"),
-            self.TABLE_PREFIX,
-        )
+                event_occurence_member.event_occurence.weather = {
+                    "day": event_occurence_member.event_occurence.get_actual_weather_day(),
+                    "hours": event_occurence_member.event_occurence.get_actual_weather_hours(),
+                }
+            else:
+                event_occurence_member.event_occurence.has_forecast = False
 
-        return rides, ride_filter, filtered_rides, RideType.Registered
+            # Include task ID for events that are being updated
+            if event_occurence_member.event_occurence.route.start_zip_code in task_ids:
+                event_occurence_member.event_occurence.weather_task_id = task_ids[
+                    event_occurence_member.event_occurence.route.start_zip_code
+                ]
 
 
 class AvailableRidesView(EventView):
@@ -293,10 +259,41 @@ class AvailableRidesView(EventView):
         )
         return rides, ride_filter, filtered_rides, RideType.Available
 
+    def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids):
+        for event_occurence in filtered_rides:
+            if event_occurence.pk in [event.pk for event in events_having_forecast]:
+                event_occurence.has_forecast = True
 
-class MyWaitlistView(EventView):
+                event_occurence.weather = {
+                    "day": event_occurence.get_actual_weather_day(),
+                    "hours": event_occurence.get_actual_weather_hours(),
+                }
+            else:
+                event_occurence.has_forecast = False
+
+            # Include task ID for events that are being updated
+            if event_occurence.route.start_zip_code in task_ids:
+                event_occurence.weather_task_id = task_ids[event_occurence.route.start_zip_code]
+
+
+class MyRidesView(EventOccurenceBaseView):
     TABLE_PREFIX = "event_occurence__"
-    ITEMS_PER_PAGE = 4
+    # ITEMS_PER_PAGE = 8
+
+    def get_ride_data(self):
+        rides = self.request.user.upcoming_rides(self.DAYS_IN_FUTURE).order_by("event_occurence__ride_date")
+        ride_filter = get_ride_filter(self.request, rides, self.TABLE_PREFIX)
+        filtered_rides = self.filter_by_day(
+            ride_filter.qs.order_by(f"{self.TABLE_PREFIX}ride_date", f"{self.TABLE_PREFIX}ride_time"),
+            self.TABLE_PREFIX,
+        )
+
+        return rides, ride_filter, filtered_rides, RideType.Registered
+
+
+class MyWaitlistView(EventOccurenceBaseView):
+    TABLE_PREFIX = "event_occurence__"
+    # ITEMS_PER_PAGE = 4
 
     def get_ride_data(self):
         rides = self.request.user.waitlisted_rides(self.DAYS_IN_FUTURE).order_by("event_occurence__ride_date")
