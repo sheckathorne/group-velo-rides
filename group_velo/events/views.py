@@ -259,19 +259,7 @@ class MyRidesView(EventView):
                 ]
 
 
-class AvailableRidesView(EventView):
-    TABLE_PREFIX = ""
-    # ITEMS_PER_PAGE = 8
-
-    def get_ride_data(self):
-        rides = self.request.user.available_rides(self.DAYS_IN_FUTURE)
-        ride_filter = get_ride_filter(self.request, rides, self.TABLE_PREFIX)
-        filtered_rides = self.filter_by_day(
-            ride_filter.qs.order_by(f"{self.TABLE_PREFIX}ride_date", f"{self.TABLE_PREFIX}ride_time"),
-            self.TABLE_PREFIX,
-        )
-        return rides, ride_filter, filtered_rides, RideType.Available
-
+class EventOccurenceBaseView(EventView):
     def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids):
         for event_occurence in filtered_rides:
             if event_occurence.pk in [event.pk for event in events_having_forecast]:
@@ -289,9 +277,23 @@ class AvailableRidesView(EventView):
                 event_occurence.weather_task_id = task_ids[event_occurence.route.start_zip_code]
 
 
-class MyWaitlistView(EventView):
+class AvailableRidesView(EventOccurenceBaseView):
+    TABLE_PREFIX = ""
+    # ITEMS_PER_PAGE = 8
+
+    def get_ride_data(self):
+        rides = self.request.user.available_rides(self.DAYS_IN_FUTURE)
+        ride_filter = get_ride_filter(self.request, rides, self.TABLE_PREFIX)
+        filtered_rides = self.filter_by_day(
+            ride_filter.qs.order_by(f"{self.TABLE_PREFIX}ride_date", f"{self.TABLE_PREFIX}ride_time"),
+            self.TABLE_PREFIX,
+        )
+        return rides, ride_filter, filtered_rides, RideType.Available
+
+
+class MyWaitlistView(EventOccurenceBaseView):
     TABLE_PREFIX = "event_occurence__"
-    ITEMS_PER_PAGE = 4
+    # ITEMS_PER_PAGE = 4
 
     def get_ride_data(self):
         rides = self.request.user.waitlisted_rides(self.DAYS_IN_FUTURE).order_by("event_occurence__ride_date")
