@@ -108,35 +108,15 @@ class EventView(TemplateView):
 
         return context
 
+    def add_weather_data_to_events(self):
+        raise NotImplementedError("Subclasses must implement add_weather_data_to_events")
+
     def filter_weather_hours(self, event_occurence, weather_data):
         start_hour, end_hour = event_occurence.ride_rounded_start_and_end_hour()
         end_hour = end_hour - 1 if end_hour > 23 else end_hour
         weather_hours = weather_data["hours"].filter(hour__gte=start_hour, hour__lte=end_hour)
 
         return weather_hours
-
-    def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids):
-        # events_having_forecast is a queryset
-
-        for event_occurence_member in filtered_rides:
-            if event_occurence_member.pk in [event.pk for event in events_having_forecast]:
-                event_occurence_member.event_occurence.has_forecast = True
-
-                event_occurence_member.event_occurence.weather = {
-                    "day": event_occurence_member.event_occurence.get_actual_weather_day(),
-                    "hours": event_occurence_member.event_occurence.get_actual_weather_hours(),
-                }
-            else:
-                event_occurence_member.event_occurence.has_forecast = False
-
-            # Include task ID for events that are being updated
-
-            # print("THESE ARE THE TASK IDS", task_ids
-            # {'75036': '68444549-fb83-4d7b-8611-340e8fe43c4a', '80439': 'cdae5aec-45ad-4ed6-8108-a833d485597c'}
-            if event_occurence_member.event_occurence.route.start_zip_code in task_ids:
-                event_occurence_member.event_occurence.weather_task_id = task_ids[
-                    event_occurence_member.event_occurence.route.start_zip_code
-                ]
 
     def get_events_having_forecast(self, filtered_rides):
         cutoff_start = localdate()
@@ -260,6 +240,24 @@ class MyRidesView(EventView):
 
         return rides, ride_filter, filtered_rides, RideType.Registered
 
+    def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids):
+        for event_occurence_member in filtered_rides:
+            if event_occurence_member.pk in [event.pk for event in events_having_forecast]:
+                event_occurence_member.event_occurence.has_forecast = True
+
+                event_occurence_member.event_occurence.weather = {
+                    "day": event_occurence_member.event_occurence.get_actual_weather_day(),
+                    "hours": event_occurence_member.event_occurence.get_actual_weather_hours(),
+                }
+            else:
+                event_occurence_member.event_occurence.has_forecast = False
+
+            # Include task ID for events that are being updated
+            if event_occurence_member.event_occurence.route.start_zip_code in task_ids:
+                event_occurence_member.event_occurence.weather_task_id = task_ids[
+                    event_occurence_member.event_occurence.route.start_zip_code
+                ]
+
 
 class AvailableRidesView(EventView):
     TABLE_PREFIX = ""
@@ -273,6 +271,22 @@ class AvailableRidesView(EventView):
             self.TABLE_PREFIX,
         )
         return rides, ride_filter, filtered_rides, RideType.Available
+
+    def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids):
+        for event_occurence in filtered_rides:
+            if event_occurence.pk in [event.pk for event in events_having_forecast]:
+                event_occurence.has_forecast = True
+
+                event_occurence.weather = {
+                    "day": event_occurence.get_actual_weather_day(),
+                    "hours": event_occurence.get_actual_weather_hours(),
+                }
+            else:
+                event_occurence.has_forecast = False
+
+            # Include task ID for events that are being updated
+            if event_occurence.route.start_zip_code in task_ids:
+                event_occurence.weather_task_id = task_ids[event_occurence.route.start_zip_code]
 
 
 class MyWaitlistView(EventView):
