@@ -70,6 +70,17 @@ class ClubForm(forms.ModelForm):
 
         self.helper.layout = Layout(
             Div(
+                HTML(
+                    '<h1 class="text-3xl font-bold tracking-tight">Edit Club</h1>'
+                    '<p class="text-muted-foreground">Update your club'
+                    "s information and settings</p>"
+                ),
+                css_class="flex flex-col gap-2",
+            )
+        )
+
+        self.helper.layout = Layout(
+            Div(
                 Fieldset(
                     "General",
                     Field("name", css_class=css_class),

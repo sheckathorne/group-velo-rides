@@ -2890,6 +2890,10 @@ video {
   line-height: 1.625;
 }
 
+.tracking-tight {
+  letter-spacing: -0.025em;
+}
+
 .\!text-red-800 {
   --tw-text-opacity: 1 !important;
   color: rgb(153 27 27 / var(--tw-text-opacity, 1)) !important;
