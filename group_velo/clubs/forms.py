@@ -3,7 +3,7 @@ import datetime
 import pytz
 from crispy_forms.bootstrap import StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Div, Field, Fieldset, Layout
+from crispy_forms.layout import HTML, Div, Field, Layout
 from django import forms
 from django.core.exceptions import ValidationError
 from django.forms.widgets import RadioSelect
@@ -19,7 +19,8 @@ from group_velo.clubs.models import (
     ClubVerificationRequest,
 )
 from group_velo.data.choices import MemberType, RequestStatus
-from group_velo.utils.utils import base_input_style, css_container, dropdown, form_row, form_row_new
+from group_velo.utils.layout import IconPrefixedField
+from group_velo.utils.utils import css_container, dropdown, form_row, form_row_new
 
 
 class ClubForm(forms.ModelForm):
@@ -57,9 +58,18 @@ class ClubForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        fieldset_class = "w-full h-auto p-2 mb-3 space-y-2"
-        css_class = "w-full shadow-lg"
-        checkbox_template = "tailwind/checkbox_left.html"
+        prefix_class = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm "
+        "ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground "
+        "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring "
+        "focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 rounded-l-none dark:bg-slate-800 "
+        "dark:border-slate-700 dark:text-gray-200"
+        css_class = "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm "
+        "ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground "
+        "placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring "
+        "focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 "
+        "dark:border-slate-700"
+        label_class = "text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium"
+        # checkbox_template = "tailwind/checkbox_left.html"
         self.submit_text = kwargs.pop("submit_text", "Submit")
 
         super().__init__(*args, **kwargs)
@@ -70,99 +80,216 @@ class ClubForm(forms.ModelForm):
 
         self.helper.layout = Layout(
             Div(
-                HTML(
-                    '<h1 class="text-3xl font-bold tracking-tight">Edit Club</h1>'
-                    '<p class="text-muted-foreground">Update your club'
-                    "s information and settings</p>"
+                # Header
+                Div(
+                    HTML(
+                        '<h1 class="text-3xl font-bold tracking-tight">Edit Club</h1>'
+                        '<p class="text-muted-foreground">Update your club'
+                        "s information and settings</p>"
+                    ),
+                    css_class="flex flex-col gap-2",
                 ),
-                css_class="flex flex-col gap-2",
+                # Grid Body
+                Div(
+                    # Section 1
+                    Div(
+                        # Section Header
+                        Div(
+                            Div(
+                                HTML(
+                                    "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' "
+                                    "viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' "
+                                    "stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-building2 "
+                                    "h-5 w-5'><path d='M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z'></path>"
+                                    "<path d='M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2'>"
+                                    "</path><path d='M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2'></path>"
+                                    "<path d='M10 6h4'></path><path d='M10 10h4'>"
+                                    "</path><path d='M10 14h4'></path><path d='M10 18h4'></path></svg>"
+                                ),
+                                HTML(
+                                    "<h3 class='text-2xl font-semibold leading-none "
+                                    "tracking-tight'>General Information</h3>"
+                                ),
+                                css_class="flex items-center gap-2",
+                            ),
+                            HTML("<p class='text-sm text-white/80'>Basic details about your club</p>"),
+                            css_class="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-violet-500 "
+                            "to-purple-600 dark:from-violet-600 dark:to-purple-800 text-white rounded-t-lg",
+                        ),
+                        # Section Body
+                        Div(
+                            Div(
+                                Field("name", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
+                                Field(
+                                    "abbreviation",
+                                    css_class=css_class,
+                                    label_class=label_class,
+                                    wrapper_class="space-y-2",
+                                ),
+                                Field(
+                                    "description",
+                                    css_class=css_class,
+                                    label_class=label_class,
+                                    wrapper_class="space-y-2",
+                                ),
+                                IconPrefixedField(
+                                    "url",
+                                    template="tailwind/layout/icon_prefixed_field.html",
+                                    icon_path="/static/icons/url.svg",
+                                    css_class=prefix_class,
+                                ),
+                                Field("logo", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
+                                css_class="space-y-2",
+                            ),
+                            css_class="p-6 pt-6 space-y-4",
+                        ),
+                        css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
+                    ),
+                    # Section 2
+                    Div(
+                        # Section Header
+                        Div(
+                            Div(
+                                HTML(
+                                    "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' "
+                                    "viewBox='0 0 24 24' fill='none' stroke='currentColor' "
+                                    "stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide "
+                                    "lucide-building2 h-5 w-5'><path d='M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z'>"
+                                    "</path><path d='M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2'>"
+                                    "</path><path d='M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2'>"
+                                    "</path><path d='M10 6h4'></path><path d='M10 10h4'></path><path d='M10 14h4'>"
+                                    "</path><path d='M10 18h4'></path></svg>"
+                                ),
+                                HTML(
+                                    "<h3 class='text-2xl font-semibold leading-none tracking-tight'>"
+                                    "General Information</h3>"
+                                ),
+                                css_class="flex items-center gap-2",
+                            ),
+                            HTML("<p class='text-sm text-white/80'>Basic details about your club</p>"),
+                            css_class="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-sky-500 to-blue-600 "
+                            "dark:from-sky-600 dark:to-blue-800 text-white rounded-t-lg",
+                        ),
+                        # Section Body
+                        Div(
+                            Div(
+                                Field("city", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
+                                Field(
+                                    "state", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"
+                                ),
+                                Field(
+                                    "zip_code", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"
+                                ),
+                                IconPrefixedField(
+                                    "email_address",
+                                    template="tailwind/layout/icon_prefixed_field.html",
+                                    icon_path="/static/icons/email.svg",
+                                    css_class=prefix_class,
+                                ),
+                                IconPrefixedField(
+                                    "phone_number",
+                                    template="tailwind/layout/icon_prefixed_field.html",
+                                    icon_path="/static/icons/phone.svg",
+                                    id="club_create_phone_number",
+                                    x_mask="(999) 999-9999",
+                                    css_class=prefix_class,
+                                ),
+                                css_class="space-y-2",
+                            ),
+                            css_class="p-6 pt-6 space-y-4",
+                        ),
+                        css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
+                    ),
+                    css_class="grid gap-6 md:grid-cols-2",
+                ),
+                css_class="space-y-6",
             )
         )
 
-        self.helper.layout = Layout(
-            Div(
-                Fieldset(
-                    "General",
-                    Field("name", css_class=css_class),
-                    Field("abbreviation", css_class=css_class),
-                    Field("description", css_class=css_class),
-                    Field("url", css_class=css_class),
-                    Field("logo", css_class=css_class),
-                    css_class=fieldset_class,
-                ),
-                Fieldset(
-                    "Location/Contact",
-                    Field("city", css_class=css_class),
-                    Field("state", css_class=css_class),
-                    Field("zip_code", css_class=css_class),
-                    Field("email_address", css_class=css_class),
-                    Field(
-                        "phone_number",
-                        id="club_create_phone_number",
-                        css_class=base_input_style(),
-                        label_class="dark:text-gray-200",
-                        x_mask="(999) 999-9999",
-                    ),
-                    css_class=fieldset_class,
-                ),
-                Fieldset(
-                    "Settings",
-                    Div(
-                        Field("privacy_level", wrapper_class="xl:mb-1 w-full"),
-                        id="privacy_level_row",
-                        css_class="py-2",
-                    ),
-                    Div(
-                        Field(
-                            "active",
-                            template=checkbox_template,
-                            wrapper_class="xl:mb-1 w-full",
-                        ),
-                        id="active_check_row",
-                        css_class="py-2",
-                    ),
-                    Div(
-                        Field(
-                            "private_ride_attendence",
-                            template=checkbox_template,
-                            wrapper_class="xl:mb-1  w-full",
-                        ),
-                        id="private_attendence_row",
-                        css_class="py-2",
-                    ),
-                    Div(
-                        Field(
-                            "private_ride_waitlist",
-                            template=checkbox_template,
-                            wrapper_class="xl:mb-1  w-full",
-                        ),
-                        id="private_waitlist_row",
-                        css_class="py-2",
-                    ),
-                    Div(
-                        Field(
-                            "allow_ride_discussion",
-                            template=checkbox_template,
-                            wrapper_class="xl:mb-1  w-full",
-                        ),
-                        id="allow_ride_discussion_row",
-                        css_class="py-2",
-                    ),
-                    Div(
-                        Field(
-                            "strict_ride_classification",
-                            x_model="showStrictRideClassBtn",
-                            template=checkbox_template,
-                            wrapper_class="xl:mb-1  w-full",
-                        ),
-                        id="strict_ride_classification_row",
-                        css_class="py-2",
-                    ),
-                    css_class=fieldset_class,
-                ),
-                css_class="w-full grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1",
-            ),
-        )
+        # self.helper.layout = Layout(
+        #     Div(
+        #         Fieldset(
+        #             "General",
+        #             Field("name", css_class=css_class),
+        #             Field("abbreviation", css_class=css_class),
+        #             Field("description", css_class=css_class),
+        #             Field("url", css_class=css_class),
+        #             Field("logo", css_class=css_class),
+        #             css_class=fieldset_class,
+        #         ),
+        #         Fieldset(
+        #             "Location/Contact",
+        #             Field("city", css_class=css_class),
+        #             Field("state", css_class=css_class),
+        #             Field("zip_code", css_class=css_class),
+        #             Field("email_address", css_class=css_class),
+        #             Field(
+        #                 "phone_number",
+        #                 id="club_create_phone_number",
+        #                 css_class=base_input_style(),
+        #                 label_class="dark:text-gray-200",
+        #                 x_mask="(999) 999-9999",
+        #             ),
+        #             css_class=fieldset_class,
+        #         ),
+        #         Fieldset(
+        #             "Settings",
+        #             Div(
+        #                 Field("privacy_level", wrapper_class="xl:mb-1 w-full"),
+        #                 id="privacy_level_row",
+        #                 css_class="py-2",
+        #             ),
+        #             Div(
+        #                 Field(
+        #                     "active",
+        #                     template=checkbox_template,
+        #                     wrapper_class="xl:mb-1 w-full",
+        #                 ),
+        #                 id="active_check_row",
+        #                 css_class="py-2",
+        #             ),
+        #             Div(
+        #                 Field(
+        #                     "private_ride_attendence",
+        #                     template=checkbox_template,
+        #                     wrapper_class="xl:mb-1  w-full",
+        #                 ),
+        #                 id="private_attendence_row",
+        #                 css_class="py-2",
+        #             ),
+        #             Div(
+        #                 Field(
+        #                     "private_ride_waitlist",
+        #                     template=checkbox_template,
+        #                     wrapper_class="xl:mb-1  w-full",
+        #                 ),
+        #                 id="private_waitlist_row",
+        #                 css_class="py-2",
+        #             ),
+        #             Div(
+        #                 Field(
+        #                     "allow_ride_discussion",
+        #                     template=checkbox_template,
+        #                     wrapper_class="xl:mb-1  w-full",
+        #                 ),
+        #                 id="allow_ride_discussion_row",
+        #                 css_class="py-2",
+        #             ),
+        #             Div(
+        #                 Field(
+        #                     "strict_ride_classification",
+        #                     x_model="showStrictRideClassBtn",
+        #                     template=checkbox_template,
+        #                     wrapper_class="xl:mb-1  w-full",
+        #                 ),
+        #                 id="strict_ride_classification_row",
+        #                 css_class="py-2",
+        #             ),
+        #             css_class=fieldset_class,
+        #         ),
+        #         css_class="w-full grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1",
+        #     ),
+        # )
 
         info_icon = (
             "<button x-tooltip.placement.auto-start='{ content: () => $refs.privacyPopoverTemplate.innerHTML, "
