@@ -58,13 +58,17 @@ class ClubForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
-        prefix_class = "w-full shadow-lg focus:ring-2 dark:bg-gray-800 dark:text-gray-200 text-gray-700 "
-        "focus:ring-blue-700 dark:border-gray-700 border-gray-300 border shadow rounded-r-md dark:focus:ring-blue-500"
-        "px-4 leading-normal py-2 appearance-none bg-white rounded-l-none"
+        prefix_class = (
+            "w-full px-4 shadow-lg focus:ring-2 dark:bg-gray-800 dark:text-gray-200 text-gray-700 "
+            "focus:ring-blue-700 dark:border-gray-700 border-gray-300 border shadow rounded-r-md "
+            "dark:focus:ring-blue-500 px-4 leading-normal py-2 appearance-none bg-white rounded-l-none"
+        )
 
-        css_class = "w-full shadow-lg rounded-md focus:ring-2 dark:bg-gray-800 dark:text-gray-200 text-gray-700 "
-        "focus:ring-blue-700 dark:border-gray-700 border-gray-300 border shadow rounded dark:focus:ring-blue-500 "
-        "px-4 leading-normal py-2 appearance-none bg-white"
+        css_class = (
+            "w-full shadow-lg rounded-md focus:ring-2 dark:bg-gray-800 dark:text-gray-200 text-gray-700 "
+            "focus:ring-blue-700 dark:border-gray-700 border-gray-300 border shadow rounded dark:focus:ring-blue-500 "
+            "px-4 leading-normal py-2 appearance-none bg-white"
+        )
 
         label_class = "text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium"
         checkbox_template = "tailwind/checkbox_left.html"
@@ -78,15 +82,6 @@ class ClubForm(forms.ModelForm):
 
         self.helper.layout = Layout(
             Div(
-                # Header
-                Div(
-                    HTML(
-                        '<h1 class="text-3xl font-bold tracking-tight dark:text-white">Edit Club</h1>'
-                        '<p class="text-muted-foreground">Update your club'
-                        "s information and settings</p>"
-                    ),
-                    css_class="flex flex-col gap-2 dark:text-gray-400",
-                ),
                 # Grid Body
                 Div(
                     # Section 1
