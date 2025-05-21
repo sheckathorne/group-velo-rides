@@ -19,8 +19,14 @@
           action="{% url 'clubs:edit_club' slug=slug %}"
           enctype="multipart/form-data"
           autocomplete="off">
-      {% crispy form %}
-      <div x-show="showStrictRideClassBtn">{% include "clubs/actions/_view_classification_limits_formset.html" %}</div>
+      <div class="space-y-6">
+        <div class="grid gap-6 md:grid-cols-2">
+          {% crispy form %}
+          <div class="md:col-span-2" x-show="showStrictRideClassBtn">
+            {% include "clubs/actions/_view_classification_limits_formset.html" %}
+          </div>
+        </div>
+      </div>
       <div class="w-full grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1">
         <div class="w-full h-auto py-2 mt-2 space-y-2">
           <button class="btn w-full btn-primary-color" type="submit" value="Save">Save</button>
