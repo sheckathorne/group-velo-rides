@@ -20,7 +20,7 @@ from group_velo.clubs.models import (
 )
 from group_velo.data.choices import MemberType, RequestStatus
 from group_velo.utils.layout import IconPrefixedField
-from group_velo.utils.utils import css_container, dropdown, form_row, form_row_new
+from group_velo.utils.utils import css_container, dropdown, form_row, form_row_new, get_group_classification_color
 
 
 class ClubForm(forms.ModelForm):
@@ -350,11 +350,15 @@ class ClubRideClassificationLimitForm(forms.ModelForm):
             else ""
         )
 
+        label_color = get_group_classification_color(group_classification[0])
+
         self.group_class_field = HTML(
             '<div class="w-auto" id="generic-row">'
             f"{self.label}"
-            '<span class="w-full block appearance-none text-gray-800 text-center dark:text-gray-300 py-2" '
-            f'id="group_classification">{group_classification[1]}</span> '
+            '<div class="p-4 flex items-center justify-center">'
+            f'<span x-tooltip.raw="{group_classification[1]}" class="inline-flex '
+            f"items-center justify-center h-8 w-8 rounded-full {label_color} font-semibold "
+            f'mr-3">{group_classification[0]}</span></div>'
             "</div>"
         )
 
