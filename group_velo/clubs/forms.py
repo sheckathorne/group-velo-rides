@@ -20,7 +20,7 @@ from group_velo.clubs.models import (
 )
 from group_velo.data.choices import MemberType, RequestStatus
 from group_velo.utils.layout import IconPrefixedField
-from group_velo.utils.utils import css_container, dropdown, form_row, form_row_new, get_group_classification_color
+from group_velo.utils.utils import css_container, dropdown, form_row, get_group_classification_color
 
 
 class ClubForm(forms.ModelForm):
@@ -341,6 +341,9 @@ class ClubRideClassificationLimitForm(forms.ModelForm):
         self.fields["lower_pace_range"].required = False
         self.fields["upper_pace_range"].required = False
 
+        classification_label, classification_display = group_classification
+        surface_type_label, _ = surface_type
+
         self.label = (
             (
                 '<label for="group_classification" class="block text-sm '
@@ -350,29 +353,34 @@ class ClubRideClassificationLimitForm(forms.ModelForm):
             else ""
         )
 
-        label_color = get_group_classification_color(group_classification[0])
+        label_color = get_group_classification_color(classification_label)
+        tooltip = (
+            f' x-tooltip.raw="{classification_display}" class="cursor-help"'
+            if classification_label != classification_display
+            else ""
+        )
 
         self.group_class_field = HTML(
-            '<div class="w-auto" id="generic-row">'
+            f"<div{tooltip}>"
             f"{self.label}"
-            '<div class="p-4 flex items-center justify-center">'
-            f'<span x-tooltip.raw="{group_classification[1]}" class="inline-flex '
-            f"items-center justify-center h-8 w-8 rounded-full {label_color} font-semibold "
-            f'mr-3">{group_classification[0]}</span></div>'
+            '<div class="py-5 flex items-center justify-center">'
+            '<span class="inline-flex '
+            f"items-center justify-center h-8 w-8 rounded-full {label_color} "
+            f'font-semibold">{classification_label}</span></div>'
             "</div>"
         )
 
-        self.prefix = f"{surface_type[0]}_{group_classification[0]}"
+        self.prefix = f"{surface_type_label}_{classification_label}"
 
         self.form_fields = [
             Field("club", type="hidden", value=club_id),
-            Field("surface_type", type="hidden", value=surface_type[0]),
-            Field("group_classification", type="hidden", value=group_classification[0]),
+            Field("surface_type", type="hidden", value=surface_type_label),
+            Field("group_classification", type="hidden", value=classification_label),
             Field("active", type="hidden", value=True),
             Div(
                 Field(
                     "lower_pace_range",
-                    css_class="num-only lower-pace-range-field",
+                    css_class="num-only lower-pace-range-field my-4",
                     data_rules='["numeric", "lowerLessThanUpper:999"]',
                     short_name=f"{self.prefix}_lpr",
                 ),
@@ -384,7 +392,7 @@ class ClubRideClassificationLimitForm(forms.ModelForm):
             Div(
                 Field(
                     "upper_pace_range",
-                    css_class="num-only upper-pace-range-field",
+                    css_class="num-only upper-pace-range-field my-4",
                     data_rules='["numeric","upperGreaterThanLower:-1"]',
                     short_name=f"{self.prefix}_upr",
                 ),
@@ -399,11 +407,12 @@ class ClubRideClassificationLimitForm(forms.ModelForm):
             self.helper.form_show_labels = False
 
         self.helper.layout = Layout(
-            form_row_new(
-                Div(
-                    self.group_class_field,
-                    *self.form_fields,
-                    css_class="grid gap-2 grid-cols-[130px_minmax(0,1fr)_minmax(0,1fr)] pb-2 w-full xl:w-2/3",
+            Div(
+                self.group_class_field,
+                *self.form_fields,
+                css_class=(
+                    "grid grid-cols-[1fr_1fr_1fr] border-b border-gray-200 dark:border-gray-700"
+                    "hover:bg-white dark:hover:bg-gray-800 transition-colors duration-150 gap-4"
                 ),
             ),
         )
