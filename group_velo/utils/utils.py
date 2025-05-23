@@ -203,3 +203,21 @@ def pagination_css():
         "tw_active": "text-white bg-blue-600 shadow-xl",
         "outer_div": "",
     }
+
+
+def get_group_classification_color(group_classification_value):
+    match group_classification_value:
+        case "A":
+            return "text-red-700 bg-red-600/30 dark:text-red-950 dark:bg-red-400/50"
+        case "B":
+            return "text-orange-700 bg-orange-600/30 dark:text-orange-950 dark:bg-orange-400/50"
+        case "C":
+            return "text-yellow-700 bg-yellow-500/30 dark:text-yellow-950 dark:bg-yellow-400/50"
+        case "D":
+            return "text-green-700 bg-green-600/30 dark:text-green-950 dark:bg-green-400/50"
+        case "N":
+            return "text-blue-700 bg-blue-600/30 dark:text-blue-950 dark:bg-blue-400/50"
+        case "NA":
+            return "text-gray-900 bg-gray-600/30 dark:text-gray-300 dark:bg-gray-800/50"
+        case _:
+            return "text-gray-900 bg-gray-600/30 dark:text-gray-300 dark:bg-gray-800/50"

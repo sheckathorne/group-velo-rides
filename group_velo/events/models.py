@@ -28,6 +28,7 @@ from group_velo.data.choices import (
     SurfaceType,
 )
 from group_velo.routes.models import Route
+from group_velo.utils.utils import get_group_classification_color
 from group_velo.weather.models import WeatherForecastDay, WeatherForecastHour
 
 from .fields import CharFieldAllowsMultiSelectSearch, ChoiceArrayField, DaysOfWeek
@@ -489,21 +490,7 @@ class EventOccurence(EventBase):
 
     @property
     def return_group_classification_color(self):
-        match GroupClassification(self.group_classification).value:
-            case "A":
-                return "bg-red-500 dark:bg-red-600"
-            case "B":
-                return "bg-orange-500 dark:bg-orange-600"
-            case "C":
-                return "bg-yellow-500 dark:bg-yellow-600"
-            case "D":
-                return "bg-green-500 dark:bg-green-600"
-            case "N":
-                return "bg-blue-500 dark:bg-blue-600"
-            case "NA":
-                return "bg-gray-500 dark:bg-gray-600"
-            case _:
-                return "bg-gray-500 dark:bg-gray-600"
+        return get_group_classification_color(GroupClassification(self.group_classification).value)
 
     @property
     def ride_leader_users(self):

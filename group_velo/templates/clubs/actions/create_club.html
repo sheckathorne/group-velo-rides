@@ -9,14 +9,20 @@
 
 {% block content %}
   {% include 'clubs/partials/_club_privacy_popover.html' %}
-  <div class="w-full"
+  <div class="w-full space-y-4 mb-2"
        x-data="{ showStrictRideClassBtn: {{ club.strict_ride_classification|yesno:'true,false' }} }">
+    <div class="flex flex-col gap-2 dark:text-gray-400">
+      <h1 class="text-3xl font-bold tracking-tight dark:text-white">Create Club</h1>
+      <p class="text-muted-foreground">Update your club's information and settings</p>
+    </div>
     <form method="post"
           action="{% url 'clubs:create_club' %}"
           enctype="multipart/form-data">
-      {% crispy form %}
+      <div class="space-y-6">
+        <div class="grid gap-6 md:grid-cols-2">{% crispy form %}</div>
+      </div>
       <div class="w-full grid xl:grid-cols-3 md:grid-cols-2 grid-cols-1">
-        <div class="w-full h-auto p-2 mt-2 space-y-2">
+        <div class="w-full h-auto py-2 mt-2 space-y-2">
           <button class="btn w-full btn-primary-color" type="submit" value="Save">Save</button>
         </div>
       </div>
