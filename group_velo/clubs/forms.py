@@ -344,15 +344,6 @@ class ClubRideClassificationLimitForm(forms.ModelForm):
         classification_label, classification_display = group_classification
         surface_type_label, _ = surface_type
 
-        self.label = (
-            (
-                '<label for="group_classification" class="block text-sm '
-                'font-bold text-gray-800 dark:text-gray-100">Ride Classification</label>'
-            )
-            if first_row
-            else ""
-        )
-
         label_color = get_group_classification_color(classification_label)
         tooltip = (
             f' x-tooltip.raw="{classification_display}" class="cursor-help"'
@@ -362,7 +353,6 @@ class ClubRideClassificationLimitForm(forms.ModelForm):
 
         self.group_class_field = HTML(
             f"<div{tooltip}>"
-            f"{self.label}"
             '<div class="py-5 flex items-center justify-center">'
             '<span class="inline-flex '
             f"items-center justify-center h-8 w-8 rounded-full {label_color} "
@@ -403,16 +393,15 @@ class ClubRideClassificationLimitForm(forms.ModelForm):
             ),
         ]
 
-        if not first_row:
-            self.helper.form_show_labels = False
+        self.helper.form_show_labels = False
 
         self.helper.layout = Layout(
             Div(
                 self.group_class_field,
                 *self.form_fields,
                 css_class=(
-                    "grid grid-cols-[1fr_1fr_1fr] border-b border-gray-200 dark:border-gray-700"
-                    "hover:bg-white dark:hover:bg-gray-800 transition-colors duration-150 gap-4"
+                    "grid grid-cols-[1fr_1fr_1fr] border-b border-gray-200 dark:border-gray-700 "
+                    "hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-150 gap-4"
                 ),
             ),
         )

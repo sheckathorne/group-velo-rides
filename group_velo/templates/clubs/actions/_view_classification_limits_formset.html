@@ -34,9 +34,16 @@
           </div>
         </div>
       </div>
-      {% for gc_form in group_classification_form_list %}
-        <div x-show="selected==='{{ gc_form.surface_type.0 }}'">{% crispy gc_form.form %}</div>
-      {% endfor %}
+      <div class="dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div class="grid grid-cols-[1fr_1fr_1fr] dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <div class="py-3 px-4 text-center font-medium text-gray-700 dark:text-gray-300">Classification</div>
+          <div class="py-3 px-4 text-left font-medium text-gray-700 dark:text-gray-300">Lower Pace (mph)</div>
+          <div class="py-3 px-4 text-left font-medium text-gray-700 dark:text-gray-300">Upper Pace (mph)</div>
+        </div>
+        {% for gc_form in group_classification_form_list %}
+          <div x-show="selected==='{{ gc_form.surface_type.0 }}'">{% crispy gc_form.form %}</div>
+        {% endfor %}
+      </div>
     </div>
   </div>
 </div>
