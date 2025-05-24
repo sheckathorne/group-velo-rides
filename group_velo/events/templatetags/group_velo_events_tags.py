@@ -108,3 +108,30 @@ def integer_to_hour_text(val):
         return "12 PM"
     else:
         return f"{val - 12} PM"
+
+
+@register.filter
+def temperature_text_color(temp):
+    if not temp:
+        return ""
+
+    temp = int(temp)
+
+    if temp < 40:
+        return "text-sky-500"
+    elif temp >= 40 and temp < 50:
+        return "text-blue-700"
+    elif temp >= 50 and temp < 60:
+        return "text-emerald-500"
+    elif temp >= 60 and temp < 70:
+        return "text-yellow-400"
+    elif temp >= 70 and temp < 80:
+        return "text-amber-600"
+    elif temp >= 80 and temp < 90:
+        return "text-orange-800"
+    elif temp >= 90 and temp < 100:
+        return "text-red-500"
+    elif temp >= 100:
+        return "text-red-950"
+    else:
+        return "text-gray-900 dark:text-gray-300"

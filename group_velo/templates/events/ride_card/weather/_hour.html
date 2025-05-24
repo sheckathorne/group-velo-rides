@@ -1,4 +1,4 @@
-{% load embedded_map_from integer_to_hour_text from group_velo_events_tags %}
+{% load embedded_map_from integer_to_hour_text temperature_text_color from group_velo_events_tags %}
 
 <div id="weather-hour-{{ ride_id }}"
      hx-swap-oob="true"
@@ -17,8 +17,8 @@
                    height="36"
                    alt="Hourly Weather Icon - {{ forecast_hour.condition_text }}" />
             </span>
-            <span class="text-sm font-medium">{{ forecast_hour.temperature_f|floatformat:0 }}°F</span>
-            <span class="text-xs text-muted-foreground">Feels {{ forecast_hour.feelslike_f|floatformat:0 }}°F</span>
+            <span class="text-sm font-medium {{ forecast_hour.temperature_f|temperature_text_color }}">{{ forecast_hour.temperature_f|floatformat:0 }}°F</span>
+            <span class="text-xs text-muted-foreground">Feels <span class="{{ forecast_hour.feelslike_f|temperature_text_color }}">{{ forecast_hour.feelslike_f|floatformat:0 }}°F</span></span>
             <div class="flex items-center gap-1 mt-1">
               <svg xmlns="http://www.w3.org/2000/svg"
                    width="24"
@@ -37,7 +37,7 @@
             </div>
             <div class="flex items-center gap-1 mt-3 text-red-500">
               <svg width="48" height="48" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" stroke="black" stroke-width="2" fill="none" />
+                <circle cx="50" cy="50" r="45" stroke="stroke-gray-700 dark:stroke-gray-200" stroke-width="2" fill="none" />
                 <g transform="rotate({{ forecast_hour.wind_heading }}, 50, 50)">
                 <polygon points="50,20, 40,50 50,45 58,50" fill="red" />
                 </g>
