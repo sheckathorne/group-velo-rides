@@ -36,8 +36,11 @@
               <span class="text-xs">{{ forecast_hour.chance_of_precip }}%</span>
             </div>
             <div class="flex items-center gap-1 mt-3 text-red-500">
-              <svg width="48" height="48" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" stroke="stroke-gray-700 dark:stroke-gray-200" stroke-width="2" fill="none" />
+              <svg width="48"
+                   height="48"
+                   viewBox="0 0 100 100"
+                   class="stroke-gray-600 dark:stroke-gray-300">
+                <circle cx="50" cy="50" r="45" stroke-width="2" fill="none" />
                 <g transform="rotate({{ forecast_hour.wind_heading }}, 50, 50)">
                 <polygon points="50,20, 40,50 50,45 58,50" fill="red" />
                 </g>

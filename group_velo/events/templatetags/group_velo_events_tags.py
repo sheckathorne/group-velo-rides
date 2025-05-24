@@ -112,26 +112,33 @@ def integer_to_hour_text(val):
 
 @register.filter
 def temperature_text_color(temp):
+    default = "text-gray-900 dark:text-gray-300"
     if not temp:
-        return ""
+        return default
 
     temp = int(temp)
 
-    if temp < 40:
-        return "text-sky-500"
-    elif temp >= 40 and temp < 50:
-        return "text-blue-700"
-    elif temp >= 50 and temp < 60:
-        return "text-emerald-500"
-    elif temp >= 60 and temp < 70:
-        return "text-yellow-400"
-    elif temp >= 70 and temp < 80:
-        return "text-amber-600"
-    elif temp >= 80 and temp < 90:
-        return "text-orange-800"
-    elif temp >= 90 and temp < 100:
-        return "text-red-500"
-    elif temp >= 100:
-        return "text-red-950"
-    else:
-        return "text-gray-900 dark:text-gray-300"
+    ranges = [
+        (None, 30, "text-violet-700"),
+        (30, 35, "text-indigo-600"),
+        (35, 40, "text-blue-600"),
+        (40, 45, "text-cyan-500"),
+        (45, 50, "text-teal-500"),
+        (50, 55, "text-emerald-500"),
+        (55, 60, "text-green-500"),
+        (60, 65, "text-lime-500"),
+        (65, 70, "text-yellow-400"),
+        (70, 75, "text-amber-500"),
+        (75, 80, "text-orange-500"),
+        (80, 85, "text-red-500"),
+        (85, 90, "text-rose-600"),
+        (90, 95, "text-red-800"),
+        (95, 100, "text-rose-900"),
+        (100, None, "text-red-950"),
+    ]
+
+    for low, high, color in ranges:
+        if (low is None or temp >= low) and (high is None or temp < high):
+            return color
+
+    return default
