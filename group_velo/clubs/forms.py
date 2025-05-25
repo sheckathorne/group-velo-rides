@@ -23,7 +23,31 @@ from group_velo.utils.layout import IconPrefixedField
 from group_velo.utils.utils import css_container, dropdown, form_row, get_group_classification_color
 
 
-class ClubForm(forms.ModelForm):
+class BaseClubForm(forms.ModelForm):
+    def section_header(self, section_data):
+        colors = section_data["colors"]
+        header_svg = section_data["header_svg"]
+        header_title = section_data["header_title"]
+        header_subtitle = section_data["header_subtitle"]
+
+        header_css_class = (
+            f"flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-{colors['light']['from']} "
+            f"to-{colors['light']['to']} dark:from-{colors['dark']['from']} "
+            f"dark:to-{colors['dark']['to']} text-white rounded-t-lg"
+        )
+
+        return Div(
+            Div(
+                HTML(header_svg),
+                HTML("<h3 class='text-2xl font-semibold leading-none " f"tracking-tight'>{header_title}</h3>"),
+                css_class="flex items-center gap-2",
+            ),
+            HTML(f"<p class='text-sm text-white/80'>{header_subtitle}</p>"),
+            css_class=header_css_class,
+        )
+
+
+class ClubForm(BaseClubForm):
     class Meta:
         model = Club
         fields = [
@@ -80,32 +104,61 @@ class ClubForm(forms.ModelForm):
         self.helper.label_class = "block text-gray-700 text-sm font-bold dark:text-gray-100"
         self.helper.form_tag = False
 
+        general_header = {
+            "header_svg": (
+                "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' "
+                "viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' "
+                "stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-building2 "
+                "h-5 w-5'><path d='M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z'></path>"
+                "<path d='M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2'>"
+                "</path><path d='M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2'></path>"
+                "<path d='M10 6h4'></path><path d='M10 10h4'>"
+                "</path><path d='M10 14h4'></path><path d='M10 18h4'></path></svg>"
+            ),
+            "header_title": "General Information",
+            "header_subtitle": "Basic details about your club",
+            "colors": {
+                "light": {"from": "violet-500", "to": "purple-600"},
+                "dark": {"from": "violet-600", "to": "purple-800"},
+            },
+        }
+
+        contact_header = {
+            "header_svg": (
+                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
+                'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+                'stroke-linecap="round" stroke-linejoin="round" class="lucide '
+                'lucide-map-pin h-5 w-5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z">'
+                '</path><circle cx="12" cy="10" r="3"></circle></svg>'
+            ),
+            "header_title": "Location & Contact",
+            "header_subtitle": "Where your club is located and how to reach you",
+            "colors": {"light": {"from": "sky-500", "to": "blue-600"}, "dark": {"from": "sky-600", "to": "blue-800"}},
+        }
+
+        settings_header = {
+            "header_svg": (
+                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
+                'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+                'stroke-linecap="round" stroke-linejoin="round" class="lucide '
+                'lucide-shield h-5 w-5">'
+                '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 '
+                "13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 "
+                '3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>'
+            ),
+            "header_title": "Club Settings",
+            "header_subtitle": "Configure privacy and behavior settings for your club",
+            "colors": {
+                "light": {"from": "amber-500", "to": "orange-600"},
+                "dark": {"from": "amber-600", "to": "orange-800"},
+            },
+        }
+
         self.helper.layout = Layout(
             # Section 1
             Div(
                 # Section Header
-                Div(
-                    Div(
-                        HTML(
-                            "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' "
-                            "viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' "
-                            "stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-building2 "
-                            "h-5 w-5'><path d='M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z'></path>"
-                            "<path d='M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2'>"
-                            "</path><path d='M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2'></path>"
-                            "<path d='M10 6h4'></path><path d='M10 10h4'>"
-                            "</path><path d='M10 14h4'></path><path d='M10 18h4'></path></svg>"
-                        ),
-                        HTML(
-                            "<h3 class='text-2xl font-semibold leading-none "
-                            "tracking-tight'>General Information</h3>"
-                        ),
-                        css_class="flex items-center gap-2",
-                    ),
-                    HTML("<p class='text-sm text-white/80'>Basic details about your club</p>"),
-                    css_class="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-violet-500 "
-                    "to-purple-600 dark:from-violet-600 dark:to-purple-800 text-white rounded-t-lg",
-                ),
+                self.section_header(general_header),
                 # Section Body
                 Div(
                     Div(
@@ -138,24 +191,7 @@ class ClubForm(forms.ModelForm):
             # Section 2
             Div(
                 # Section Header
-                Div(
-                    Div(
-                        HTML(
-                            '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
-                            'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
-                            'stroke-linecap="round" stroke-linejoin="round" class="lucide '
-                            'lucide-map-pin h-5 w-5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z">'
-                            '</path><circle cx="12" cy="10" r="3"></circle></svg>'
-                        ),
-                        HTML(
-                            "<h3 class='text-2xl font-semibold leading-none tracking-tight'>" "Location & Contact</h3>"
-                        ),
-                        css_class="flex items-center gap-2",
-                    ),
-                    HTML("<p class='text-sm text-white/80'>Where your club is located and how to reach you</p>"),
-                    css_class="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-sky-500 to-blue-600 "
-                    "dark:from-sky-600 dark:to-blue-800 text-white rounded-t-lg",
-                ),
+                self.section_header(contact_header),
                 # Section Body
                 Div(
                     Div(
@@ -185,26 +221,7 @@ class ClubForm(forms.ModelForm):
             # Section 3
             Div(
                 # Section Header
-                Div(
-                    Div(
-                        HTML(
-                            '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
-                            'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
-                            'stroke-linecap="round" stroke-linejoin="round" class="lucide '
-                            'lucide-shield h-5 w-5">'
-                            '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 '
-                            "13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 "
-                            '3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>'
-                        ),
-                        HTML("<h3 class='text-2xl font-semibold leading-none tracking-tight'>" "Club Settings</h3>"),
-                        css_class="flex items-center gap-2",
-                    ),
-                    HTML(
-                        "<p class='text-sm text-white/80'>Configure privacy " "and behavior settings for your club</p>"
-                    ),
-                    css_class="flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-amber-500 to-orange-600 "
-                    "dark:from-amber-600 dark:to-orange-800 text-white rounded-t-lg",
-                ),
+                self.section_header(settings_header),
                 # Section Body
                 Div(
                     Div(
@@ -236,7 +253,7 @@ class ClubForm(forms.ModelForm):
                                 Field(
                                     "private_ride_attendence",
                                     template=checkbox_template,
-                                    wrapper_class="xl:mb-1  w-full",
+                                    wrapper_class="xl:mb-1 w-full",
                                 ),
                                 id="private_attendence_row",
                                 css_class="py-2",
@@ -245,7 +262,7 @@ class ClubForm(forms.ModelForm):
                                 Field(
                                     "private_ride_waitlist",
                                     template=checkbox_template,
-                                    wrapper_class="xl:mb-1  w-full",
+                                    wrapper_class="xl:mb-1 w-full",
                                 ),
                                 id="private_waitlist_row",
                                 css_class="py-2",
@@ -254,7 +271,7 @@ class ClubForm(forms.ModelForm):
                                 Field(
                                     "allow_ride_discussion",
                                     template=checkbox_template,
-                                    wrapper_class="xl:mb-1  w-full",
+                                    wrapper_class="xl:mb-1 w-full",
                                 ),
                                 id="allow_ride_discussion_row",
                                 css_class="py-2",
