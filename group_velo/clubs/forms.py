@@ -24,6 +24,15 @@ from group_velo.utils.utils import css_container, dropdown, form_row, get_group_
 
 
 class BaseClubForm(forms.ModelForm):
+    def section_wrapper(self, *args):
+        return Div(
+            Div(
+                *args,
+                css_class="space-y-2",
+            ),
+            css_class="p-6 pt-6 space-y-4",
+        )
+
     def section_header(self, section_data):
         colors = section_data["colors"]
         header_svg = section_data["header_svg"]
@@ -31,9 +40,9 @@ class BaseClubForm(forms.ModelForm):
         header_subtitle = section_data["header_subtitle"]
 
         header_css_class = (
-            f"flex flex-col space-y-1.5 p-6 bg-gradient-to-r from-{colors['light']['from']} "
-            f"to-{colors['light']['to']} dark:from-{colors['dark']['from']} "
-            f"dark:to-{colors['dark']['to']} text-white rounded-t-lg"
+            f"flex flex-col space-y-1.5 p-6 bg-gradient-to-r {colors['light']['from']} "
+            f"{colors['light']['to']} {colors['dark']['from']} "
+            f"{colors['dark']['to']} text-white rounded-t-lg"
         )
 
         return Div(
@@ -118,8 +127,8 @@ class ClubForm(BaseClubForm):
             "header_title": "General Information",
             "header_subtitle": "Basic details about your club",
             "colors": {
-                "light": {"from": "violet-500", "to": "purple-600"},
-                "dark": {"from": "violet-600", "to": "purple-800"},
+                "light": {"from": "from-violet-500", "to": "to-purple-600"},
+                "dark": {"from": "dark:from-violet-600", "to": "dark:to-purple-800"},
             },
         }
 
@@ -133,7 +142,10 @@ class ClubForm(BaseClubForm):
             ),
             "header_title": "Location & Contact",
             "header_subtitle": "Where your club is located and how to reach you",
-            "colors": {"light": {"from": "sky-500", "to": "blue-600"}, "dark": {"from": "sky-600", "to": "blue-800"}},
+            "colors": {
+                "light": {"from": "from-sky-500", "to": "to-blue-600"},
+                "dark": {"from": "dark:from-sky-600", "to": "dark:to-blue-800"},
+            },
         }
 
         settings_header = {
@@ -149,8 +161,8 @@ class ClubForm(BaseClubForm):
             "header_title": "Club Settings",
             "header_subtitle": "Configure privacy and behavior settings for your club",
             "colors": {
-                "light": {"from": "amber-500", "to": "orange-600"},
-                "dark": {"from": "amber-600", "to": "orange-800"},
+                "light": {"from": "from-amber-500", "to": "to-orange-600"},
+                "dark": {"from": "dark:from-amber-600", "to": "dark:to-orange-800"},
             },
         }
 
@@ -160,31 +172,27 @@ class ClubForm(BaseClubForm):
                 # Section Header
                 self.section_header(general_header),
                 # Section Body
-                Div(
-                    Div(
-                        Field("name", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
-                        Field(
-                            "abbreviation",
-                            css_class=css_class,
-                            label_class=label_class,
-                            wrapper_class="space-y-2",
-                        ),
-                        Field(
-                            "description",
-                            css_class=css_class,
-                            label_class=label_class,
-                            wrapper_class="space-y-2",
-                        ),
-                        IconPrefixedField(
-                            "url",
-                            template="tailwind/layout/icon_prefixed_field.html",
-                            icon_path="icons/url.html",
-                            css_class=prefix_class,
-                        ),
-                        Field("logo", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
-                        css_class="space-y-2",
+                self.section_wrapper(
+                    Field("name", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
+                    Field(
+                        "abbreviation",
+                        css_class=css_class,
+                        label_class=label_class,
+                        wrapper_class="space-y-2",
                     ),
-                    css_class="p-6 pt-6 space-y-4",
+                    Field(
+                        "description",
+                        css_class=css_class,
+                        label_class=label_class,
+                        wrapper_class="space-y-2",
+                    ),
+                    IconPrefixedField(
+                        "url",
+                        template="tailwind/layout/icon_prefixed_field.html",
+                        icon_path="icons/url.html",
+                        css_class=prefix_class,
+                    ),
+                    Field("logo", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
                 ),
                 css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
             ),
@@ -193,28 +201,24 @@ class ClubForm(BaseClubForm):
                 # Section Header
                 self.section_header(contact_header),
                 # Section Body
-                Div(
-                    Div(
-                        Field("city", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
-                        Field("state", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
-                        Field("zip_code", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
-                        IconPrefixedField(
-                            "email_address",
-                            template="tailwind/layout/icon_prefixed_field.html",
-                            icon_path="icons/email.html",
-                            css_class=prefix_class,
-                        ),
-                        IconPrefixedField(
-                            "phone_number",
-                            template="tailwind/layout/icon_prefixed_field.html",
-                            icon_path="icons/phone.html",
-                            id="club_create_phone_number",
-                            x_mask="(999) 999-9999",
-                            css_class=prefix_class,
-                        ),
-                        css_class="space-y-2",
+                self.section_wrapper(
+                    Field("city", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
+                    Field("state", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
+                    Field("zip_code", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
+                    IconPrefixedField(
+                        "email_address",
+                        template="tailwind/layout/icon_prefixed_field.html",
+                        icon_path="icons/email.html",
+                        css_class=prefix_class,
                     ),
-                    css_class="p-6 pt-6 space-y-4",
+                    IconPrefixedField(
+                        "phone_number",
+                        template="tailwind/layout/icon_prefixed_field.html",
+                        icon_path="icons/phone.html",
+                        id="club_create_phone_number",
+                        x_mask="(999) 999-9999",
+                        css_class=prefix_class,
+                    ),
                 ),
                 css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
             ),
