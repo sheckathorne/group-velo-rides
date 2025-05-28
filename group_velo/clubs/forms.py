@@ -25,99 +25,33 @@ from group_velo.utils.utils import css_container, dropdown, form_row, get_group_
 
 
 class ClubForm(BaseForm):
-    class Meta:
-        model = Club
-        fields = [
-            "name",
-            "abbreviation",
-            "description",
-            "url",
-            "logo",
-            "city",
-            "state",
-            "zip_code",
-            "email_address",
-            "phone_number",
-            "private",
-            "privacy_level",
-            "active",
-            "private_ride_attendence",
-            "private_ride_waitlist",
-            "allow_ride_discussion",
-            "strict_ride_classification",
-        ]
-
-        widgets = {
-            "logo": ImageUploaderWidget(),
-            "active": LeftSideCheckboxInput(),
-            "private": LeftSideCheckboxInput(),
-            "privacy_level": RadioSelect(),
-            "private_ride_attendence": LeftSideCheckboxInput(),
-            "private_ride_waitlist": LeftSideCheckboxInput(),
-            "allow_ride_discussion": LeftSideCheckboxInput(),
-            "strict_ride_classification": LeftSideCheckboxInput(),
-        }
-
     def __init__(self, *args, **kwargs):
-        self.submit_text = kwargs.pop("submit_text", "Submit")
-
         super().__init__(*args, **kwargs)
+        self.submit_text = kwargs.pop("submit_text", "Submit")
         self.helper = FormHelper(self)
         self.helper.css_container = css_container()
         self.helper.label_class = "block text-gray-700 text-sm font-bold dark:text-gray-100"
         self.helper.form_tag = False
 
         general_header = {
-            "header_svg": (
-                "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' "
-                "viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' "
-                "stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-building2 "
-                "h-5 w-5'><path d='M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z'></path>"
-                "<path d='M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2'>"
-                "</path><path d='M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2'></path>"
-                "<path d='M10 6h4'></path><path d='M10 10h4'>"
-                "</path><path d='M10 14h4'></path><path d='M10 18h4'></path></svg>"
-            ),
+            "header_svg": self.svgs["general"],
             "header_title": "General Information",
             "header_subtitle": "Basic details about your club",
-            "colors": {
-                "light": {"from": "from-violet-500", "to": "to-purple-600"},
-                "dark": {"from": "dark:from-violet-600", "to": "dark:to-purple-800"},
-            },
+            "colors": self.header_colors["purple"],
         }
 
         contact_header = {
-            "header_svg": (
-                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
-                'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
-                'stroke-linecap="round" stroke-linejoin="round" class="lucide '
-                'lucide-map-pin h-5 w-5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z">'
-                '</path><circle cx="12" cy="10" r="3"></circle></svg>'
-            ),
+            "header_svg": self.svgs["location"],
             "header_title": "Location & Contact",
             "header_subtitle": "Where your club is located and how to reach you",
-            "colors": {
-                "light": {"from": "from-sky-500", "to": "to-blue-600"},
-                "dark": {"from": "dark:from-sky-600", "to": "dark:to-blue-800"},
-            },
+            "colors": self.header_colors["blue"],
         }
 
         settings_header = {
-            "header_svg": (
-                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
-                'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
-                'stroke-linecap="round" stroke-linejoin="round" class="lucide '
-                'lucide-shield h-5 w-5">'
-                '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 '
-                "13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 "
-                '3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>'
-            ),
+            "header_svg": self.svgs["settings"],
             "header_title": "Club Settings",
             "header_subtitle": "Configure privacy and behavior settings for your club",
-            "colors": {
-                "light": {"from": "from-amber-500", "to": "to-orange-600"},
-                "dark": {"from": "dark:from-amber-600", "to": "dark:to-orange-800"},
-            },
+            "colors": self.header_colors["orange"],
         }
 
         self.helper.layout = Layout(
@@ -287,6 +221,39 @@ class ClubForm(BaseForm):
             + "<span class='speicalAsteriskField'>*</span></div>"
         )
         self.fields["privacy_level"].label
+
+    class Meta:
+        model = Club
+        fields = [
+            "name",
+            "abbreviation",
+            "description",
+            "url",
+            "logo",
+            "city",
+            "state",
+            "zip_code",
+            "email_address",
+            "phone_number",
+            "private",
+            "privacy_level",
+            "active",
+            "private_ride_attendence",
+            "private_ride_waitlist",
+            "allow_ride_discussion",
+            "strict_ride_classification",
+        ]
+
+        widgets = {
+            "logo": ImageUploaderWidget(),
+            "active": LeftSideCheckboxInput(),
+            "private": LeftSideCheckboxInput(),
+            "privacy_level": RadioSelect(),
+            "private_ride_attendence": LeftSideCheckboxInput(),
+            "private_ride_waitlist": LeftSideCheckboxInput(),
+            "allow_ride_discussion": LeftSideCheckboxInput(),
+            "strict_ride_classification": LeftSideCheckboxInput(),
+        }
 
 
 class ClubRideClassificationLimitForm(forms.ModelForm):
