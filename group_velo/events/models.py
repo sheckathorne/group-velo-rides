@@ -438,16 +438,17 @@ class EventOccurence(EventBase):
         # Get all dates between start and end (inclusive)
         current_date = start_datetime.date()
         while current_date <= end_datetime.date():
-            if current_date == start_datetime.date():
-                # First day - from start hour to end of day
+            if current_date == start_datetime.date() and current_date == end_datetime.date():
+                # Same day — limit from start to end hour inclusive
+                for h in range(start_datetime.hour, end_datetime.hour + 1):
+                    all_hours.append({"date": current_date, "hour": h, "has_data": False})
+            elif current_date == start_datetime.date():
                 for h in range(start_datetime.hour, 24):
                     all_hours.append({"date": current_date, "hour": h, "has_data": False})
             elif current_date == end_datetime.date():
-                # Last day - from start of day to end hour
                 for h in range(0, end_datetime.hour + 1):
                     all_hours.append({"date": current_date, "hour": h, "has_data": False})
             else:
-                # Middle days - all hours
                 for h in range(0, 24):
                     all_hours.append({"date": current_date, "hour": h, "has_data": False})
 
