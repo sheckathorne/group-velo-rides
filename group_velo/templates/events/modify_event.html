@@ -17,7 +17,9 @@
     <form method="post"
           action="{% url 'events:modify_event' event_occurence_sqid=event_occurence.id|to_sqid slug=event_occurence.slug %}"
           x-data="form">
-      {% crispy form %}
+      <div class="space-y-6 my-6">
+        <div class="grid gap-6 md:grid-cols-2">{% crispy form %}</div>
+      </div>
     </form>
     <input type="hidden" id="route_url" value="{{ event_occurence.route.url }}" />
     <input type="hidden"

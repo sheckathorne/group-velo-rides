@@ -19,44 +19,12 @@ from group_velo.clubs.models import (
     ClubVerificationRequest,
 )
 from group_velo.data.choices import MemberType, RequestStatus
+from group_velo.utils.forms import BaseForm
 from group_velo.utils.layout import IconPrefixedField
 from group_velo.utils.utils import css_container, dropdown, form_row, get_group_classification_color
 
 
-class BaseClubForm(forms.ModelForm):
-    def section_wrapper(self, *args):
-        return Div(
-            Div(
-                *args,
-                css_class="space-y-2",
-            ),
-            css_class="p-6 pt-6 space-y-4",
-        )
-
-    def section_header(self, section_data):
-        colors = section_data["colors"]
-        header_svg = section_data["header_svg"]
-        header_title = section_data["header_title"]
-        header_subtitle = section_data["header_subtitle"]
-
-        header_css_class = (
-            f"flex flex-col space-y-1.5 p-6 bg-gradient-to-r {colors['light']['from']} "
-            f"{colors['light']['to']} {colors['dark']['from']} "
-            f"{colors['dark']['to']} text-white rounded-t-lg"
-        )
-
-        return Div(
-            Div(
-                HTML(header_svg),
-                HTML("<h3 class='text-2xl font-semibold leading-none " f"tracking-tight'>{header_title}</h3>"),
-                css_class="flex items-center gap-2",
-            ),
-            HTML(f"<p class='text-sm text-white/80'>{header_subtitle}</p>"),
-            css_class=header_css_class,
-        )
-
-
-class ClubForm(BaseClubForm):
+class ClubForm(BaseForm):
     class Meta:
         model = Club
         fields = [
@@ -91,20 +59,6 @@ class ClubForm(BaseClubForm):
         }
 
     def __init__(self, *args, **kwargs):
-        prefix_class = (
-            "w-full px-4 shadow-lg focus:ring-2 dark:bg-gray-800 dark:text-gray-200 text-gray-700 "
-            "focus:ring-blue-700 dark:border-gray-700 border-gray-300 border shadow rounded-r-md "
-            "dark:focus:ring-blue-500 px-4 leading-normal py-2 appearance-none bg-white rounded-l-none"
-        )
-
-        css_class = (
-            "w-full shadow-lg rounded-md focus:ring-2 dark:bg-gray-800 dark:text-gray-200 text-gray-700 "
-            "focus:ring-blue-700 dark:border-gray-700 border-gray-300 border shadow rounded dark:focus:ring-blue-500 "
-            "px-4 leading-normal py-2 appearance-none bg-white"
-        )
-
-        label_class = "text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-medium"
-        checkbox_template = "tailwind/checkbox_left.html"
         self.submit_text = kwargs.pop("submit_text", "Submit")
 
         super().__init__(*args, **kwargs)
@@ -173,26 +127,26 @@ class ClubForm(BaseClubForm):
                 self.section_header(general_header),
                 # Section Body
                 self.section_wrapper(
-                    Field("name", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
+                    Field("name", css_class=self.css_class, label_class=self.label_class, wrapper_class="space-y-2"),
                     Field(
                         "abbreviation",
-                        css_class=css_class,
-                        label_class=label_class,
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                         wrapper_class="space-y-2",
                     ),
                     Field(
                         "description",
-                        css_class=css_class,
-                        label_class=label_class,
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                         wrapper_class="space-y-2",
                     ),
                     IconPrefixedField(
                         "url",
                         template="tailwind/layout/icon_prefixed_field.html",
                         icon_path="icons/url.html",
-                        css_class=prefix_class,
+                        css_class=self.prefix_class,
                     ),
-                    Field("logo", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
+                    Field("logo", css_class=self.css_class, label_class=self.label_class, wrapper_class="space-y-2"),
                 ),
                 css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
             ),
@@ -202,14 +156,16 @@ class ClubForm(BaseClubForm):
                 self.section_header(contact_header),
                 # Section Body
                 self.section_wrapper(
-                    Field("city", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
-                    Field("state", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
-                    Field("zip_code", css_class=css_class, label_class=label_class, wrapper_class="space-y-2"),
+                    Field("city", css_class=self.css_class, label_class=self.label_class, wrapper_class="space-y-2"),
+                    Field("state", css_class=self.css_class, label_class=self.label_class, wrapper_class="space-y-2"),
+                    Field(
+                        "zip_code", css_class=self.css_class, label_class=self.label_class, wrapper_class="space-y-2"
+                    ),
                     IconPrefixedField(
                         "email_address",
                         template="tailwind/layout/icon_prefixed_field.html",
                         icon_path="icons/email.html",
-                        css_class=prefix_class,
+                        css_class=self.prefix_class,
                     ),
                     IconPrefixedField(
                         "phone_number",
@@ -217,7 +173,7 @@ class ClubForm(BaseClubForm):
                         icon_path="icons/phone.html",
                         id="club_create_phone_number",
                         x_mask="(999) 999-9999",
-                        css_class=prefix_class,
+                        css_class=self.prefix_class,
                     ),
                 ),
                 css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
@@ -244,7 +200,7 @@ class ClubForm(BaseClubForm):
                             Div(
                                 Field(
                                     "active",
-                                    template=checkbox_template,
+                                    template=self.checkbox_template,
                                     wrapper_class="xl:mb-1 w-full",
                                 ),
                                 id="active_check_row",
@@ -256,7 +212,7 @@ class ClubForm(BaseClubForm):
                             Div(
                                 Field(
                                     "private_ride_attendence",
-                                    template=checkbox_template,
+                                    template=self.checkbox_template,
                                     wrapper_class="xl:mb-1 w-full",
                                 ),
                                 id="private_attendence_row",
@@ -265,7 +221,7 @@ class ClubForm(BaseClubForm):
                             Div(
                                 Field(
                                     "private_ride_waitlist",
-                                    template=checkbox_template,
+                                    template=self.checkbox_template,
                                     wrapper_class="xl:mb-1 w-full",
                                 ),
                                 id="private_waitlist_row",
@@ -274,7 +230,7 @@ class ClubForm(BaseClubForm):
                             Div(
                                 Field(
                                     "allow_ride_discussion",
-                                    template=checkbox_template,
+                                    template=self.checkbox_template,
                                     wrapper_class="xl:mb-1 w-full",
                                 ),
                                 id="allow_ride_discussion_row",
@@ -284,7 +240,7 @@ class ClubForm(BaseClubForm):
                                 Field(
                                     "strict_ride_classification",
                                     x_model="showStrictRideClassBtn",
-                                    template=checkbox_template,
+                                    template=self.checkbox_template,
                                     wrapper_class="xl:mb-1  w-full",
                                 ),
                                 id="strict_ride_classification_row",

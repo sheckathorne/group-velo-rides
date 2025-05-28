@@ -103,7 +103,7 @@ def integer_to_hour_text(val):
     if val == 0:
         return "12 AM"
     elif val > 0 and val < 12:
-        return f"{val + 1} AM"
+        return f"{val} AM"
     elif val == 12:
         return "12 PM"
     else:

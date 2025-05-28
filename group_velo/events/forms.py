@@ -1,6 +1,6 @@
 from crispy_forms.bootstrap import InlineCheckboxes, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import HTML, Div, Field, Fieldset, Layout
+from crispy_forms.layout import HTML, Div, Field, Layout
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.apps import apps
@@ -18,7 +18,8 @@ from group_velo.events.models import (
 from group_velo.events.validators import MaxRidersValidator
 from group_velo.routes.models import Route
 from group_velo.users.models import SavedFilter
-from group_velo.utils.utils import base_input_style, css_container, dropdown, form_row, text_input
+from group_velo.utils.forms import BaseForm
+from group_velo.utils.utils import base_input_style, css_container, form_row, text_input
 
 
 class DeleteRouteForm(forms.ModelForm):
@@ -120,7 +121,7 @@ class RouteChoiceField(ModelChoiceField):
         return {"label": super().label_from_instance(obj), "data-url": obj.url}
 
 
-class ModifyEventForm(forms.ModelForm):
+class ModifyEventForm(BaseForm):
     def __init__(
         self,
         user_clubs,
@@ -129,7 +130,6 @@ class ModifyEventForm(forms.ModelForm):
         *args,
         **kwargs,
     ):
-        fieldset_class = "my-4 mx-2 xl:col-span-4 lg:col-span-6 col-span-12"
         width = "col-span-12"
         row_padding = "pb-2 mb-3"
 
@@ -140,22 +140,90 @@ class ModifyEventForm(forms.ModelForm):
         self.helper = FormHelper(self)
         self.helper.css_container = css_container()
         self.helper.label_class = "block text-gray-700 text-sm font-bold dark:text-gray-100"
+
+        general_header = {
+            "header_svg": (
+                "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' "
+                "viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' "
+                "stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-building2 "
+                "h-5 w-5'><path d='M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z'></path>"
+                "<path d='M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2'>"
+                "</path><path d='M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2'></path>"
+                "<path d='M10 6h4'></path><path d='M10 10h4'>"
+                "</path><path d='M10 14h4'></path><path d='M10 18h4'></path></svg>"
+            ),
+            "header_title": "Ride Information",
+            "header_subtitle": "Basic details about your ride",
+            "colors": {
+                "light": {"from": "from-violet-500", "to": "to-purple-600"},
+                "dark": {"from": "dark:from-violet-600", "to": "dark:to-purple-800"},
+            },
+        }
+
+        ride_details_header = {
+            "header_svg": (
+                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
+                'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+                'stroke-linecap="round" stroke-linejoin="round" class="lucide '
+                'lucide-map-pin h-5 w-5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z">'
+                '</path><circle cx="12" cy="10" r="3"></circle></svg>'
+            ),
+            "header_title": "Ride Details",
+            "header_subtitle": "More detailed information about the pace, surface type, etc.",
+            "colors": {
+                "light": {"from": "from-sky-500", "to": "to-blue-600"},
+                "dark": {"from": "dark:from-sky-600", "to": "dark:to-blue-800"},
+            },
+        }
+
+        schedule_header = {
+            "header_svg": (
+                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
+                'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+                'stroke-linecap="round" stroke-linejoin="round" class="lucide '
+                'lucide-shield h-5 w-5">'
+                '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 '
+                "13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 "
+                '3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>'
+            ),
+            "header_title": "Schedule & Timing",
+            "header_subtitle": "Set the start and end dates, time zone, ride duration, and recurrence for the event",
+            "colors": {
+                "light": {"from": "from-amber-500", "to": "to-orange-600"},
+                "dark": {"from": "dark:from-amber-600", "to": "dark:to-orange-800"},
+            },
+        }
+
         self.helper.layout = Layout(
-            form_row(
-                Fieldset(
-                    "Ride Info",
-                    form_row(
-                        text_input("occurence_name", "event_occurence", width=width),
-                        padding_bottom=row_padding,
+            # Section 1
+            Div(
+                # Section Header
+                self.section_header(general_header),
+                # Section Body
+                self.section_wrapper(
+                    Field(
+                        "occurence_name",
+                        id="event_occurence_create_occurence_name",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                     ),
-                    form_row(
-                        text_input("description", "event_occurence", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "description",
+                        id="event_occurence_create_description",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                     ),
-                    form_row(
-                        dropdown("privacy", "event_occurence", width=width),
-                        dropdown("club", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "privacy",
+                        id="event_occurence_create_privacy",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                    ),
+                    Field(
+                        "club",
+                        id="event_create_club",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                     ),
                     form_row(
                         Div(
@@ -175,84 +243,96 @@ class ModifyEventForm(forms.ModelForm):
                         padding_bottom=row_padding,
                     ),
                     Field("route", type="hidden", id="route_id"),
-                    form_row(
-                        text_input("max_riders", "event_occurence", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "max_riders",
+                        id="event_occurence_create_max_riders",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                     ),
-                    css_class=fieldset_class,
                 ),
-                Fieldset(
-                    "Details",
-                    form_row(
-                        text_input("surface_type", "event_occurence", width=width),
-                        padding_bottom=row_padding,
+                css_class="md:col-span-2 bg-white dark:bg-gray-900 rounded-lg "
+                "overflow-hidden border border-gray-200 dark:border-gray-800 shadow-md",
+            ),
+            # Section 2
+            Div(
+                # Section Header
+                self.section_header(ride_details_header),
+                # Section Body
+                self.section_wrapper(
+                    Field(
+                        "surface_type",
+                        id="event_occurence_create_surface_type",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                     ),
-                    form_row(
-                        dropdown("group_classification", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "group_classification",
+                        id="event_create_group_classification",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                     ),
-                    form_row(
-                        Field(
-                            "lower_pace_range",
-                            id="event_create_lower_pace_range",
-                            css_class="w-full shadow",
-                            label_class="dark:text-gray-200",
-                            wrapper_class=width,
-                        ),
-                        padding_bottom=row_padding,
+                    Field(
+                        "lower_pace_range",
+                        id="event_create_lower_pace_range",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                     ),
                     HTML(
                         '<p x-show="lower_pace_range.errorMessage" x-text="lower_pace_range.errorMessage" '
                         ' class="-mt-4 mb-3 text-sm text-red-700 dark:text-red-400"></p>'
                     ),
-                    form_row(
-                        Field(
-                            "upper_pace_range",
-                            id="event_create_upper_pace_range",
-                            css_class="w-full shadow",
-                            label_class="dark:text-gray-200",
-                            wrapper_class=width,
-                        ),
-                        padding_bottom=row_padding,
+                    Field(
+                        "upper_pace_range",
+                        id="event_create_upper_pace_range",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                     ),
                     HTML(
                         '<p x-show="upper_pace_range.errorMessage" x-text="upper_pace_range.errorMessage" '
-                        'class="-mt-4  mb-3 text-sm text-red-700 dark:text-red-400"></p>'
+                        ' class="-mt-4 mb-3 text-sm text-red-700 dark:text-red-400"></p>'
                     ),
-                    form_row(
-                        text_input("drop_designation", "event_occurence", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "drop_designation",
+                        id="event_occurence_create_drop_designation",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                     ),
-                    css_class=fieldset_class,
                 ),
-                Fieldset(
-                    "Date / Time",
-                    form_row(
-                        text_input("ride_date", "event_occurence", width=width),
-                        padding_bottom=row_padding,
-                    ),
-                    form_row(
-                        text_input("ride_time", "event", width=width),
-                        padding_bottom=row_padding,
-                    ),
-                    form_row(
-                        dropdown("time_zone", "event", width=width),
-                        padding_bottom=row_padding,
-                    ),
-                    css_class=fieldset_class,
-                ),
+                css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
             ),
-            form_row(
-                Div(
-                    StrictButton(
-                        "Save Changes",
-                        value="Save",
-                        type="submit",
-                        css_class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 "
-                        "rounded shadow-lg mb-4",
+            # Section 3
+            Div(
+                # Section Header
+                self.section_header(schedule_header),
+                # Section Body
+                self.section_wrapper(
+                    Field(
+                        "ride_date",
+                        id="event_occurence_create_ride_date",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
                     ),
-                    css_class=fieldset_class,
-                )
+                    Field(
+                        "ride_time",
+                        id="event_create_ride_time",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                    ),
+                    Field(
+                        "time_zone",
+                        id="event_create_time_zone",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                    ),
+                ),
+                css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
+            ),
+            StrictButton(
+                "Save Changes",
+                value="Save",
+                type="submit",
+                css_class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 "
+                "rounded shadow-lg mb-4",
             ),
         )
 
@@ -358,9 +438,8 @@ class ModifyEventForm(forms.ModelForm):
         }
 
 
-class CreateEventForm(forms.ModelForm):
+class CreateEventForm(BaseForm):
     def __init__(self, user_clubs, user_routes, *args, **kwargs):
-        fieldset_class = "my-4 mx-2 xl:col-span-4 lg:col-span-6 col-span-12"
         width = "col-span-12"
         row_padding = "pb-2 mb-3"
 
@@ -372,22 +451,94 @@ class CreateEventForm(forms.ModelForm):
         self.helper.css_container = css_container()
         self.helper.label_class = "block text-gray-700 text-sm font-bold dark:text-gray-100"
         self.helper.form_show_errors = False
+
+        general_header = {
+            "header_svg": (
+                "<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' "
+                "viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' "
+                "stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-building2 "
+                "h-5 w-5'><path d='M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z'></path>"
+                "<path d='M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2'>"
+                "</path><path d='M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2'></path>"
+                "<path d='M10 6h4'></path><path d='M10 10h4'>"
+                "</path><path d='M10 14h4'></path><path d='M10 18h4'></path></svg>"
+            ),
+            "header_title": "Ride Information",
+            "header_subtitle": "Basic details about your ride",
+            "colors": {
+                "light": {"from": "from-violet-500", "to": "to-purple-600"},
+                "dark": {"from": "dark:from-violet-600", "to": "dark:to-purple-800"},
+            },
+        }
+
+        ride_details_header = {
+            "header_svg": (
+                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
+                'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+                'stroke-linecap="round" stroke-linejoin="round" class="lucide '
+                'lucide-map-pin h-5 w-5"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z">'
+                '</path><circle cx="12" cy="10" r="3"></circle></svg>'
+            ),
+            "header_title": "Ride Details",
+            "header_subtitle": "More detailed information about the pace, surface type, etc.",
+            "colors": {
+                "light": {"from": "from-sky-500", "to": "to-blue-600"},
+                "dark": {"from": "dark:from-sky-600", "to": "dark:to-blue-800"},
+            },
+        }
+
+        schedule_header = {
+            "header_svg": (
+                '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" '
+                'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+                'stroke-linecap="round" stroke-linejoin="round" class="lucide '
+                'lucide-shield h-5 w-5">'
+                '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 '
+                "13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 "
+                '3.81 17 5 19 5a1 1 0 0 1 1 1z"></path></svg>'
+            ),
+            "header_title": "Schedule & Timing",
+            "header_subtitle": "Set the start and end dates, time zone, ride duration, and recurrence for the event",
+            "colors": {
+                "light": {"from": "from-amber-500", "to": "to-orange-600"},
+                "dark": {"from": "dark:from-amber-600", "to": "dark:to-orange-800"},
+            },
+        }
+
         self.helper.layout = Layout(
-            form_row(
-                Fieldset(
-                    "Ride Info",
-                    form_row(
-                        text_input("name", "event", width=width),
-                        padding_bottom=row_padding,
+            # Section 1
+            Div(
+                # Section Header
+                self.section_header(general_header),
+                # Section Body
+                self.section_wrapper(
+                    Field(
+                        "name",
+                        id="event_create_name",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
-                    form_row(
-                        text_input("description", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "description",
+                        id="event_create_description",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
-                    form_row(
-                        dropdown("privacy", "event", width=width),
-                        dropdown("club", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "privacy",
+                        id="event_create_privacy",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
+                    ),
+                    Field(
+                        "club",
+                        id="event_create_club",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
                     form_row(
                         Div(
@@ -398,109 +549,130 @@ class CreateEventForm(forms.ModelForm):
                             StrictButton(
                                 "Select Route",
                                 css_id="routeChoiceButton",
-                                css_class="w-full py-2 px-4 font-semibold btn-primary-color rounded shadow-lg",
+                                css_class="w-full py-4 px-4 font-semibold btn-primary-color rounded-md shadow-lg",
                                 **{"@click": "routeSelectModalOpen=true"},
                             ),
                             css_id="div_id_route_select",
-                            css_class=width,
+                            css_class=width + " space-y-2",
                         ),
                         padding_bottom=row_padding,
                     ),
                     Field("route", type="hidden", id="route_id"),
-                    form_row(
-                        text_input("max_riders", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "max_riders",
+                        id="event_occurence_create_max_riders",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
-                    css_class=fieldset_class,
                 ),
-                Fieldset(
-                    "Details",
-                    form_row(
-                        text_input("surface_type", "event_occurence", width=width),
-                        padding_bottom=row_padding,
+                css_class="md:col-span-2 bg-white dark:bg-gray-900 rounded-lg "
+                "overflow-hidden border border-gray-200 dark:border-gray-800 shadow-md",
+            ),
+            # Section 2
+            Div(
+                # Section Header
+                self.section_header(ride_details_header),
+                # Section Body
+                self.section_wrapper(
+                    Field(
+                        "surface_type",
+                        id="event_occurence_create_surface_type",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
-                    form_row(
-                        dropdown("group_classification", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "group_classification",
+                        id="event_create_group_classification",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
-                    form_row(
-                        Field(
-                            "lower_pace_range",
-                            id="event_create_lower_pace_range",
-                            css_class="w-full shadow",
-                            label_class="dark:text-gray-200",
-                            wrapper_class=width,
-                        ),
-                        padding_bottom=row_padding,
+                    Field(
+                        "lower_pace_range",
+                        id="event_create_lower_pace_range",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
                     HTML(
                         '<p x-show="lower_pace_range.errorMessage" x-text="lower_pace_range.errorMessage" '
                         ' class="-mt-4 mb-3 text-sm text-red-700 dark:text-red-400"></p>'
                     ),
-                    form_row(
-                        Field(
-                            "upper_pace_range",
-                            id="event_create_upper_pace_range",
-                            css_class="w-full shadow",
-                            label_class="dark:text-gray-200",
-                            wrapper_class=width,
-                        ),
-                        padding_bottom=row_padding,
+                    Field(
+                        "upper_pace_range",
+                        id="event_create_upper_pace_range",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
                     HTML(
                         '<p x-show="upper_pace_range.errorMessage" x-text="upper_pace_range.errorMessage" '
-                        'class="-mt-4  mb-3 text-sm text-red-700 dark:text-red-400"></p>'
+                        ' class="-mt-4 mb-3 text-sm text-red-700 dark:text-red-400"></p>'
                     ),
-                    form_row(
-                        text_input("drop_designation", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "drop_designation",
+                        id="event_create_drop_designation",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
-                    css_class=fieldset_class,
                 ),
-                Fieldset(
-                    "Date / Time / Recurring",
-                    form_row(
-                        text_input("start_date", "event", width=width),
-                        padding_bottom=row_padding,
+                css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
+            ),
+            # Section 3
+            Div(
+                # Section Header
+                self.section_header(schedule_header),
+                # Section Body
+                self.section_wrapper(
+                    Field(
+                        "start_date",
+                        id="event_create_start_date",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
                     HTML(
                         '<p x-show="start_date.errorMessage" x-text="start_date.errorMessage" '
                         ' class="-mt-4 mb-3 text-sm text-red-700 dark:text-red-400"></p>'
                     ),
-                    form_row(
-                        text_input("end_date", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "end_date",
+                        id="event_create_end_date",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
                     HTML(
                         '<p x-show="end_date.errorMessage" x-text="end_date.errorMessage" '
                         ' class="-mt-4 mb-3 text-sm text-red-700 dark:text-red-400"></p>'
                     ),
-                    form_row(
-                        dropdown("time_zone", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "time_zone",
+                        id="event_create_time_zone",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
-                    form_row(
-                        text_input("ride_time", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "ride_time",
+                        id="event_create_ride_time",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
-                    form_row(
-                        dropdown("frequency", "event", width=width),
-                        padding_bottom=row_padding,
+                    Field(
+                        "frequency",
+                        id="event_create_frequency",
+                        css_class=self.css_class,
+                        label_class=self.label_class,
+                        wrapper_class="space-y-2",
                     ),
-                    InlineCheckboxes("weekdays", label="", wrapper_class="mb-3"),
-                    css_class=fieldset_class,
+                    InlineCheckboxes("weekdays", label="", wrapper_class="mb-3 space-y-2"),
                 ),
-            ),
-            form_row(
-                Div(
-                    StrictButton(
-                        "Create Ride",
-                        value="Create Ride",
-                        type="submit",
-                        css_class="w-full btn-primary-color",
-                    ),
-                    css_class=fieldset_class,
-                )
+                css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
             ),
         )
 

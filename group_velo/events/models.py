@@ -199,7 +199,7 @@ class EventBase(models.Model):
 
 
 class Event(EventBase):
-    name = models.CharField("Event Name", max_length=100)
+    name = models.CharField("Ride Name", max_length=100)
     start_date = models.DateField("Start Date")
     end_date = models.DateField("End Date")
     frequency = models.IntegerField("Recurrence", choices=RecurrenceFrequency.choices)
@@ -310,7 +310,7 @@ class EventOccurence(EventBase):
         default_validators = []
 
     event = models.ForeignKey(Event, null=True, blank=True, on_delete=models.CASCADE)
-    occurence_name = models.CharField("Event Name", max_length=100)
+    occurence_name = models.CharField("Ride Name", max_length=100)
     slug = models.SlugField(max_length=255, blank=True)
     ride_date = models.DateField("Ride Date")
     modified_by = models.ForeignKey(
@@ -364,20 +364,25 @@ class EventOccurence(EventBase):
         # Get all dates between start and end (inclusive)
         current_date = start_datetime.date()
         while current_date <= end_datetime.date():
-            if current_date == start_datetime.date():
-                # First day - from start hour to end of day
+            if current_date == start_datetime.date() and current_date == end_datetime.date():
+                # Same day event
+                day_query = Q(
+                    forecast__forecast_date=current_date, hour__gte=start_datetime.hour, hour__lte=end_datetime.hour
+                )
+            elif current_date == start_datetime.date():
+                # First day
                 day_query = Q(forecast__forecast_date=current_date, hour__gte=start_datetime.hour)
             elif current_date == end_datetime.date():
-                # Last day - from start of day to end hour
+                # Last day
                 day_query = Q(forecast__forecast_date=current_date, hour__lte=end_datetime.hour)
             else:
-                # Middle days - all hours
+                # Middle day
                 day_query = Q(forecast__forecast_date=current_date)
 
-            # Add this day's query to the main query with OR
             query |= day_query
             current_date += datetime.timedelta(days=1)
 
+        print(query)
         hour_data = WeatherForecastHour.objects.filter(zip_query, query).order_by("forecast__forecast_date", "hour")
         return hour_data[:max_hours]
 
@@ -454,7 +459,7 @@ class EventOccurence(EventBase):
 
     @property
     def pace_range_text(self):
-        return f"{self.lower_pace_range.normalize()} - {self.upper_pace_range.normalize()} mph"
+        return f"{format(self.lower_pace_range.normalize(),'f')} - {format(self.upper_pace_range.normalize(),'f')} mph"
 
     @property
     def estimated_ride_duration(self):

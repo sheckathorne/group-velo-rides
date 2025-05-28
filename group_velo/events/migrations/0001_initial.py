@@ -735,7 +735,7 @@ class Migration(migrations.Migration):
                         verbose_name="Classification",
                     ),
                 ),
-                ("name", models.CharField(max_length=100, verbose_name="Event Name")),
+                ("name", models.CharField(max_length=100, verbose_name="Ride Name")),
                 ("start_date", models.DateField(verbose_name="Start Date")),
                 ("end_date", models.DateField(verbose_name="End Date")),
                 (
@@ -1516,7 +1516,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "occurence_name",
-                    models.CharField(max_length=100, verbose_name="Event Name"),
+                    models.CharField(max_length=100, verbose_name="Ride Name"),
                 ),
                 ("slug", models.SlugField(blank=True, max_length=255)),
                 ("ride_date", models.DateField(verbose_name="Ride Date")),

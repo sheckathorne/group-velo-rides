@@ -108,7 +108,7 @@ class EventView(TemplateView):
 
         return context
 
-    def add_weather_data_to_events(self):
+    def add_weather_data_to_events(self, filtered_rides, events_having_forecast, task_ids):
         raise NotImplementedError("Subclasses must implement add_weather_data_to_events")
 
     def filter_weather_hours(self, event_occurence, weather_data):
