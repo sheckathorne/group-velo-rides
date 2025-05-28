@@ -4,6 +4,8 @@ from django import forms
 
 class BaseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
+        self.submit_text = kwargs.pop("submit_text", "Submit")
+
         super().__init__(*args, **kwargs)
 
         self.svgs = {
@@ -66,6 +68,16 @@ class BaseForm(forms.ModelForm):
                 "6.312a8.92 8.92 0 00-6.313-2.635H157.938c-2.451 0-4.687 "
                 "1.01-6.312 2.635-1.625 1.625-2.635 3.861-2.635 "
                 '6.312v140.557a8.92 8.92 0 002.635 6.312c1.625 1.625 3.861 2.635 6.312 2.635h97.264z" /></svg>'
+            ),
+            "calendar": (
+                '<svg width="24" height="24" viewBox="0 0 24 24" '
+                'fill="none" xmlns="http://www.w3.org/2000/svg">'
+                '<rect x="3" y="4" width="18" height="16" rx="2" ry="2" '
+                'stroke="currentColor" stroke-width="2" fill="none"/>'
+                '<line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/>'
+                '<line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/>'
+                '<line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>'
+                "</svg>"
             ),
         }
 

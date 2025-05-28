@@ -27,7 +27,7 @@ from group_velo.utils.utils import css_container, dropdown, form_row, get_group_
 class ClubForm(BaseForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.submit_text = kwargs.pop("submit_text", "Submit")
+        # self.submit_text = kwargs.pop("submit_text", "Submit")
         self.helper = FormHelper(self)
         self.helper.css_container = css_container()
         self.helper.label_class = "block text-gray-700 text-sm font-bold dark:text-gray-100"
