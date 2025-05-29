@@ -121,52 +121,50 @@ class RouteChoiceField(ModelChoiceField):
         return {"label": super().label_from_instance(obj), "data-url": obj.url}
 
 
-class ModifyEventForm(BaseForm):
-    def __init__(
-        self,
-        user_clubs,
-        user_routes,
-        registered_rider_count,
-        *args,
-        **kwargs,
-    ):
-        width = "col-span-12"
-        row_padding = "pb-2 mb-3"
-
+class BaseEventForm(BaseForm):
+    def __init__(self, *args, user_clubs=None, user_routes=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["max_riders"].validators.append(MaxRidersValidator(registered_rider_count))
-        self.fields["club"].choices = user_clubs
-        self.fields["route"].queryset = user_routes
-        self.helper = FormHelper(self)
-        self.helper.css_container = css_container()
-        self.helper.label_class = "block text-gray-700 text-sm font-bold dark:text-gray-100"
-
-        general_header = {
+        self.general_header = {
             "header_svg": self.svgs["location"],
             "header_title": "Ride Information",
             "header_subtitle": "Basic details about your ride",
             "colors": self.header_colors["purple"],
         }
 
-        ride_details_header = {
+        self.ride_details_header = {
             "header_svg": self.svgs["general"],
             "header_title": "Ride Details",
             "header_subtitle": "More detailed information about the pace, surface type, etc.",
             "colors": self.header_colors["blue"],
         }
 
-        schedule_header = {
+        self.schedule_header = {
             "header_svg": self.svgs["calendar"],
             "header_title": "Schedule & Timing",
             "header_subtitle": "Set the start and end dates, time zone, ride duration, and recurrence for the event",
             "colors": self.header_colors["orange"],
         }
 
+        if user_clubs is not None:
+            self.fields["club"].choices = user_clubs
+        if user_routes is not None:
+            self.fields["route"].queryset = user_routes
+
+        self.helper = FormHelper(self)
+        self.helper.css_container = css_container()
+        self.helper.label_class = "block text-gray-700 text-sm font-bold dark:text-gray-100"
+
+
+class ModifyEventForm(BaseEventForm):
+    def __init__(self, user_clubs, user_routes, registered_rider_count, *args, **kwargs):
+        super().__init__(*args, user_clubs=user_clubs, user_routes=user_routes, **kwargs)
+
+        self.fields["max_riders"].validators.append(MaxRidersValidator(registered_rider_count))
         self.helper.layout = Layout(
             # Section 1
             Div(
                 # Section Header
-                self.section_header(general_header),
+                self.section_header(self.general_header),
                 # Section Body
                 self.section_wrapper(
                     Field(
@@ -202,13 +200,13 @@ class ModifyEventForm(BaseForm):
                             StrictButton(
                                 "Select Route",
                                 css_id="routeChoiceButton",
-                                css_class="w-full py-2 px-4 font-semibold btn-primary-color rounded shadow-lg",
+                                css_class="w-full py-3 px-4 font-semibold btn-primary-color rounded shadow-lg",
                                 **{"@click": "routeSelectModalOpen=true"},
                             ),
                             css_id="div_id_route_select",
-                            css_class=width,
+                            css_class="col-span-12",
                         ),
-                        padding_bottom=row_padding,
+                        padding_bottom="pb-2 mb-3",
                     ),
                     Field("route", type="hidden", id="route_id"),
                     Field(
@@ -224,7 +222,7 @@ class ModifyEventForm(BaseForm):
             # Section 2
             Div(
                 # Section Header
-                self.section_header(ride_details_header),
+                self.section_header(self.ride_details_header),
                 # Section Body
                 self.section_wrapper(
                     Field(
@@ -271,7 +269,7 @@ class ModifyEventForm(BaseForm):
             # Section 3
             Div(
                 # Section Header
-                self.section_header(schedule_header),
+                self.section_header(self.schedule_header),
                 # Section Body
                 self.section_wrapper(
                     Field(
@@ -406,46 +404,17 @@ class ModifyEventForm(BaseForm):
         }
 
 
-class CreateEventForm(BaseForm):
+class CreateEventForm(BaseEventForm):
     def __init__(self, user_clubs, user_routes, *args, **kwargs):
-        width = "col-span-12"
-        row_padding = "pb-2 mb-3"
+        super().__init__(*args, user_clubs=user_clubs, user_routes=user_routes, **kwargs)
 
-        super().__init__(*args, **kwargs)
         self.fields["frequency"].label = "Recurrence"
-        self.fields["route"].queryset = user_routes
-        self.fields["club"].choices = user_clubs
-        self.helper = FormHelper(self)
-        self.helper.css_container = css_container()
-        self.helper.label_class = "block text-gray-700 text-sm font-bold dark:text-gray-100"
         self.helper.form_show_errors = False
-
-        general_header = {
-            "header_svg": self.svgs["location"],
-            "header_title": "Ride Information",
-            "header_subtitle": "Basic details about your ride",
-            "colors": self.header_colors["purple"],
-        }
-
-        ride_details_header = {
-            "header_svg": self.svgs["general"],
-            "header_title": "Ride Details",
-            "header_subtitle": "More detailed information about the pace, surface type, etc.",
-            "colors": self.header_colors["blue"],
-        }
-
-        schedule_header = {
-            "header_svg": self.svgs["calendar"],
-            "header_title": "Schedule & Timing",
-            "header_subtitle": "Set the start and end dates, time zone, ride duration, and recurrence for the event",
-            "colors": self.header_colors["orange"],
-        }
-
         self.helper.layout = Layout(
             # Section 1
             Div(
                 # Section Header
-                self.section_header(general_header),
+                self.section_header(self.general_header),
                 # Section Body
                 self.section_wrapper(
                     Field(
@@ -489,9 +458,9 @@ class CreateEventForm(BaseForm):
                                 **{"@click": "routeSelectModalOpen=true"},
                             ),
                             css_id="div_id_route_select",
-                            css_class=width + " space-y-2",
+                            css_class="col-span-12 space-y-2",
                         ),
-                        padding_bottom=row_padding,
+                        padding_bottom="pb-2 mb-3",
                     ),
                     Field("route", type="hidden", id="route_id"),
                     Field(
@@ -508,7 +477,7 @@ class CreateEventForm(BaseForm):
             # Section 2
             Div(
                 # Section Header
-                self.section_header(ride_details_header),
+                self.section_header(self.ride_details_header),
                 # Section Body
                 self.section_wrapper(
                     Field(
@@ -560,7 +529,7 @@ class CreateEventForm(BaseForm):
             # Section 3
             Div(
                 # Section Header
-                self.section_header(schedule_header),
+                self.section_header(self.schedule_header),
                 # Section Body
                 self.section_wrapper(
                     Field(
