@@ -1,6 +1,7 @@
 import datetime
 import os
 import uuid
+from datetime import timedelta
 
 import pytz
 from django.apps import apps
@@ -147,12 +148,14 @@ class Club(models.Model, SqidMixin):
     @property
     def total_rides(self):
         now = timezone.now()
+        one_year_ago = timezone.now() - timedelta(days=365)
         event_occurence_member = apps.get_model("events.EventOccurenceMember")
         return (
             event_occurence_member.objects.select_related("user", "event_occurence", "club")
             .filter(
                 event_occurence__club=self,
                 event_occurence__ride_date__lt=now,
+                event_occurence__ride_date__gt=one_year_ago,
                 attended=True,
             )
             .values("user")
