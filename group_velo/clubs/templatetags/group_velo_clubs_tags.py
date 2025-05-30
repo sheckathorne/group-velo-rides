@@ -6,14 +6,14 @@ from group_velo.data.choices import RequestStatus
 register = template.Library()
 
 
-@register.simple_tag
-def club_border_style(loop_count, club_count):
-    border_class = ""
+# @register.simple_tag
+# def club_border_style(loop_count, club_count):
+#     border_class = ""
 
-    if loop_count == 1:
-        border_class += " rounded-t-xl"
+#     if loop_count == 1:
+#         border_class += " rounded-t-xl"
 
-    return border_class
+#     return border_class
 
 
 @register.simple_tag
