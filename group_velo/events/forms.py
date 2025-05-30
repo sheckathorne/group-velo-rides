@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from django import forms
 from django.apps import apps
 from django.forms import ModelChoiceField, Select
-from django.utils.html import mark_safe
+from django.utils.safestring import mark_safe
 
 from group_velo.data.choices import EventMemberType, RecurrenceFrequency
 from group_velo.events.models import (
@@ -578,6 +578,13 @@ class CreateEventForm(BaseEventForm):
                     InlineCheckboxes("weekdays", label="", wrapper_class="mb-3 space-y-2"),
                 ),
                 css_class="rounded-lg bg-card text-card-foreground shadow-sm border dark:border-slate-700",
+            ),
+            StrictButton(
+                "Create Ride",
+                value="create",
+                type="submit",
+                css_class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 "
+                "rounded shadow-lg mb-4",
             ),
         )
 
