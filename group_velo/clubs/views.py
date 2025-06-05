@@ -47,7 +47,11 @@ class MyClubs(ListView):
 
     def get_context_data(self):
         context = super().get_context_data()
-        context["club_count"] = self.request.user.clubs().count()
+        memberships = self.request.user.clubs()
+        club_names = [membership.club.name.lower() for membership in memberships]
+
+        context["club_count"] = memberships.count()
+        context["club_names"] = club_names
         return context
 
 
