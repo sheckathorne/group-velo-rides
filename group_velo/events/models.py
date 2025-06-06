@@ -382,7 +382,6 @@ class EventOccurence(EventBase):
             query |= day_query
             current_date += datetime.timedelta(days=1)
 
-        print(query)
         hour_data = WeatherForecastHour.objects.filter(zip_query, query).order_by("forecast__forecast_date", "hour")
         return hour_data[:max_hours]
 

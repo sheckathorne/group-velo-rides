@@ -726,7 +726,7 @@ class EditClub(TemplateView):
                         return HttpResponseRedirect(reverse("clubs:edit_club", kwargs={"slug": slug}))
 
                 messages.success(request, "Successfully updated the club.", extra_tags="timeout-5000")
-                return HttpResponseRedirect(reverse("home"))
+                return HttpResponseRedirect(reverse_lazy("clubs:my_clubs"))
             else:
                 for error in list(gc_form.errors.values()):
                     messages.error(request, error)
