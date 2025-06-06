@@ -1,6 +1,7 @@
 import datetime
 import os
 import uuid
+from datetime import timedelta
 
 import pytz
 from django.apps import apps
@@ -33,7 +34,7 @@ class Club(models.Model, SqidMixin):
     @property
     def get_logo(self):
         if not self.logo:
-            return "/media/default/bicycle.png"
+            return False  # "/media/default/bicycle.png"
         return self.logo.url
 
     name = models.CharField("Club Name", max_length=255)
@@ -147,12 +148,14 @@ class Club(models.Model, SqidMixin):
     @property
     def total_rides(self):
         now = timezone.now()
+        one_year_ago = timezone.now() - timedelta(days=365)
         event_occurence_member = apps.get_model("events.EventOccurenceMember")
         return (
             event_occurence_member.objects.select_related("user", "event_occurence", "club")
             .filter(
                 event_occurence__club=self,
                 event_occurence__ride_date__lt=now,
+                event_occurence__ride_date__gt=one_year_ago,
                 attended=True,
             )
             .values("user")
@@ -201,6 +204,56 @@ class ClubMembership(models.Model):
     @property
     def membership_type_label(self):
         return MemberType(self.membership_type).label
+
+    @property
+    def membership_level_classes(self):
+        creator_admin = {
+            "base": "border-emerald-600",
+            "avatar": "bg-emerald-100 text-emerald-600",
+            "dark_button": "bg-emerald-600 text-white",
+            "dark_button_hover": "hover:bg-emerald-700",
+            "light_button": (
+                "bg-white dark:bg-emerald-200 dark:border-emerald-600 border "
+                "border-emerald-300 dark:text-emerald-900 text-emerald-700"
+            ),
+            "light_button_hover": "dark:hover:bg-emerald-50 hover:bg-emerald-50",
+        }
+
+        standard = {
+            "base": "border-blue-600",
+            "avatar": "bg-blue-100 text-blue-600",
+            "dark_button": "bg-blue-600 text-white",
+            "dark_button_hover": "hover:bg-blue-700",
+            "light_button": (
+                "bg-white dark:bg-blue-200 dark:border-blue-600 border "
+                "border-blue-300 dark:text-blue-900 text-blue-700"
+            ),
+            "light_button_hover": "dark:hover:bg-blue-50 hover:bg-blue-50",
+        }
+
+        nonmember = {
+            "base": "border-gray-600",
+            "avatar": "bg-gray-100 text-gray-600",
+            "dark_button": "bg-gray-600 text-white",
+            "dark_button_hover": "hover:bg-gray-700",
+            "light_button": (
+                "bg-white dark:bg-gray-200 dark:border-gray-600 "
+                "border border-gray-300 dark:text-gray-900 text-gray-700"
+            ),
+            "light_button_hover": "dark:hover:bg-gray-50 hover:bg-gray-50",
+        }
+
+        level_classes = {
+            1: creator_admin,
+            2: creator_admin,
+            3: standard,
+            4: standard,
+            5: standard,
+            6: nonmember,
+            7: nonmember,
+        }
+
+        return level_classes.get(self.membership_type, nonmember)
 
     def __str__(self):
         return self.club.name + " - " + self.user.name + " - " + MemberType(self.membership_type).label

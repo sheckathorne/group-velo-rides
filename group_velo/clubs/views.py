@@ -47,7 +47,11 @@ class MyClubs(ListView):
 
     def get_context_data(self):
         context = super().get_context_data()
-        context["club_count"] = self.request.user.clubs().count()
+        memberships = self.request.user.clubs()
+        club_names = [membership.club.name.lower() for membership in memberships]
+
+        context["club_count"] = memberships.count()
+        context["club_names"] = club_names
         return context
 
 
@@ -722,7 +726,7 @@ class EditClub(TemplateView):
                         return HttpResponseRedirect(reverse("clubs:edit_club", kwargs={"slug": slug}))
 
                 messages.success(request, "Successfully updated the club.", extra_tags="timeout-5000")
-                return HttpResponseRedirect(reverse("home"))
+                return HttpResponseRedirect(reverse_lazy("clubs:my_clubs"))
             else:
                 for error in list(gc_form.errors.values()):
                     messages.error(request, error)

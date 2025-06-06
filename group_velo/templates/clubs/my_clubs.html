@@ -1,142 +1,63 @@
 {% extends "base.html" %}
 
-{% load group_velo_clubs_tags %}
-{% load to_sqid from group_velo_data_tags %}
-{% load humanize %}
-
 {% block title %}
   GroupVelo | My Clubs
 {% endblock title %}
 {% block content %}
-{% if club_list %}
-  {% include 'clubs/modals/request_club_verification/_blank.html' %}
-  <div id="clubs-accordion-collapse"
-       class="w-full flex-none inline-block h-auto mb-6 mt-4 overflow-hidden"
-       x-data="{ selected: null }">
-    <div class="border border-gray-300 rounded-xl overflow-hidden divide-y divide-gray-300 dark:divide-gray-600 dark:border-gray-600">
-      {% for mem in club_list %}
-        {% with membership=mem.membership available_ride_count=mem.available_ride_count registered_ride_count=mem.registered_ride_count enable_rides_button=mem.enable_rides_button %}
-          {% club_border_style forloop.counter club_count as border_class %}
-          <div class="group">
-            <h2 id="clubs-accordion-collapse-heading-{{ membership.club.id|to_sqid }}">
-              <button type="button"
-                      class="flex flex-row items-center justify-between w-full p-6 font-medium text-left text-gray-700 border-b-0{{ border_class }} dark:focus:ring-gray-800 dark:border-gray-800 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-800"
-                      @click="selected = (selected === '{{ membership.club.id|to_sqid }}' ? null : '{{ membership.club.id|to_sqid }}')"
-                      :class="selected === '{{ membership.club.id|to_sqid }}' ? 'bg-blue-100 border border-blue-100 dark:border-gray-500 dark:bg-gray-800 dark:text-white' : ''"
-                      aria-expanded="false"
-                      aria-controls="clubs-accordion-collapse-body-{{ membership.club.id|to_sqid }}">
-                <div class="flex flex-row items-center">
-                  <img class="mx-auto w-16 object-contain"
-                       src="{{ membership.club.get_logo }}"
-                       alt="logo" />
-                  <div class="flex flex-col">
-                    <span class="pl-4">{{ membership.club.name }}
-                      {% if membership.club.verified %}
-                        {% include 'clubs/partials/_verified_badge.html' %}
-                      {% endif %}
-                    </span>
-                    <span class="pl-4 text-gray-500 dark:text-gray-400 font-light text-xs">{{ membership.club.city }}, {{ membership.club.state }}</span>
-                  </div>
-                </div>
-                <div class="flex flex-row">
-                  {% include 'clubs/actions/club_actions.html' %}
-                  <svg class="w-6 h-6 shrink-0 club-arrow-svg dark:group-hover:text-blue-400"
-                       :class="selected === '{{ membership.club.id|to_sqid }}' ? '' : 'rotate-svg-neg-90'"
-                       fill="currentColor"
-                       viewBox="0 0 20 20"
-                       xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                </div>
-              </button>
-            </h2>
-            <div id="clubs-accordion-collapse-body-{{ membership.club.id|to_sqid }}"
-                 class="text-gray-700 dark:text-gray-300"
-                 x-show="selected === '{{ membership.club.id|to_sqid }}'"
-                 aria-labelledby="clubs-accordion-collapse-heading-{{ membership.club.id|to_sqid }}">
-              <div class="p-6 font-light border border-blue-100 dark:border-gray-700 dark:bg-gray-900">
-                <div class="flex flex-row">
-                  <span class="w-48 font-bold">Total Members:</span><span class="text-sm">{{ membership.club.active_and_current_member_count|intcomma }}</span>
-                </div>
-                <div class="flex flex-row">
-                  <span class="w-48 font-bold">Membership Level:</span><span class="text-sm">{{ membership.level }}</span>
-                </div>
-                <div class="flex flex-row">
-                  <span class="w-48 font-bold">Join Date:</span><span class="text-sm">{{ membership.create_date|date }}</span>
-                </div>
-                <div class="flex flex-row">
-                  <span class="w-48 font-bold">Mem. Expiration Date:</span><span class="text-sm">{{ membership.membership_expires|date }}</span>
-                </div>
-                {% with club_admins=membership.club.club_admins %}
-                  <div class="flex flex-row">
-                    <span class="w-48 font-bold">Admin{{ club_admins.count|pluralize }}:</span>
-                    <span class="text-sm">
-                      {% for ad in club_admins %}
-                        {% if forloop.counter == 1 %}
-                          {{ ad.user.name }}
-                        {% else %}
-                          , {{ ad.user.name }}
-                        {% endif %}
-                      {% endfor %}
-                    </span>
-                  </div>
-                {% endwith %}
-                <div class="flex flex-row">
-                  {% rank_ride_count membership.club.total_rides request.user as ride_count_and_rank %}
-                  <span class="w-48 font-bold">Ride Count:</span>
-                  <span class="text-sm">{{ ride_count_and_rank.ride_count }} club rides completed
-                    {% if ride_count_and_rank.rank != "N/A" %}- ranked #{{ ride_count_and_rank.rank }}{% endif %}
-                  </span>
-                </div>
-                <div class="flex flex-row mb-1">
-                  <span class="w-48 font-bold">Club Description:</span>
-                </div>
-                <span class="text-sm">{{ membership.club.description|safe }}</span>
-                {% if mem.show_registered_rides_btn or mem.show_join_rides_btn or mem.show_create_ride_btn or mem.show_manage_members_btn or mem.show_edit_club_button %}
-                  <div class="flex-col mt-4 xl:w-1/8 lg:w-1/3 md:w-1/2 sm:w-2/3 w-full space-y-2">
-                    {% if mem.show_registered_rides_btn %}
-                      <a href="{% url 'events:available_rides' %}?club={{ membership.club.slug }}&group_classification=&distance__lt=&distance__gt="
-                         class="block text-center w-full btn-primary-color">Registered Rides</a>
-                    {% endif %}
-                    {% if mem.show_join_rides_btn %}
-                      <a href="{% url 'events:available_rides' %}?club={{ membership.club.slug }}&group_classification=&distance__lt=&distance__gt="
-                         class="block text-center w-full btn-primary-color">Join Ride</a>
-                    {% endif %}
-                    {% if mem.show_create_ride_btn %}
-                      <a href="{% url 'events:create_event' %}?club_id={{ membership.club.id|to_sqid }}"
-                         class="block text-center w-full btn-primary-color">Create Ride</a>
-                    {% endif %}
-                    {% if mem.show_manage_members_btn %}
-                      <a href="{% url 'clubs:club_member_management' slug=membership.club.slug tab_type='active' %}"
-                         class="block text-center w-full btn-primary-color">Manage Members</a>
-                    {% endif %}
-                    {% if mem.show_edit_club_btn %}
-                      <a href="{% url 'clubs:edit_club' slug=membership.club.slug %}"
-                         class="block text-center w-full btn-primary-color">Edit Club</a>
-                    {% endif %}
-                    {% if mem.show_request_verification_btn %}
-                      <button @click="requestClubVerificationModalOpen=true"
-                              hx-get="{% url 'clubs:get_club_verification_form' slug=membership.club.slug %}"
-                              hx-swap="outerHTML"
-                              hx-target="#requestClubVerificationModalReplace"
-                              class="block text-center w-full btn-primary-color">Verify Club</button>
-                    {% endif %}
-                  </div>
-                {% endif %}
+  {% if club_list %}
+    <div x-data="{ search: '', club_names: {{ club_names }} }" class="w-full">
+      {% include 'clubs/modals/request_club_verification/_blank.html' %}
+      <div class="flex flex-col gap-6 w-full">
+        <div class="flex flex-col space-y-6 bg-gradient-to-r from-purple-700 to-pink-600 text-white p-6 rounded-lg shadow-md">
+          <div class="flex flex-col space-y items-baseline">
+            <h1 class="text-3xl font-bold tracking-tight">My Clubs</h1>
+            <p class="opacity-90">Manage your cycling club memberships and activities</p>
+          </div>
+          <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-2 mt-4 mb-6 gap-y-6 gap-x-4">
+            <div id="div_id_club" class="relative">
+              <input type="text"
+                     placeholder="Club name"
+                     class="peer h-10 pl-8 w-full bg-transparent border rounded-md border-gray-500 dark:text-gray-200 dark:border-gray-500 placeholder-transparent focus:outline-none focus:border-gray-300"
+                     id="club_name_text"
+                     x-model.debounce.400ms="search" />
+              <label for="route_name_text"
+                     class="absolute left-0 pl-1 -top-3.5 text-gray-600 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-placeholder-shown:pl-8 peer-focus:pl-0 peer-focus:-top-5 peer-focus:text-gray-300 peer-focus:text-sm">
+                Filter club name
+              </label>
+              <div class="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none stroke-gray-400 dark:stroke-gray-400 peer-focus:stroke-gray-600 peer-focus:dark:stroke-gray-300">
+                <svg class="w-5 h-5"
+                     aria-hidden="true"
+                     fill="currentColor"
+                     viewBox="0 0 20 20"
+                     xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                </svg>
               </div>
             </div>
           </div>
-        {% endwith %}
-      {% endfor %}
+        </div>
+        <div class="flex flex-col gap-4">
+          {% for mem in club_list %}
+            {% with membership=mem.membership available_ride_count=mem.available_ride_count registered_ride_count=mem.registered_ride_count enable_rides_button=mem.enable_rides_button %}
+              {% include "clubs/club_card/_club_card.html" %}
+            {% endwith %}
+          {% endfor %}
+          <div x-show="search && !club_names.find(clubname => clubname.includes(search.toLowerCase()))">
+            <h3 class="text-xl font-bold text-gray-700 dark:text-gray-200">No clubs to show, try modifying your filter</h3>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
   {% else %}
     <span class="font-bold text-gray-700 dark:text-gray-200">You are not a member of any clubs.
-      <br><br>
-    <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="{% url 'clubs:search_club' %}">Search and join</a>
-    or
-      <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="{% url 'clubs:create_club' %}">create</a>
-    your own now!
+      <br />
+      <br />
+      <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+         href="{% url 'clubs:search_club' %}">Search and join</a>
+      or
+      <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+         href="{% url 'clubs:create_club' %}">create</a>
+      your own now!
     </span>
   {% endif %}
 {% endblock content %}
